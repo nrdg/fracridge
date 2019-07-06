@@ -71,7 +71,7 @@ def vec_len(vec):
     return np.sqrt(np.sum(vec ** 2))
 
 
-def optimize_for_frac(X, frac):
+def optimize_for_frac(X, fracs):
     """
     Empirically find the alpha that gives frac reduction in vector length of
     the solution
@@ -89,7 +89,7 @@ def optimize_for_frac(X, frac):
     for ii, alpha in enumerate(alphas):
         results[ii] = frac_reduction(X, alpha, s=s)
 
-    return interp1d(results, alphas)(frac).item()
+    return interp1d(results, alphas)(np.asarray(fracs))
 
 
 def frac_reduction(X, alpha, s=None):
@@ -106,6 +106,10 @@ def frac_reduction(X, alpha, s=None):
 
     ref_len = vec_len(ols_betas)
     new_len = vec_len(rr_betas)
+
+    # Below is based on Kendrick's original code (I think):
+    # ref_len = np.sqrt(s.shape[0])
+    # new_len = np.sqrt(np.sum((rr_betas/ols_betas)**2))
 
     return new_len / ref_len
 
