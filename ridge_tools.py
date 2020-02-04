@@ -4,6 +4,112 @@
 import numpy as np
 from scipy.linalg import svd
 from scipy.interpolate import interp1d
+import warnings
+
+# Module-wide constants
+BIG_BIAS = 10e3
+SMALL_BIAS = 10e-3
+BIAS_STEP = 0.25
+
+
+def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
+    """
+    Approximates alpha parameters to match desired fractions of OLS length.
+
+    Parameters
+    ----------
+    X : ndarray, shape (n, p)
+        Design matrix for regression, with n number of
+        observations and p number of model parameters.
+
+    y : ndarray, shape (n, b)
+        Data, with n number of observations and b number of simultaneous
+        measurement units (e.g., channels).
+
+    fracs : float or 1d array
+        The desired fractions of the parameter vector length, relative to
+        OLS solution. If 1d array, the shape is (f,)
+
+    Returns
+    -------
+    coef : ndarray, shape (p, f, b)
+        The full estimated parameters across units of measurement for every
+        desired fraction.
+    alphas : ndarray, shape (f,)
+
+    Examples
+    --------
+    """
+    n, p = X.shape
+    b = y.shape[-1]
+    if hasattr(fracs, "__len__"):
+        fracs = np.asanyarray(fracs)
+        f = fracs.shape[0]
+    else:
+        f = 1
+
+    # This is the expensive step:
+    uu, selt, vv = svd(X, full_matrices=False)
+    vv = vv.T
+
+    isbad = selt < tol
+    if np.any(isbad):
+        warnings.warn("Some eigenvalues of X are small" +
+                      " and being treated as zero.")
+
+    # Rotate the data:
+    ynew = uu.T @ y
+
+    # Solve OLS for the rotated problem:
+    hols_new = (ynew.T / selt).T
+
+    # Set solutions for small eigenvalues to 0 for all b:
+    hols_new[isbad, :] = 0
+
+    val1 = BIG_BIAS * selt[0] ** 2
+    val2 = SMALL_BIAS * selt[-1] ** 2
+
+    alphagrid = np.concatenate(
+        [np.array([0]),
+         10 ** np.arange(np.floor(np.log10(val2)),
+                         np.ceil(np.log10(val1)), BIAS_STEP)])
+
+    seltsq = selt**2
+    sclg = seltsq / (seltsq + alphagrid[:, None])
+    sclg[:, isbad] = 0
+
+    # Prellocate the solution
+    coef = np.empty((p, b, f))
+    alphas = np.empty((f, b))
+    for vx in range(y.shape[-1]):
+        newlen = np.empty(len(alphagrid))
+        for p in range(len(alphagrid)):
+            newlen[p] = vec_len(sclg[p] * hols_new[:, vx])
+        newlen = newlen / newlen[0]
+        temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False,
+                        fill_value="extrapolate")(fracs)
+        targetalphas = temp = np.exp(temp) - 1
+        for p in range(len(targetalphas)):
+            sc = seltsq / (seltsq + targetalphas[p])
+            coef[:, vx, p] = vv.T @ (sc * hols_new[:, vx])
+
+    # for ii in range(b):
+    #     vlen = np.sqrt(sclg**2 @ hols_new[:, ii]**2)
+    #     vlen /= vlen[0]
+    #     mxgap = np.max(np.abs(np.diff(vlen)))
+    #     assert mxgap < 0.2, "BIAS_STEP is too large"
+    #     assert np.min(vlen) < 10e-3, "Need to sample such that we get results  close to 0"
+    #     temp = interp1d(vlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate")(fracs)
+    #     temp = np.exp(temp) - 1
+    #     temp[fracs == 0] = np.inf
+    #     assert np.all(~np.isnan(temp))
+    #     alphas[:, ii] = temp
+    #     sc = seltsq / (seltsq + temp)
+    #     sc[isbad, :] = 0
+    #     temp = vv.T @ (sc * hols_new[:, ii])
+    #     coef[:, :, ii] = temp
+
+    return coef, alphas
 
 
 def vec_len(vec):
