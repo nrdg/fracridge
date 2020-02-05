@@ -82,9 +82,7 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
     coef = np.empty((p, b, f))
     alphas = np.empty((f, b))
     for vx in range(y.shape[-1]):
-        newlen = np.empty(len(alphagrid))
-        for p in range(len(alphagrid)):
-            newlen[p] = vec_len(sclg[p] * hols_new[:, vx])
+        newlen = (sclg @ ynew[:,vx]**2).T
         newlen = newlen / newlen[0]
         temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False,
                         fill_value="extrapolate")(fracs)
@@ -92,23 +90,7 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
         for p in range(len(targetalphas)):
             sc = seltsq / (seltsq + targetalphas[p])
             coef[:, vx, p] = vv.T @ (sc * hols_new[:, vx])
-
-    # for ii in range(b):
-    #     vlen = np.sqrt(sclg**2 @ hols_new[:, ii]**2)
-    #     vlen /= vlen[0]
-    #     mxgap = np.max(np.abs(np.diff(vlen)))
-    #     assert mxgap < 0.2, "BIAS_STEP is too large"
-    #     assert np.min(vlen) < 10e-3, "Need to sample such that we get results  close to 0"
-    #     temp = interp1d(vlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate")(fracs)
-    #     temp = np.exp(temp) - 1
-    #     temp[fracs == 0] = np.inf
-    #     assert np.all(~np.isnan(temp))
-    #     alphas[:, ii] = temp
-    #     sc = seltsq / (seltsq + temp)
-    #     sc[isbad, :] = 0
-    #     temp = vv.T @ (sc * hols_new[:, ii])
-    #     coef[:, :, ii] = temp
-
+            
     return coef, alphas
 
 
