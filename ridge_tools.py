@@ -26,9 +26,11 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
         Data, with n number of observations and b number of simultaneous
         measurement units (e.g., channels).
 
-    fracs : float or 1d array
+    fracs : float or 1d array, optional
         The desired fractions of the parameter vector length, relative to
-        OLS solution. If 1d array, the shape is (f,)
+        OLS solution. If 1d array, the shape is (f,). 
+        Default: np.arange(.1, 1.1, .1)
+
 
     Returns
     -------
@@ -40,6 +42,9 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
     Examples
     --------
     """
+    if fracs is None: 
+        fracs = np.arange(.1, 1.1, .1)
+
     n, p = X.shape
     b = y.shape[-1]
     if hasattr(fracs, "__len__"):
@@ -78,7 +83,7 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
     sclg[:, isbad] = 0
 
     # Prellocate the solution
-    coef = np.empty((p, b, f))
+    coef = np.empty((p, f, b))
     alphas = np.empty((f, b))
     
     for vx in range(y.shape[-1]):
@@ -89,7 +94,7 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
         targetalphas = np.exp(temp) - 1
         for p in range(len(targetalphas)):
             sc = seltsq / (seltsq + targetalphas[p])
-            coef[:, vx, p] = vv.T @ (sc * hols_new[:, vx])
+            coef[:, p, vx] = vv.T @ (sc * hols_new[:, vx])
     return coef, alphas
 
 
