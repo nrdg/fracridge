@@ -3,9 +3,8 @@
 """
 import numpy as np
 from scipy.linalg import svd
-from numpy import interp
+from numpy.core.multiarray import interp
 import warnings
-
 
 # Module-wide constants
 BIG_BIAS = 10e3
