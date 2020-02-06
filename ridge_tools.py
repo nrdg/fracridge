@@ -4,7 +4,10 @@
 import numpy as np
 from scipy.linalg import svd
 from scipy.interpolate import interp1d
+from scipy import interp
+import interpolation
 import warnings
+
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -50,7 +53,6 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
 
     # This is the expensive step:
     uu, selt, vv = svd(X, full_matrices=False)
-    vv = vv.T
 
     isbad = selt < tol
     if np.any(isbad):
@@ -81,16 +83,16 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
     # Prellocate the solution
     coef = np.empty((p, b, f))
     alphas = np.empty((f, b))
+    
     for vx in range(y.shape[-1]):
         newlen = (sclg @ ynew[:,vx]**2).T
-        newlen = newlen / newlen[0]
-        temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False,
-                        fill_value="extrapolate")(fracs)
-        targetalphas = temp = np.exp(temp) - 1
+        newlen = (newlen / newlen[0])
+        temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        # temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate")(fracs)
+        targetalphas = np.exp(temp) - 1
         for p in range(len(targetalphas)):
             sc = seltsq / (seltsq + targetalphas[p])
             coef[:, vx, p] = vv.T @ (sc * hols_new[:, vx])
-            
     return coef, alphas
 
 
@@ -150,4 +152,3 @@ def reg_alpha_flat(X, gamma, s=None):
     if s is None:
         u, s, v = svd(X)
     return (s ** 2) * (1 / gamma - 1)
-
