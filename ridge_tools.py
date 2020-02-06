@@ -3,9 +3,7 @@
 """
 import numpy as np
 from scipy.linalg import svd
-from scipy.interpolate import interp1d
-from scipy import interp
-import interpolation
+from numpy import interp
 import warnings
 
 
