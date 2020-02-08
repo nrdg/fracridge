@@ -3,8 +3,10 @@
 """
 import numpy as np
 from scipy.linalg import svd
+from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
+
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -12,7 +14,7 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.25
 
 
-def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
+def fracridge(X, y, fracs=None, tol=1e-6):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -26,31 +28,31 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
         Data, with n number of observations and b number of simultaneous
         measurement units (e.g., channels).
 
-    fracs : float or 1d array
+    fracs : 1d array, optional
         The desired fractions of the parameter vector length, relative to
-        OLS solution. If 1d array, the shape is (f,)
+        OLS solution. If 1d array, the shape is (f,). 
+        Default: np.arange(.1, 1.1, .1)
+
 
     Returns
     -------
-    coef : ndarray, shape (p, f, b)
+    coef : ndarray, shape (pp, ff, bb)
         The full estimated parameters across units of measurement for every
         desired fraction.
-    alphas : ndarray, shape (f,)
-
+    alphas : ndarray, shape (ff, bb)
+        The alpha coefficients associated with each solution
     Examples
     --------
     """
-    n, p = X.shape
-    b = y.shape[-1]
-    if hasattr(fracs, "__len__"):
-        fracs = np.asanyarray(fracs)
-        f = fracs.shape[0]
-    else:
-        f = 1
+    if fracs is None: 
+        fracs = np.arange(.1, 1.1, .1)
+
+    nn, pp = X.shape
+    bb = y.shape[-1]
+    ff = fracs.shape[0]
 
     # This is the expensive step:
     uu, selt, vv = svd(X, full_matrices=False)
-    vv = vv.T
 
     isbad = selt < tol
     if np.any(isbad):
@@ -79,36 +81,20 @@ def ridgeregressiongamma(X, y, fracs=None, tol=1e-6):
     sclg[:, isbad] = 0
 
     # Prellocate the solution
-    coef = np.empty((p, b, f))
-    alphas = np.empty((f, b))
+    coef = np.empty((pp, ff, bb))
+    alphas = np.empty((ff, bb))
+    
     for vx in range(y.shape[-1]):
-        newlen = np.empty(len(alphagrid))
-        for p in range(len(alphagrid)):
-            newlen[p] = vec_len(sclg[p] * hols_new[:, vx])
-        newlen = newlen / newlen[0]
-        temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False,
-                        fill_value="extrapolate")(fracs)
-        targetalphas = temp = np.exp(temp) - 1
+        newlen = (sclg @ ynew[:,vx]**2).T
+        newlen = (newlen / newlen[0])
+        #temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate",
+                       )(fracs)
+        targetalphas = np.exp(temp) - 1
         for p in range(len(targetalphas)):
             sc = seltsq / (seltsq + targetalphas[p])
-            coef[:, vx, p] = vv.T @ (sc * hols_new[:, vx])
-
-    # for ii in range(b):
-    #     vlen = np.sqrt(sclg**2 @ hols_new[:, ii]**2)
-    #     vlen /= vlen[0]
-    #     mxgap = np.max(np.abs(np.diff(vlen)))
-    #     assert mxgap < 0.2, "BIAS_STEP is too large"
-    #     assert np.min(vlen) < 10e-3, "Need to sample such that we get results  close to 0"
-    #     temp = interp1d(vlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate")(fracs)
-    #     temp = np.exp(temp) - 1
-    #     temp[fracs == 0] = np.inf
-    #     assert np.all(~np.isnan(temp))
-    #     alphas[:, ii] = temp
-    #     sc = seltsq / (seltsq + temp)
-    #     sc[isbad, :] = 0
-    #     temp = vv.T @ (sc * hols_new[:, ii])
-    #     coef[:, :, ii] = temp
-
+            coef[:, p, vx] = vv.T @ (sc * hols_new[:, vx])
+            
     return coef, alphas
 
 
@@ -168,4 +154,3 @@ def reg_alpha_flat(X, gamma, s=None):
     if s is None:
         u, s, v = svd(X)
     return (s ** 2) * (1 / gamma - 1)
-

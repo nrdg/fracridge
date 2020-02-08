@@ -10,6 +10,7 @@ def test_ridgeregressiongamma():
     lr.fit(X, y)
     hols = lr.coef_.T  # Transpose for consistent shape with "rotated" solution
     fracs = np.arange(.1, 1.1, .1)
-    coef, alphas = ridge_tools.ridgeregressiongamma(X, y, fracs=fracs)
-    assert np.abs(1 - (ridge_tools.vec_len(coef[:, 0, -1]) / ridge_tools.vec_len(hols[:, 0])))< 0.05
+    coef, alphas = ridge_tools.fracridge(X, y, fracs=fracs)
+    assert np.abs(1 - (ridge_tools.vec_len(coef[:, -1, 0]) / ridge_tools.vec_len(hols[:, 0])))< 0.05
     assert np.abs(0.1 - (ridge_tools.vec_len(coef[:, 0, 0]) / ridge_tools.vec_len(hols[:, 0]))) < 0.05
+    assert np.allclose(coef[:, -1, :], hols, atol=10e-3)
