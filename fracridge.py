@@ -100,12 +100,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
         coef1[:, :, ii] = (sc * ols_coef[:, ii]).T
 
-        for p in range(len(targetalphas)):
-            sc = seltsq / (seltsq + targetalphas[p])
-            coef2[:, p, ii] = sc * ols_coef[:, ii]
-
-    assert np.allclose(coef1, coef2)
-    coef = vv.T @ coef2.reshape((pp, ff * bb))
+    coef = vv.T @ coef1.reshape((pp, ff * bb))
     coef = coef.reshape((pp, ff, bb))
     return coef, alphas
 
