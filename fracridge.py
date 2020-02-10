@@ -81,8 +81,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
     # Prellocate the solution
-    coef1 = np.empty((pp, ff, bb))
-    coef2 = np.empty((pp, ff, bb))
+    coef = np.empty((pp, ff, bb))
     alphas = np.empty((ff, bb))
 
     for ii in range(y.shape[-1]):
@@ -98,10 +97,10 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         targetalphas = np.exp(temp) - 1
 
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
-        coef1[:, :, ii] = (sc * ols_coef[:, ii]).T
+        coef[:, :, ii] = (sc * ols_coef[:, ii]).T
 
-    coef = vv.T @ coef1.reshape((pp, ff * bb))
-    coef = coef.reshape((pp, ff, bb))
+    coef = np.reshape(vv.T @ coef.reshape((pp, ff * bb)),
+                      (pp, ff, bb))
     return coef, alphas
 
 
