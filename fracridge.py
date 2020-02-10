@@ -3,6 +3,7 @@
 """
 import numpy as np
 from scipy.linalg import svd
+import numpy.linalg as nla
 from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
@@ -25,12 +26,11 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         observations and p number of model parameters.
 
     y : ndarray, shape (n, b)
-        Data, with n number of observations and b number of simultaneous
-        measurement units (e.g., channels).
+        Data, with n number of observations and b number of targets.
 
     fracs : 1d array, optional
         The desired fractions of the parameter vector length, relative to
-        OLS solution. If 1d array, the shape is (f,). 
+        OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
 
 
@@ -44,7 +44,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     Examples
     --------
     """
-    if fracs is None: 
+    if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
     nn, pp = X.shape
@@ -53,20 +53,21 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
     # This is the expensive step:
     uu, selt, vv = svd(X, full_matrices=False)
+    # selt = selt / selt[0]
 
     isbad = selt < tol
     if np.any(isbad):
         warnings.warn("Some eigenvalues of X are small" +
                       " and being treated as zero.")
-
+        selt[isbad] = 0
     # Rotate the data:
     ynew = uu.T @ y
 
-    # Solve OLS for the rotated problem:
-    hols_new = (ynew.T / selt).T
+    # Solve OLS for the rotated problem and replace y:
+    ols_coef = (ynew.T / selt).T
 
-    # Set solutions for small eigenvalues to 0 for all b:
-    hols_new[isbad, :] = 0
+    # Set solutions for small eigenvalues to 0 for all targets:
+    ols_coef[isbad, :] = 0
 
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
@@ -78,28 +79,31 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
     seltsq = selt**2
     sclg = seltsq / (seltsq + alphagrid[:, None])
-    sclg[:, isbad] = 0
-
+    sclg_sq = sclg**2
     # Prellocate the solution
     coef = np.empty((pp, ff, bb))
     alphas = np.empty((ff, bb))
-    
-    for vx in range(y.shape[-1]):
-        newlen = (sclg @ ynew[:,vx]**2).T
+
+    for ii in range(y.shape[-1]):
+        newlen = np.sqrt(sclg_sq @ ols_coef[:, ii]**2).T
         newlen = (newlen / newlen[0])
-        #temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
-        temp = interp1d(newlen, np.log(1 + alphagrid), bounds_error=False, fill_value="extrapolate",
-                       )(fracs)
+        # Alternative fast interpolation
+        # temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        temp = interp1d(newlen,
+                        np.log(1 + alphagrid),
+                        bounds_error=False,
+                        fill_value="extrapolate",
+                        kind='cubic')(fracs)
         targetalphas = np.exp(temp) - 1
         for p in range(len(targetalphas)):
             sc = seltsq / (seltsq + targetalphas[p])
-            coef[:, p, vx] = vv.T @ (sc * hols_new[:, vx])
-            
+            coef[:, p, ii] = vv.T @ (sc * ols_coef[:, ii])
+
     return coef, alphas
 
 
-def vec_len(vec):
-    return np.sqrt(np.sum(vec ** 2))
+def vec_len(vec, axis=0):
+    return np.sqrt((vec * vec).sum(axis=axis))
 
 
 def optimize_for_frac(X, fracs):

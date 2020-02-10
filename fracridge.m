@@ -18,16 +18,16 @@ function [coef,alphas] = fracridge(X,fracs,y,tol)
 %
 % The basic idea is that we want ridge-regression solutions
 % whose vector lengths are controlled by the user. The vector
-% lengths are specified in terms of fractions of the length of 
+% lengths are specified in terms of fractions of the length of
 % the full-length solution which is the ordinary least squares
-% (OLS) solution. Framing the problem in this way provides 
+% (OLS) solution. Framing the problem in this way provides
 % several benefits: (1) we don't have to spend time figuring out
-% appropriate alphas for each regression problem, (2) when 
-% implemented appropriately, we can compute the full set of 
-% solutions very efficiently and in a way that avoids the need 
+% appropriate alphas for each regression problem, (2) when
+% implemented appropriately, we can compute the full set of
+% solutions very efficiently and in a way that avoids the need
 % to compute X'*X (which might be large). Computational
 % benefits are likely to occur for large-scale problems
-% where p is large. For small problems, we may take a hit in 
+% where p is large. For small problems, we may take a hit in
 % computational time due to various overhead-related steps,
 % but this is probably not a big deal since the problem is
 % fast to solve anyway.
@@ -145,7 +145,7 @@ fprintf('using a lambagrid of size %d.\n',length(alphagrid));
 
 % note that the <bstep> is a heuristic. we just need to sample alphas at sufficient
 % granularity such that pchip interpolation will be able to find the requested
-% fractions with sufficient accuracy. the idea here is that the computations for 
+% fractions with sufficient accuracy. the idea here is that the computations for
 % constructing solutions with different regularization amounts (see below) are cheap,
 % and so we are happy to "oversample" to some extent.
 
@@ -156,7 +156,7 @@ seltSQ = selt.^2;
 scLG = repmat(seltSQ,[1 length(alphagrid)]);
 scLG = scLG ./ (scLG + repmat(alphagrid,[length(seltSQ) 1]));         % p x alphagrid (OR n x alphagrid)
 if anyisbad
-  scLG(isbad,:) = 0;                                                     % for safety, ensure bad eigenvalues get scalings of 0 
+  scLG(isbad,:) = 0;                                                     % for safety, ensure bad eigenvalues get scalings of 0
 end
 scLG = scLG.^2';                                                       % alphagrid x p (OR alphagrid x n)
 seltSQ2 = repmat(seltSQ,[1 f]);                                        % p x f (OR n x f)
@@ -173,7 +173,7 @@ for ii=1:b
   % compute vector length for each alpha
     % OLD SLOW WAY: len = vectorlength(bsxfun(@times,scLG,ynew(:,ii)),1);   % 1 x alphagrid
   len = sqrt((scLG*ynew(:,ii).^2)');                     % 1 x alphagrid
-  
+
   % make lengths relative to the first one (i.e. no regularization)
   len = len / len(1);
 
@@ -184,7 +184,7 @@ for ii=1:b
     xlabel('length');
     ylabel('log(1+alphagrid)');
   end
-  
+
   % sanity check that the gridding is not too coarse
   mxgap = max(abs(diff(len)));                    % maximum gap
   assert(mxgap < 0.2,'need to decrease bstep!');  % if this fails, bstep should be smaller
@@ -197,7 +197,7 @@ for ii=1:b
   temp(fracs==0) = Inf;                                                % when frac is exactly 0, we are out of range, so handle explicitly
   assert(all(~isnan(temp)));                                           % if all went well, no value should be NaN (but can be Inf)
   alphas(:,ii) = temp;
-  
+
   % get the solutions
   sc = seltSQ2 ./ (seltSQ2 + repmat(temp,[length(seltSQ) 1]));             % p x f (OR n x f)
     %OLD: sc = bsxfun(@rdivide,seltSQ,bsxfun(@plus,seltSQ,temp));              % p x f (OR n x f)
