@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 
 
 def test_ridgeregressiongamma():
+    np.random.seed(1)
     X = np.random.randn(1000, 10)
     y = np.random.randn(1000, 2)
     lr = LinearRegression()
