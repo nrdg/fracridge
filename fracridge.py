@@ -47,7 +47,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    nn, pp = X.shape
+    _, pp = X.shape
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
@@ -88,12 +88,12 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         newlen = np.sqrt(sclg_sq @ ols_coef[:, ii]**2).T
         newlen = (newlen / newlen[0])
         # Alternative fast interpolation
-        # temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
-        temp = interp1d(newlen,
-                        np.log(1 + alphagrid),
-                        bounds_error=False,
-                        fill_value="extrapolate",
-                        kind='linear')(fracs)
+        temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        # temp = interp1d(newlen,
+        #                 np.log(1 + alphagrid),
+        #                 bounds_error=False,
+        #                 fill_value="extrapolate",
+        #                 kind='linear')(fracs)
         targetalphas = np.exp(temp) - 1
 
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
