@@ -36,10 +36,10 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
     Returns
     -------
-    coef : ndarray, shape (pp, ff, bb)
+    coef : ndarray, shape (p, f, b)
         The full estimated parameters across units of measurement for every
         desired fraction.
-    alphas : ndarray, shape (ff, bb)
+    alphas : ndarray, shape (f, b)
         The alpha coefficients associated with each solution
     Examples
     --------
@@ -47,26 +47,31 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    _, pp = X.shape
+    nn, pp = X.shape
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
-    # This is the expensive step:
-    uu, selt, vv = svd(X, full_matrices=False)
-    # selt = selt / selt[0]
+    # if nn >= pp:
+    #     _, selt, v = svd(X.T @ X, full_matrices=False)
+    #     if bb >= nn:
+    #         ynew = ((1/selt) @ v.T @ X.T) @ y
+    #     else:
+    #         ynew = (1/selt) @ v.T @ (X.T @ y)
 
-    isbad = selt < tol
-    if np.any(isbad):
-        warnings.warn("Some eigenvalues of X are small" +
-                      " and being treated as zero.")
-        selt[isbad] = 0
-    # Rotate the data:
+    # else:
+    uu, selt, v = svd(X, full_matrices=False)
     ynew = uu.T @ y
+    del uu
 
     # Solve OLS for the rotated problem and replace y:
     ols_coef = (ynew.T / selt).T
+    del ynew
 
     # Set solutions for small eigenvalues to 0 for all targets:
+    isbad = selt < tol
+    if np.any(isbad):
+        warnings.warn("Some eigenvalues are being treated as 0")
+
     ols_coef[isbad, :] = 0
 
     val1 = BIG_BIAS * selt[0] ** 2
@@ -99,7 +104,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
         coef[:, :, ii] = (sc * ols_coef[:, ii]).T
 
-    coef = np.reshape(vv.T @ coef.reshape((pp, ff * bb)),
+    coef = np.reshape(v.T @ coef.reshape((pp, ff * bb)),
                       (pp, ff, bb))
     return coef, alphas
 
