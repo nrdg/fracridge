@@ -8,7 +8,7 @@ from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
 
-from sklearn.base import BaseEstimator
+from sklearn.linear_model import Ridge
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 
@@ -52,6 +52,9 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         fracs = np.arange(.1, 1.1, .1)
 
     nn, pp = X.shape
+    if len(y.shape) == 1:
+        y = y[:, np.newaxis]
+
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
@@ -68,7 +71,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     if np.any(isbad):
         warnings.warn("Some eigenvalues are being treated as 0")
 
-    ols_coef[isbad, :] = 0
+    ols_coef[isbad, ...] = 0
 
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
@@ -82,11 +85,16 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
     # Prellocate the solution
-    coef = np.empty((pp, ff, bb))
+    if nn >= pp:
+        first_dim = pp
+    else:
+        first_dim = nn
+
+    coef = np.empty((first_dim, ff, bb))
     alphas = np.empty((ff, bb))
 
     for ii in range(y.shape[-1]):
-        newlen = np.sqrt(sclg_sq @ ols_coef[:, ii]**2).T
+        newlen = np.sqrt(sclg_sq @ ols_coef[..., ii]**2).T
         newlen = (newlen / newlen[0])
         # Alternative fast interpolation
         temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
@@ -98,27 +106,35 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         targetalphas = np.exp(temp) - 1
 
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
-        coef[:, :, ii] = (sc * ols_coef[:, ii]).T
+        coef[..., ii] = (sc * ols_coef[..., ii]).T
 
-    coef = np.reshape(v_t.T @ coef.reshape((pp, ff * bb)),
+    coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
-    return coef, alphas
+
+    return coef.squeeze(), alphas
 
 
-class FracRidge(BaseEstimator):
-    def __init__(self, fracs=None):
-        self.fracs=fracs
+class FracRidge(Ridge):
+    def __init__(self, fracs=np.arange(.1, 1.1, .1)):
+        self.fracs = fracs
 
     def fit(self, X, y):
+        fracs = np.sort(self.fracs)
+        if 1.0 not in fracs:
+            fracs = np.hstack([self.fracs, 1.0])
         X, y = check_X_y(X, y, accept_sparse=True)
+        y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
+        coef, alphas = fracridge(X, y, fracs=fracs)
+        self.frac_alpha_ = alphas
+        self.frac_coef_ = coef
+        self.coef_ = coef[:, -1, :]
         return self
 
     def predict(self, X):
         X = check_array(X, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
         return np.ones(X.shape[0], dtype=np.int64)
-
 
 
 def vec_len(vec, axis=0):
