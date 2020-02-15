@@ -1,8 +1,8 @@
 import numpy as np
-from fracridge import fracridge, vec_len
+from fracridge import fracridge, vec_len, FracRidge
 from sklearn.linear_model import LinearRegression
+from sklearn.utils.estimator_checks import check_estimator
 import pytest
-
 
 def make_data(nn, pp, bb):
     np.random.seed(1)
@@ -34,3 +34,17 @@ def test_fracridge_fracs(frac,nn,pp,bb):
         np.abs(
             frac -
             vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
+
+
+check_estimator(FracRidge)
+
+@pytest.mark.parametrize("nn,pp,bb", [(1000, 10, 2), (10, 100, 2)])
+def test_FracRidge(nn, pp, bb):
+    X, y, coef_ols = make_data(1000, 10, 2)
+    fracs = np.arange(.1, 1.1, .1)
+    coef, _ = fracridge(X, y, fracs=fracs)
+    # Make sure that in the absence of regularization, we get
+    # the same result as ols:
+    FR = FracRidge(fracs=fracs)
+    FR.fit(X, y)
+    assert np.allclose(FR.coef[:, -1, :], coef_ols, atol=10e-3)

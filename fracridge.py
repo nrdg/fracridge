@@ -8,6 +8,10 @@ from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
 
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+
+
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -99,6 +103,22 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     coef = np.reshape(v_t.T @ coef.reshape((pp, ff * bb)),
                       (pp, ff, bb))
     return coef, alphas
+
+
+class FracRidge(BaseEstimator):
+    def __init__(self, fracs=None):
+        self.fracs=fracs
+
+    def fit(self, X, y):
+        X, y = check_X_y(X, y, accept_sparse=True)
+        self.is_fitted_ = True
+        return self
+
+    def predict(self, X):
+        X = check_array(X, accept_sparse=True)
+        check_is_fitted(self, 'is_fitted_')
+        return np.ones(X.shape[0], dtype=np.int64)
+
 
 
 def vec_len(vec, axis=0):
