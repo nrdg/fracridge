@@ -14,7 +14,7 @@ def make_data(nn, pp, bb):
     return X, y, coef_ols
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10)]) #, (10, 100)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10)], (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols = make_data(nn, pp, bb)
@@ -26,8 +26,9 @@ def test_fracridge_ols(nn, pp, bb):
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
-@pytest.mark.parametrize("nn, pp, bb", [(1000, 10, 2), (10, 100, 2)])
-def test_fracridge_fracs(frac,nn,pp,bb):
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+@pytest.mark.parametrize("bb", [(1), (2)])
+def test_fracridge_fracs(frac, nn, pp, bb):
     X, y, coef_ols = make_data(1000, 10, 2)
     # Make sure that you get the fraction you asked for
     coef, _ = fracridge(X, y, fracs=np.array([frac]))
