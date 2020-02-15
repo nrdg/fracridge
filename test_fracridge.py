@@ -8,9 +8,7 @@ def make_data(nn, pp, bb):
     np.random.seed(1)
     X = np.random.randn(nn, pp)
     y = np.random.randn(nn, bb).squeeze()
-    lr = LinearRegression()
-    lr.fit(X, y)
-    coef_ols = lr.coef_.T
+    coef_ols = np.linalg.pinv(X.T @ X) @ X.T @ y
     return X, y, coef_ols
 
 
@@ -21,16 +19,7 @@ def test_fracridge_ols(nn, pp, bb):
     fracs = np.arange(.1, 1.1, .1)
     coef, _ = fracridge(X, y, fracs=fracs)
     coef = coef[:, -1, ...]
-    if nn >= pp:
-        # Make sure that in the absence of regularization, we get
-        # the same result as ols:
-        assert np.allclose(coef, coef_ols, atol=10e-3)
-    else:
-        # In the ill-conditioned case, make sure that we have errors at
-        # least as small as OLS:
-        err1 = np.sqrt(np.sum((y - X @ coef)**2))
-        err2 = np.sqrt(np.sum((y - X @ coef_ols)**2))
-        assert err1 < err2
+    assert np.allclose(coef, coef_ols, atol=10e-3)
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])

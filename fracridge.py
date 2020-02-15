@@ -84,6 +84,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     seltsq = selt**2
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
+
     # Prellocate the solution
     if nn >= pp:
         first_dim = pp
