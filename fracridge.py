@@ -51,15 +51,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
-    # if nn >= pp:
-    #     _, selt, v = svd(X.T @ X, full_matrices=False)
-    #     if bb >= nn:
-    #         ynew = ((1/selt) @ v.T @ X.T) @ y
-    #     else:
-    #         ynew = (1/selt) @ v.T @ (X.T @ y)
-
-    # else:
-    uu, selt, v = svd(X, full_matrices=False)
+    uu, selt, v_t = svd(X, full_matrices=False)
     ynew = uu.T @ y
     del uu
 
@@ -104,7 +96,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
         coef[:, :, ii] = (sc * ols_coef[:, ii]).T
 
-    coef = np.reshape(v.T @ coef.reshape((pp, ff * bb)),
+    coef = np.reshape(v_t.T @ coef.reshape((pp, ff * bb)),
                       (pp, ff, bb))
     return coef, alphas
 
