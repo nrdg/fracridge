@@ -35,13 +35,12 @@ def test_fracridge_fracs(frac, nn, pp, bb):
             vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
 
-# check_estimator(FracRidge)
-
+check_estimator(FracRidge)
 
 # @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 # @pytest.mark.parametrize("bb", [(1), (2)])
 # def test_FracRidge(nn, pp, bb):
-#     X, y, coef_ols = make_data(1000, 10, 2)
+#     X, y, coef_ols = make_data(nn, pp, bb)
 #     fracs = np.arange(.1, 1.1, .1)
 #     coef, _ = fracridge(X, y, fracs=fracs)
 #     # Make sure that in the absence of regularization, we get

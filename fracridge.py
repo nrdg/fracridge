@@ -8,9 +8,8 @@ from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
 
-from sklearn.linear_model import Ridge
+from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-
 
 
 # Module-wide constants
@@ -115,12 +114,18 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     return coef.squeeze(), alphas
 
 
-class FracRidge(Ridge):
-    def __init__(self, fracs=np.arange(.1, 1.1, .1)):
-        self.fracs = fracs
+class FracRidge(BaseEstimator):
+
+    def _more_tags(self):
+        return {'multioutput': True}
+
+    def __init__(self, low_frac=0.1, high_frac=1.1, frac_step=0.1):
+        self.low_frac = low_frac
+        self.high_frac = high_frac
+        self.frac_step = frac_step
 
     def fit(self, X, y):
-        fracs = np.sort(self.fracs)
+        fracs = np.arange(self.low_frac, self.high_frac, self.frac_step)
         if 1.0 not in fracs:
             fracs = np.hstack([self.fracs, 1.0])
         X, y = check_X_y(X, y, accept_sparse=True)
@@ -129,7 +134,7 @@ class FracRidge(Ridge):
         coef, alphas = fracridge(X, y, fracs=fracs)
         self.frac_alpha_ = alphas
         self.frac_coef_ = coef
-        self.coef_ = coef[:, -1, :]
+        self.coef_ = coef[:, -1, ...]
         return self
 
     def predict(self, X):
