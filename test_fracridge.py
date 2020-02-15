@@ -20,9 +20,17 @@ def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
     coef, _ = fracridge(X, y, fracs=fracs)
-    # Make sure that in the absence of regularization, we get
-    # the same result as ols:
-    assert np.allclose(coef[:, -1, ...], coef_ols, atol=10e-3)
+    if nn >= pp:
+        # Make sure that in the absence of regularization, we get
+        # the same result as ols:
+        assert np.allclose(coef[:, -1, ...], coef_ols, atol=10e-3)
+    else:
+        # In the ill-conditioned case, make sure that we have errors at
+        # least as small as OLS:
+
+        err1 = np.sqrt(np.sum((y - X @ coef[:, -1, ...])**2))
+        err2 = np.sqrt(np.sum((y - X @ coef_ols)**2))
+        assert err1 < err2
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
