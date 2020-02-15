@@ -14,7 +14,7 @@ def make_data(nn, pp, bb):
     return X, y, coef_ols
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10)], (10, 100)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols = make_data(nn, pp, bb)
