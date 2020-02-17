@@ -8,6 +8,9 @@ from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
 
+from sklearn.base import BaseEstimator, MultiOutputMixin
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -28,7 +31,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     y : ndarray, shape (n, b)
         Data, with n number of observations and b number of targets.
 
-    fracs : 1d array, optional
+    fracs : float or 1d array, optional
         The desired fractions of the parameter vector length, relative to
         OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
@@ -47,7 +50,14 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
+    if not hasattr(fracs , "__len__"):
+            fracs = [fracs]
+    fracs = np.array(fracs)
+
     nn, pp = X.shape
+    if len(y.shape) == 1:
+        y = y[:, np.newaxis]
+
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
@@ -64,7 +74,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     if np.any(isbad):
         warnings.warn("Some eigenvalues are being treated as 0")
 
-    ols_coef[isbad, :] = 0
+    ols_coef[isbad, ...] = 0
 
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
@@ -77,12 +87,18 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     seltsq = selt**2
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
+
     # Prellocate the solution
-    coef = np.empty((pp, ff, bb))
+    if nn >= pp:
+        first_dim = pp
+    else:
+        first_dim = nn
+
+    coef = np.empty((first_dim, ff, bb))
     alphas = np.empty((ff, bb))
 
     for ii in range(y.shape[-1]):
-        newlen = np.sqrt(sclg_sq @ ols_coef[:, ii]**2).T
+        newlen = np.sqrt(sclg_sq @ ols_coef[..., ii]**2).T
         newlen = (newlen / newlen[0])
         # Alternative fast interpolation
         temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
@@ -94,11 +110,42 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         targetalphas = np.exp(temp) - 1
 
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
-        coef[:, :, ii] = (sc * ols_coef[:, ii]).T
+        coef[..., ii] = (sc * ols_coef[..., ii]).T
 
-    coef = np.reshape(v_t.T @ coef.reshape((pp, ff * bb)),
+    coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
-    return coef, alphas
+
+    return coef.squeeze(), alphas
+
+
+class FracRidge(BaseEstimator, MultiOutputMixin):
+    """
+    Fraction Ridge estimator
+
+    Parameters
+    ----------
+    fracs : float or sequence
+
+    """
+    def _more_tags(self):
+        return {'multioutput': True}
+
+    def __init__(self, fracs=None):
+        self.fracs = fracs
+
+    def fit(self, X, y):
+        X, y = check_X_y(X, y, accept_sparse=True, multi_output=True)
+        y = np.asarray(y).astype(np.float)
+        self.is_fitted_ = True
+        coef, alpha = fracridge(X, y, fracs=self.fracs)
+        self.alpha_ = alpha
+        self.coef_ = coef
+        return self
+
+    def predict(self, X):
+        X = check_array(X, accept_sparse=True)
+        check_is_fitted(self, 'is_fitted_')
+        return np.ones(X.shape[0], dtype=np.int64)
 
 
 def vec_len(vec, axis=0):
