@@ -37,14 +37,10 @@ def test_fracridge_fracs(frac, nn, pp, bb):
 
 check_estimator(FracRidge)
 
-# @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-# @pytest.mark.parametrize("bb", [(1), (2)])
-# def test_FracRidge(nn, pp, bb):
-#     X, y, coef_ols = make_data(nn, pp, bb)
-#     fracs = np.arange(.1, 1.1, .1)
-#     coef, _ = fracridge(X, y, fracs=fracs)
-#     # Make sure that in the absence of regularization, we get
-#     # the same result as ols:
-#     FR = FracRidge(fracs=fracs)
-#     FR.fit(X, y)
-#     assert np.allclose(FR.coef_[:, -1, :], coef_ols, atol=10e-3)
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+def test_FracRidge(nn, pp):
+    X, y, coef_ols = make_data(nn, pp, 1)
+    fracs = np.arange(.1, 1.1, .1)
+    FR = FracRidge()
+    FR.fit(X, y, fracs=fracs)
+    assert np.allclose(FR.coef_, coef_ols, atol=10e-3)
