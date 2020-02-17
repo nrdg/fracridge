@@ -49,6 +49,8 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     """
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
+    if len(fracs.shape) == 0:
+        fracs = fracs[np.newaxis]
 
     nn, pp = X.shape
     if len(y.shape) == 1:
@@ -119,17 +121,19 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
     def _more_tags(self):
         return {'multioutput': True}
 
-    def fit(self, X, y, fracs=None):
-        if fracs is None:
+    def __init__(self, fracs=None):
+        self.fracs = fracs
+
+    def fit(self, X, y):
+        if self.fracs is None:
             fracs = np.arange(0, 1.1, 0.1)
         else:
-            fracs = np.array(fracs)
-        if 1.0 not in fracs:
-            fracs = np.hstack([fracs, 1.0])
+            self.fracs = np.array(self.fracs)
+
         X, y = check_X_y(X, y, accept_sparse=True, multi_output=True)
         y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
-        coef, alphas = fracridge(X, y, fracs=fracs)
+        coef, alphas = fracridge(X, y, fracs=self.fracs)
         self.frac_alpha_ = alphas
         self.frac_coef_ = coef
         if len(coef.shape) == 1:

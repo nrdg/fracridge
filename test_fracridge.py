@@ -39,9 +39,22 @@ check_estimator(FracRidge)
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_FracRidge(nn, pp, bb):
+def test_FracRidge_ols(nn, pp, bb):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge()
-    FR.fit(X, y, fracs=fracs)
+    FR = FracRidge(fracs=fracs)
+    FR.fit(X, y)
     assert np.allclose(FR.coef_, coef_ols, atol=10e-3)
+
+
+# @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+# @pytest.mark.parametrize("bb", [(1), (2)])
+# @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
+# def test_FracRidge_fracs(nn, pp, bb, frac):
+#     X, y, coef_ols = make_data(nn, pp, bb)
+#     FR = FracRidge()
+#     FR.fit(X, y, fracs=frac)
+#     assert np.all(
+#         np.abs(
+#             frac -
+#             vec_len(FR.frac_coef_, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
