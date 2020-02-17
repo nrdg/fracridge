@@ -31,7 +31,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     y : ndarray, shape (n, b)
         Data, with n number of observations and b number of targets.
 
-    fracs : 1d array, optional
+    fracs : float or 1d array, optional
         The desired fractions of the parameter vector length, relative to
         OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
@@ -49,8 +49,10 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     """
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
-    if len(fracs.shape) == 0:
-        fracs = fracs[np.newaxis]
+
+    if not hasattr(fracs , "__len__"):
+            fracs = [fracs]
+    fracs = np.array(fracs)
 
     nn, pp = X.shape
     if len(y.shape) == 1:
@@ -117,7 +119,14 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
 
 class FracRidge(BaseEstimator, MultiOutputMixin):
+    """
+    Fraction Ridge estimator
 
+    Parameters
+    ----------
+    fracs : float or sequence
+
+    """
     def _more_tags(self):
         return {'multioutput': True}
 
@@ -125,21 +134,12 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         self.fracs = fracs
 
     def fit(self, X, y):
-        if self.fracs is None:
-            fracs = np.arange(0, 1.1, 0.1)
-        else:
-            self.fracs = np.array(self.fracs)
-
         X, y = check_X_y(X, y, accept_sparse=True, multi_output=True)
         y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
-        coef, alphas = fracridge(X, y, fracs=self.fracs)
-        self.frac_alpha_ = alphas
-        self.frac_coef_ = coef
-        if len(coef.shape) == 1:
-            self.coef_ = coef
-        else:
-            self.coef_ = coef[:, -1, ...]
+        coef, alpha = fracridge(X, y, fracs=self.fracs)
+        self.alpha_ = alpha
+        self.coef_ = coef
         return self
 
     def predict(self, X):
