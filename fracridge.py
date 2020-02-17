@@ -119,22 +119,23 @@ class FracRidge(BaseEstimator):
     def _more_tags(self):
         return {'multioutput': True}
 
-    def __init__(self, low_frac=0.1, high_frac=1.1, frac_step=0.1):
-        self.low_frac = low_frac
-        self.high_frac = high_frac
-        self.frac_step = frac_step
-
-    def fit(self, X, y):
-        fracs = np.arange(self.low_frac, self.high_frac, self.frac_step)
+    def fit(self, X, y, fracs=None):
+        if fracs is None:
+            fracs = np.arange(0, 1.1, 0.1)
+        else:
+            fracs = np.array(fracs)
         if 1.0 not in fracs:
-            fracs = np.hstack([self.fracs, 1.0])
+            fracs = np.hstack([fracs, 1.0])
         X, y = check_X_y(X, y, accept_sparse=True)
         y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
         coef, alphas = fracridge(X, y, fracs=fracs)
         self.frac_alpha_ = alphas
         self.frac_coef_ = coef
-        self.coef_ = coef[:, -1, ...]
+        if len(coef.shape) == 1:
+            self.coef_ = coef
+        else:
+            self.coef_ = coef[:, -1, ...]
         return self
 
     def predict(self, X):
