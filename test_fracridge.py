@@ -38,8 +38,9 @@ def test_fracridge_fracs(frac, nn, pp, bb):
 check_estimator(FracRidge)
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-def test_FracRidge(nn, pp):
-    X, y, coef_ols = make_data(nn, pp, 1)
+@pytest.mark.parametrize("bb", [(1), (2)])
+def test_FracRidge(nn, pp, bb):
+    X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
     FR = FracRidge()
     FR.fit(X, y, fracs=fracs)

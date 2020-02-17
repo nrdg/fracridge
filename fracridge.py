@@ -8,7 +8,7 @@ from numpy.core.multiarray import interp
 from scipy.interpolate import interp1d
 import warnings
 
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 
@@ -114,7 +114,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     return coef.squeeze(), alphas
 
 
-class FracRidge(BaseEstimator):
+class FracRidge(BaseEstimator, MultiOutputMixin):
 
     def _more_tags(self):
         return {'multioutput': True}
@@ -126,7 +126,7 @@ class FracRidge(BaseEstimator):
             fracs = np.array(fracs)
         if 1.0 not in fracs:
             fracs = np.hstack([fracs, 1.0])
-        X, y = check_X_y(X, y, accept_sparse=True)
+        X, y = check_X_y(X, y, accept_sparse=True, multi_output=True)
         y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
         coef, alphas = fracridge(X, y, fracs=fracs)
