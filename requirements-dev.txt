@@ -1,0 +1,4 @@
+pytest
+sphinx
+sphinx-gallery
+setuptools_scm

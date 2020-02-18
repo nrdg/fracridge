@@ -17,6 +17,9 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
+__all__ = ["fracridge", "vec_len", "FracRidge"]
+
+
 def fracridge(X, y, fracs=None, tol=1e-6):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
