@@ -9,7 +9,7 @@ CLASSIFIERS = ["Development Status :: 3 - Alpha",
 # Description should be a one-liner:
 description = "Ridge regression with fraction regularization"
 
-NAME = "pyAFQ"
+NAME = "fracridge"
 MAINTAINER = "Ariel Rokem"
 MAINTAINER_EMAIL = "arokem@gmail.com"
 DESCRIPTION = description
