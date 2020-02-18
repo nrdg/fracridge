@@ -56,10 +56,9 @@ opts = dict(name=NAME,
             platforms=PLATFORMS,
             packages=find_packages(),
             install_requires=REQUIRES,
-            scripts=SCRIPTS,
             python_requires=PYTHON_REQUIRES,
             use_scm_version={"root": ".", "relative_to": __file__,
-                             "write_to": "AFQ/version.py",
+                             "write_to": "fracrdige/version.py",
                              "local_scheme": local_version},
             setup_requires=['setuptools_scm'])
 
