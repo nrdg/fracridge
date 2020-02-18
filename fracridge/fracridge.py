@@ -110,7 +110,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         #                 fill_value="extrapolate",
         #                 kind='linear')(fracs)
         targetalphas = np.exp(temp) - 1
-
+        alphas[:, ii] = targetalphas
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
         coef[..., ii] = (sc * ols_coef[..., ii]).T
 
