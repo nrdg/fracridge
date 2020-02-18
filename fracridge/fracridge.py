@@ -8,7 +8,15 @@ from scipy.interpolate import interp1d
 import warnings
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.metrics import r2_score
+from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
+                                      _check_sample_weight)
+
+from sklearn.linear_model._base import (_check_sample_weight, _rescale_data,
+                                        _preprocess_data)
+
+from sklearn.linear_model.base import (BaseEstimator, RegressorMixin,
+                                       MultiOutputMixin)
 
 
 # Module-wide constants
@@ -132,22 +140,54 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
     def _more_tags(self):
         return {'multioutput': True}
 
-    def __init__(self, fracs=None):
+    def __init__(self, fracs=None, fit_intercept=False, normalize=False,
+                 copy_X=True):
         self.fracs = fracs
+        self.fit_intercept = fit_intercept
+        self.normalize = normalize
+        self.copy_X = copy_X
 
-    def fit(self, X, y):
-        X, y = check_X_y(X, y, accept_sparse=True, multi_output=True)
+    def fit(self, X, y, sample_weight=None):
+        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
+
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X,
+                                                 dtype=X.dtype)
+
+        X, y, X_offset, y_offset, X_scale = _preprocess_data(
+            X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
+            copy=self.copy_X, sample_weight=sample_weight,
+            return_mean=True)
+
+        if sample_weight is not None:
+            # Sample weight can be implemented via a simple rescaling.
+            X, y = _rescale_data(X, y, sample_weight)
+
         y = np.asarray(y).astype(np.float)
         self.is_fitted_ = True
         coef, alpha = fracridge(X, y, fracs=self.fracs)
         self.alpha_ = alpha
         self.coef_ = coef
+        self._set_intercept(X_offset, y_offset, X_scale)
         return self
 
     def predict(self, X):
         X = check_array(X, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
-        return np.tensordot(X, self.coef_, axes=(1))
+        pred =  np.tensordot(X, self.coef_, axes=(1))
+        if self.fit_intercept:
+            pred = pred + self.intercept_
+        return pred
+
+    def _set_intercept(self, X_offset, y_offset, X_scale):
+        """Set the intercept_
+        """
+        if self.fit_intercept:
+            self.coef_ = self.coef_ / X_scale[:, np.newaxis]
+            self.intercept_ = y_offset - np.tensordot(X_offset,
+                                                      self.coef_, axes=(1))
+        else:
+            self.intercept_ = 0.
 
 
 def vec_len(vec, axis=0):

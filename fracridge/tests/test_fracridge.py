@@ -14,12 +14,14 @@ def make_data(nn, pp, bb):
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_fracridge_ols(nn, pp, bb):
+@pytest.mark.parametrize("fit_intercept", [True, False])
+def test_fracridge_ols(nn, pp, bb, fit_intercept):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    coef, _ = fracridge(X, y, fracs=fracs)
+    coef, alpha = fracridge(X, y, fracs=fracs, fit_intercept=fit_intercept)
     coef = coef[:, -1, ...]
     assert np.allclose(coef, coef_ols, atol=10e-3)
+    assert np.all(np.diff(alpha) <= 0)
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
