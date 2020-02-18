@@ -1,27 +1,31 @@
 import numpy as np
 from fracridge import fracridge, vec_len, FracRidge
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.linear_model import LinearRegression
 import pytest
 
 
-def make_data(nn, pp, bb):
+def make_data(nn, pp, bb, fit_intercept=False):
     np.random.seed(1)
     X = np.random.randn(nn, pp)
     y = np.random.randn(nn, bb).squeeze()
+    if fit_intercept:
+        X = np.hstack([X, np.ones(X.shape[0])])
     coef_ols = np.linalg.pinv(X.T @ X) @ X.T @ y
+    if fit_intercept:
+        coef_ols = coef_ols[:-1]
     return X, y, coef_ols
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-@pytest.mark.parametrize("fit_intercept", [True, False])
-def test_fracridge_ols(nn, pp, bb, fit_intercept):
+def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    coef, alpha = fracridge(X, y, fracs=fracs, fit_intercept=fit_intercept)
+    coef, alpha = fracridge(X, y, fracs=fracs)
     coef = coef[:, -1, ...]
     assert np.allclose(coef, coef_ols, atol=10e-3)
-    assert np.all(np.diff(alpha) <= 0)
+    assert np.all(np.diff(alpha, axis=0) <= 0)
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
@@ -41,10 +45,11 @@ check_estimator(FracRidge)
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_FracRidge_ols(nn, pp, bb):
+@pytest.mark.parametrize("fit_intercept", [False])
+def test_FracRidge_ols(nn, pp, bb, fit_intercept):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge(fracs=fracs)
+    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
     FR.fit(X, y)
     assert np.allclose(FR.coef_[:, -1, ...], coef_ols, atol=10e-3)
 
@@ -64,10 +69,11 @@ def test_FracRidge_fracs(nn, pp, bb, frac):
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_FracRidge_predict(nn, pp, bb):
+@pytest.mark.parametrize("fit_intercept", [True, False])
+def test_FracRidge_predict(nn, pp, bb, fit_intercept):
     X, y, coef_ols = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge(fracs=fracs)
+    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
     FR.fit(X, y)
     pred_ols = X @ coef_ols
     pred_fr = FR.predict(X)

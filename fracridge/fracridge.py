@@ -8,16 +8,10 @@ from scipy.interpolate import interp1d
 import warnings
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
-from sklearn.metrics import r2_score
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
                                       _check_sample_weight)
 
-from sklearn.linear_model._base import (_check_sample_weight, _rescale_data,
-                                        _preprocess_data)
-
-from sklearn.linear_model.base import (BaseEstimator, RegressorMixin,
-                                       MultiOutputMixin)
-
+from sklearn.linear_model._base import _preprocess_data, _rescale_data
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -183,7 +177,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         """Set the intercept_
         """
         if self.fit_intercept:
-            self.coef_ = self.coef_ / X_scale[:, np.newaxis]
+            self.coef_ = self.coef_ / X_scale[:, np.newaxis, np.newaxis]
             self.intercept_ = y_offset - np.tensordot(X_offset,
                                                       self.coef_, axes=(1))
         else:
