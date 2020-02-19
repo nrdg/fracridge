@@ -1,5 +1,8 @@
 """
-Example using the Scikti
+
+===============================
+Example using scikit learn data
+===============================
 
 """
 
