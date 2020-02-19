@@ -34,7 +34,7 @@ extensions = [
 
 sphinx_gallery_conf = {
      'examples_dirs': '../../examples',   # path to your example scripts
-     'gallery_dirs': '../build/auto_examples',  # path to where to save gallery generated output
+     'gallery_dirs': '/auto_examples',  # path to where to save gallery generated output
 }
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
