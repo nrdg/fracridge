@@ -4,6 +4,11 @@
 Example using scikit learn data
 ===============================
 
+We're going to compare the performance of the fracrdige algorithm with the
+performance of a standard approach to selection of regularization parameters:
+log-spaced selection of alphas between very minimal regularization and
+very strong regularization.
+
 """
 
 import numpy as np
