@@ -1,5 +1,5 @@
 
-`fracridge` : Ridge regression with fractio regularization
+`fracridge` : Ridge regression with fraction regularization
 ==========================================================
 
 
