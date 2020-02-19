@@ -1,7 +1,6 @@
 import numpy as np
 from fracridge import fracridge, vec_len, FracRidge
 from sklearn.utils.estimator_checks import check_estimator
-from sklearn.linear_model import LinearRegression
 import pytest
 
 
