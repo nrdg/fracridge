@@ -33,7 +33,7 @@ def make_data(nn, pp, bb, fit_intercept=False):
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_fracridge_ols(nn, pp, bb, benchmark):
+def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
     coef, alpha = fracridge(X, y, fracs=fracs)
