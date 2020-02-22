@@ -1,4 +1,5 @@
 pytest
+pytest-benchmark
 sphinx
 sphinx-gallery
 setuptools_scm

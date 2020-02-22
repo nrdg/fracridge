@@ -1,7 +1,20 @@
+import time
 import numpy as np
 from fracridge import fracridge, vec_len, FracRidge
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
+
+
+def run_fracridge(X, y, fracs):
+    fracridge(X, y, fracs=fracs)
+
+
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+@pytest.mark.parametrize("bb", [(1), (2)])
+def test_benchmark_fracridge(nn, pp, bb, benchmark):
+    X, y, _, _ = make_data(nn, pp, bb)
+    fracs = np.arange(.1, 1.1, .1)
+    benchmark(run_fracridge, X, y, fracs)
 
 
 def make_data(nn, pp, bb, fit_intercept=False):
@@ -20,7 +33,7 @@ def make_data(nn, pp, bb, fit_intercept=False):
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_fracridge_ols(nn, pp, bb):
+def test_fracridge_ols(nn, pp, bb, benchmark):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
     coef, alpha = fracridge(X, y, fracs=fracs)
