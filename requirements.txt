@@ -1,1 +1,2 @@
 scikit-learn
+git+git://github.com/danielhanchen/hyperlearn.git
