@@ -45,127 +45,20 @@ from numba import njit, prange
 USE_NUMBA = True
 
 
-__all__ = ['svd', 'pinv', 'eigh', 'cholesky', 'lstsq', 'qr','norm',
-			'mean', '_sum', 'sign', 'arange', '_abs', 'minimum', 'maximum',
-			'multsum', 'squaresum', '_sign']
+__all__ = ['svd', 'sign', 'arange']
 
 
 @njit(fastmath = True, nogil = True, cache = True)
 def svd(X):
 	return _svd(X, full_matrices = False)
 
-
-@njit(fastmath = True, nogil = True, cache = True)
-def pinv(X):
-	return _pinv(X)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def eigh(XTX):
-	return _eigh(XTX)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def cholesky(XTX):
-	return _cholesky(XTX)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def lstsq(X, y):
-	return _lstsq(X, y.astype(X.dtype))[0]
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def qr(X):
-	return _qr(X)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def norm(v, d = 2):
-	return _norm(v, d)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _0mean(X, axis = 0):
-	return __sum(X, axis)/X.shape[axis]
-
-
-def mean(X, axis = 0):
-	if axis == 0 and X.flags['C_CONTIGUOUS']:
-		return _0mean(X)
-	else:
-		return X.mean(axis)
-
-
 @njit(fastmath = True, nogil = True, cache = True)
 def sign(X):
 	return __sign(X)
 
-
 @njit(fastmath = True, nogil = True, cache = True)
 def arange(i):
 	return _arange(i)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _sum(X, axis = 0):
-	return __sum(X, axis)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _abs(v):
-	return __abs(v)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def maximum(X, i):
-    return _maximum(X, i)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def minimum(X, i):
-    return _minimum(X, i)
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _min(a,b):
-    if a < b:
-        return a
-    return b
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _max(a,b):
-    if a < b:
-        return b
-    return a
-
-
-@njit(fastmath = True, nogil = True, cache = True)
-def _sign(x):
-    if x < 0:
-        return -1
-    return 1
-
-
-@njit(fastmath = True, nogil = True, parallel = True)
-def multsum(a,b):
-    s = a[0]*b[0]
-    for i in prange(1,len(a)):
-        s += a[i]*b[i]
-    return s
-
-
-@njit(fastmath = True, nogil = True, parallel = True)
-def squaresum(v):
-	if len(v.shape) == 1:
-	    s = v[0]**2
-	    for i in prange(1,len(v)):
-	        s += v[i]**2
-	# else:
-
- #    return s
-
 
 ## TEST
 print("""Note that first time import of HyperLearn will be slow, """
@@ -178,9 +71,13 @@ y64 = ones(2, dtype = float64)
 
 X = eye(2, dtype = float32)
 A = svd(X)
+A = sign(X)
 
 X = eye(2, dtype = float64)
 A = svd(X)
+A = sign(X)
+
+A = arange(100)
 
 A = None
 X = None
