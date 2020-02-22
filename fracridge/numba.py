@@ -36,11 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 from numpy import ones, eye, float32, float64, \
-				sum as __sum, arange as _arange, sign as __sign, uint as _uint, \
-				abs as __abs, minimum as _minimum, maximum as _maximum
+                sum as __sum, arange as _arange, sign as __sign, uint as _uint, \
+                abs as __abs, minimum as _minimum, maximum as _maximum
 from numpy.linalg import svd as _svd, pinv as _pinv, eigh as _eigh, \
-					cholesky as _cholesky, lstsq as _lstsq, qr as _qr, \
-					norm as _norm
+                cholesky as _cholesky, lstsq as _lstsq, qr as _qr, \
+                norm as _norm
 from numba import njit, prange
 USE_NUMBA = True
 
@@ -50,30 +50,25 @@ __all__ = ['svd', 'sign', 'arange']
 
 @njit(fastmath = True, nogil = True, cache = True)
 def svd(X):
-	return _svd(X, full_matrices = False)
+    return _svd(X, full_matrices = False)
 
 @njit(fastmath = True, nogil = True, cache = True)
 def sign(X):
-	return __sign(X)
+    return __sign(X)
 
 @njit(fastmath = True, nogil = True, cache = True)
 def arange(i):
-	return _arange(i)
+    return _arange(i)
 
-## TEST
-print("""Note that first time import of HyperLearn will be slow, """
-		"""since NUMBA code has to be compiled to machine code """
-		"""for optimization purposes.""")
-
-y32 = ones(2, dtype = float32)
-y64 = ones(2, dtype = float64)
+y32 = ones(2, dtype=float32)
+y64 = ones(2, dtype=float64)
 
 
-X = eye(2, dtype = float32)
+X = eye(2, dtype=float32)
 A = svd(X)
 A = sign(X)
 
-X = eye(2, dtype = float64)
+X = eye(2, dtype=float64)
 A = svd(X)
 A = sign(X)
 

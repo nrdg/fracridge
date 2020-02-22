@@ -2,6 +2,7 @@
 
 """
 import numpy as np
+# from scipy.linalg import svd
 from .linalg import svd
 from numpy import interp
 import warnings
