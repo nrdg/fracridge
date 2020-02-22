@@ -1,4 +1,3 @@
-import time
 import numpy as np
 from fracridge import fracridge, vec_len, FracRidge
 from sklearn.utils.estimator_checks import check_estimator
