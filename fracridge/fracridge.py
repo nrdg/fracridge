@@ -2,9 +2,14 @@
 
 """
 import numpy as np
-from scipy.linalg import svd
-from numpy.core.multiarray import interp
-from scipy.interpolate import interp1d
+try:
+    from ._linalg import svd
+except ImportError:
+    from functools import partial
+    from scipy.linalg import svd
+    svd = partial(svd, full_matrices=False)
+
+from numpy import interp
 import warnings
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
@@ -65,7 +70,8 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
-    uu, selt, v_t = svd(X, full_matrices=False)
+    uu, selt, v_t = svd(X)
+
     ynew = uu.T @ y
     del uu
 
@@ -104,13 +110,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     for ii in range(y.shape[-1]):
         newlen = np.sqrt(sclg_sq @ ols_coef[..., ii]**2).T
         newlen = (newlen / newlen[0])
-        # Alternative fast interpolation
         temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
-        # temp = interp1d(newlen,
-        #                 np.log(1 + alphagrid),
-        #                 bounds_error=False,
-        #                 fill_value="extrapolate",
-        #                 kind='linear')(fracs)
         targetalphas = np.exp(temp) - 1
         alphas[:, ii] = targetalphas
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)

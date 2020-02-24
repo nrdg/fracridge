@@ -17,7 +17,7 @@ from fracridge import FracRidge
 
 from sklearn import datasets
 from sklearn.linear_model import Ridge
-from sklearn.model_selection import cross_val_predict, cross_val_score
+from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import r2_score
 
 X, y = datasets.load_diabetes(return_X_y=True)
