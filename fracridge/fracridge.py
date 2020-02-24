@@ -2,8 +2,13 @@
 
 """
 import numpy as np
-# from scipy.linalg import svd
-from .linalg import svd
+try:
+    from ._linalg import svd
+except ImportError:
+    from functools import partial
+    from scipy.linalg import svd
+    svd = partial(svd, full_matrices=False)
+
 from numpy import interp
 import warnings
 

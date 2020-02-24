@@ -48,15 +48,15 @@ USE_NUMBA = True
 __all__ = ['svd', 'sign', 'arange']
 
 
-@njit(fastmath = True, nogil = True, cache = True)
+@njit(fastmath=True, nogil=True, cache=True)
 def svd(X):
-    return _svd(X, full_matrices = False)
+    return _svd(X, full_matrices=False)
 
-@njit(fastmath = True, nogil = True, cache = True)
+@njit(fastmath=True, nogil=True, cache=True)
 def sign(X):
     return __sign(X)
 
-@njit(fastmath = True, nogil = True, cache = True)
+@njit(fastmath=True, nogil=True, cache=True)
 def arange(i):
     return _arange(i)
 

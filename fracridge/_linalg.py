@@ -36,23 +36,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-from . import numba
-from .numba import njit, USE_NUMBA, sign, arange
+from . import _numba as numba
+from ._numba import njit, USE_NUMBA, sign, arange
 import numpy as np
 
-def svd_flip(U, VT, U_decision = True):
+
+def svd_flip(U, VT, U_decision=True):
     """
     Flips the signs of U and VT for SVD in order to force deterministic output.
     Follows Sklearn convention by looking at U's maximum in columns
     as default.
     """
     if U_decision:
-    	max_abs_cols = abs(U).argmax(0)
-    	signs = sign( U[max_abs_cols, arange(U.shape[1])  ]  )
+        max_abs_cols = abs(U).argmax(0)
+        signs = sign(U[max_abs_cols, arange(U.shape[1])])
     else:
-    	# rows of v, columns of u
-    	max_abs_rows = abs(VT).argmax(1)
-    	signs = sign( VT[  arange(VT.shape[0]) , max_abs_rows] )
+        # rows of v, columns of u
+        max_abs_rows = abs(VT).argmax(1)
+        signs = sign( VT[arange(VT.shape[0]), max_abs_rows])
 
     U *= signs
     VT *= signs[:, np.newaxis]
@@ -60,7 +61,7 @@ def svd_flip(U, VT, U_decision = True):
 
 
 
-def svd(X, fast = True, U_decision = False, transpose = True):
+def svd(X, fast=True, U_decision=False, transpose=True):
     """
     [Edited 9/11/2018 --> Modern Big Data Algorithms p/n ratio check]
     Computes the Singular Value Decomposition of any matrix.
@@ -98,11 +99,11 @@ def svd(X, fast = True, U_decision = False, transpose = True):
             U, S, VT = numba.svd(X)
         else:
             #### TO DO: If memory usage exceeds LWORK, use GESVD
-            U, S, VT, __ = lapack("gesdd", fast)(X, full_matrices = False)
+            U, S, VT, __ = lapack("gesdd", fast)(X, full_matrices=False)
     else:
-        U, S, VT = lapack("gesvd", fast)(X, full_matrices = False)
+        U, S, VT = lapack("gesvd", fast)(X, full_matrices=False)
 
-    U, VT = svd_flip(U, VT, U_decision = U_decision)
+    U, VT = svd_flip(U, VT, U_decision=U_decision)
 
     if transpose:
         return VT.T, S, U.T
