@@ -113,6 +113,11 @@ bsmall = 10^-3;   % sets small-bias alpha. this will preserve length to at least
 bstep  = 0.2;     % step size for alpha in log10 space
 debugmode = 0;    % if set to 1, we do some optional sanity checks
 
+% sanity checks
+assert(size(X,1)==size(y,1),'number of rows in X and y should match');
+assert(ismember(class(X),{'single' 'double'}),'X should be in single or double format');
+assert(ismember(class(y),{'single' 'double'}),'y should be in single or double format');
+
 % ignore bad regressors (those that are all zeros)
 bad = all(X==0,1);
 if any(bad)
@@ -321,4 +326,10 @@ case 1
   % deal with output (alphas is irrelevant, so set to [])
   alphas = cast([],class(X));
 
+end
+
+% deal with bad regressors
+if any(bad)
+  coef(~bad,:,:) = coef;
+  coef(bad,:,:) = 0;
 end
