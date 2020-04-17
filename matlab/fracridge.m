@@ -96,6 +96,22 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 % coef3 = fracridge(X,alphas,y,[],1);
 % toc;
 % assert(all(abs(coef(:)-coef3(:))<1e-4));
+%
+% % Example 3:
+%
+% y = randn(100,1);
+% X = randn(100,6)*(1+rand(6,6));
+% fracs = .05:.05:1;
+% [coef,alphas] = fracridge(X,fracs,y);
+% figure;
+% subplot(1,2,1); hold on;
+% plot(fracs,coef');
+% xlabel('Fraction');
+% title('Trace plot of coefficients');
+% subplot(1,2,2); hold on;
+% plot(fracs,sqrt(sum(coef.^2,1)),'ro-');
+% xlabel('Fraction');
+% ylabel('Vector length');
 
 %% %%%%%% SETUP
 
