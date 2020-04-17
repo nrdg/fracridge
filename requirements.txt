@@ -1,3 +1,4 @@
 scikit-learn
 numba
 setuptools_scm
+pillow
