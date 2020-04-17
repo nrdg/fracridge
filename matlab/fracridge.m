@@ -2,13 +2,13 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 
 % function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 %
-% <X> is the design matrix (n x p) with different data points
+% <X> is the design matrix (d x p) with different data points
 %   in the rows and different regressors in the columns
 % <fracs> is a vector (1 x f) of one or more fractions between 0 and 1.
 %   Fractions can be exactly 0 or exactly 1. However, values in between
 %   0 and 1 should be no less than 0.001 and no greater than 0.999.
 %   For example, <fracs> could be 0:.05:1 or 0:.1:1.
-% <y> is the data (n x b) with one or more target variables in the columns
+% <y> is the data (d x t) with one or more target variables in the columns
 % <tol> (optional) is a tolerance value such that eigenvalues
 %   below the tolerance are treated as 0. Default: 1e-6.
 % <mode> (optional) can be:
@@ -20,9 +20,9 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 %   Default: 0.
 %
 % return:
-%  <coef> as the estimated regression weights (p x f x b)
+%  <coef> as the estimated regression weights (p x f x t)
 %    for all fractional levels for all target variables.
-%  <alphas> as the alpha values (f x b) that correspond to the
+%  <alphas> as the alpha values (f x t) that correspond to the
 %    requested fractions. Note that alpha values can be Inf
 %    in the case that the requested fraction is 0, and can
 %    be 0 in the case that the requested fraction is 1.
@@ -126,17 +126,17 @@ if any(bad)
 end
 
 % calc
-n = size(X,1);      % number of data points
+d = size(X,1);      % number of data points
 p = size(X,2);      % number of parameters (regressors)
-b = size(y,2);      % number of distinct outputs (targets) being modeled
+t = size(y,2);      % number of distinct outputs (targets) being modeled
 f = length(fracs);  % number of fractions (or alphas) being requested
 
 %% %%%%%% PERFORM SVD AND ROTATE DATA
 
 % decompose X [this is a costly step]
-  % [u,s,v] = svd(X,'econ');  % when n>=p, u is n x p, s is p x p, v is p x p
-  %                           % when n< p, u is n x n, s is n x n, v is p x n
-if n >= p
+  % [u,s,v] = svd(X,'econ');  % when d>=p, u is d x p, s is p x p, v is p x p
+  %                           % when d< p, u is d x d, s is d x d, v is p x d
+if d >= p
 
   % avoid making a large u
   [~,s,v] = svd(X'*X,'econ');
@@ -146,12 +146,12 @@ if n >= p
   clear s;               % clean up to save memory
 
   % rotate the data, i.e. u'*y (X=u*s*v', u=X*v*inv(s), u'=inv(s)*v'*X')
-  % in the below, the operation is (pxp) x (pxp) x (pxn) x (nxb).
+  % in the below, the operation is (pxp) x (pxp) x (pxd) x (dxt).
   % we group appropriately to speed things up.
-  if b >= n
-    ynew = (diag(1./selt) * v' * X') * y;  % p x b
+  if t >= d
+    ynew = (diag(1./selt) * v' * X') * y;  % p x t
   else
-    ynew = diag(1./selt) * v' * (X' * y);  % p x b
+    ynew = diag(1./selt) * v' * (X' * y);  % p x t
   end
 
 else
@@ -160,20 +160,20 @@ else
   [u,s,v] = svd(X,'econ');
 
   % extract the eigenvalues
-  selt = diag(s);  % n x 1
+  selt = diag(s);  % d x 1
   clear s;         % clean up to save memory
 
   % rotate the data
-  ynew = u'*y;     % n x b
+  ynew = u'*y;     % d x t
   clear u;         % clean up to save memory
 
 end
 
 % calc
-sz = length(selt);  % the size (rank) of the problem (either p or n)
+sz = length(selt);  % the size (rank) of the problem (either p or d)
 
 % mark eigenvalues that are essentially zero
-isbad = selt < tol;      % p x 1 (OR n x 1)
+isbad = selt < tol;      % p x 1 (OR d x 1)
 anyisbad = any(isbad);
 if anyisbad
   fprintf('WARNING: some eigenvalues are being treated as 0.\n');
@@ -182,7 +182,7 @@ end
 %% %%%%%% COMPUTE OLS SOLUTION IN ROTATED SPACE
 
 % compute the OLS (or pseudoinverse) solution in the rotated space
-ynew = ynew ./ repmat(selt,[1 b]);  % p x b (OR n x b)
+ynew = ynew ./ repmat(selt,[1 t]);  % p x t (OR d x t)
 if anyisbad
   ynew(isbad,:) = 0;  % the solution will be 0 along directions associated with eigenvalues that are essentially zero
 end
@@ -190,10 +190,10 @@ end
 %% %%%%%% DO THE MAIN STUFF
 
 % initialize
-if n >= p
-  coef = zeros(p,f*b,class(X));  % this is the easy case. the final rotation doesn't change the dimensionality.
+if d >= p
+  coef = zeros(p,f*t,class(X));  % this is the easy case. the final rotation doesn't change the dimensionality.
 else
-  coef = zeros(n,f*b,class(X));  % in this case, the final rotation will change from n dimensions to p dimensions.
+  coef = zeros(d,f*t,class(X));  % in this case, the final rotation will change from d dimensions to p dimensions.
 end
 
 % we have two modes of operation...
@@ -219,26 +219,26 @@ case 0
   % and so we are happy to "oversample" to some extent.
 
   % construct scaling factor
-  seltSQ = selt.^2;                                                     % p x 1 (OR n x 1)
-  scLG = repmat(seltSQ,[1 g]);                                          % p x g (OR n x g)
+  seltSQ = selt.^2;                                                     % p x 1 (OR d x 1)
+  scLG = repmat(seltSQ,[1 g]);                                          % p x g (OR d x g)
   scLG = scLG ./ (scLG + repmat(alphagrid,[size(scLG,1) 1]));
   if anyisbad
     scLG(isbad,:) = 0;                                                  % for safety, ensure bad eigenvalues get scalings of 0
   end
 
   % pre-compute for speed
-  scLG = scLG.^2';                                                      % g x p (OR g x n)
-  seltSQ2 = repmat(seltSQ,[1 f]);                                       % p x f (OR n x f)
+  scLG = scLG.^2';                                                      % g x p (OR g x d)
+  seltSQ2 = repmat(seltSQ,[1 f]);                                       % p x f (OR d x f)
   fracisz = find(fracs==0);                                             % indices into <fracs>
   logalpha = log(1+alphagrid)';                                         % transform alphas to log(1+x) scale (g x 1)
 
   % init
-  alphas = zeros(f,b,class(X));
+  alphas = zeros(f,t,class(X));
 
   %% %%%%% PROCEED TO COSTLY FOR-LOOP
 
   % compute ridge regression solutions and corresponding alphas
-  for ii=1:b
+  for ii=1:t
 
     % compute vector length for each alpha in the grid
     len = sqrt(scLG*ynew(:,ii).^2);  % g x 1
@@ -282,10 +282,10 @@ case 0
 
   % accuracy check to see if the achieved vector lengths are close to what was requested
   if debugmode
-    temp = sqrt(sum(coef.^2,1));    % 1 x f*b
-    temp2 = sqrt(sum(ynew.^2,1));   % 1 x b
-    temp3 = reshape(temp,[f b]) ./ repmat(temp2,[f 1]);  % f x b
-    temp4 = repmat(fracs',[1 b]);
+    temp = sqrt(sum(coef.^2,1));    % 1 x f*t
+    temp2 = sqrt(sum(ynew.^2,1));   % 1 x t
+    temp3 = reshape(temp,[f t]) ./ repmat(temp2,[f 1]);  % f x t
+    temp4 = repmat(fracs',[1 t]);
     figure; hold on;
     scatter(temp3(:),temp4(:),'r.');
     xlabel('empirical fraction');
@@ -302,26 +302,26 @@ case 0
   assert(~any(isnan(alphas(:))),'NaN encountered in alphas. Is an element in <fracs> too close to 0?');
 
   % rotate solution to the original space
-  coef = reshape(v*coef,[p f b]);
+  coef = reshape(v*coef,[p f t]);
 
 % this is the case of conventional alphas being requested
 case 1
 
   % construct scaling factor
-  sc = repmat(selt.^2,[1 f]);                                 % p x f (OR n x f)
-  sc = sc ./ (sc + repmat(fracs,[size(sc,1) 1]));             % p x f (OR n x f)
+  sc = repmat(selt.^2,[1 f]);                                 % p x f (OR d x f)
+  sc = sc ./ (sc + repmat(fracs,[size(sc,1) 1]));             % p x f (OR d x f)
   if anyisbad
     sc(isbad,:) = 0;                                          % for safety, ensure bad eigenvalues get scalings of 0
   end
 
   % apply scaling to the OLS solutions.
   % do it in a for-loop to save memory usage.
-  for ii=1:b
+  for ii=1:t
     coef(:,(ii-1)*f+(1:f)) = sc .* repmat(ynew(:,ii),[1 f]);
   end
 
   % rotate solution to the original space
-  coef = reshape(v*coef,[p f b]);
+  coef = reshape(v*coef,[p f t]);
 
   % deal with output (alphas is irrelevant, so set to [])
   alphas = cast([],class(X));
