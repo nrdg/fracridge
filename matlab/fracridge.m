@@ -1,14 +1,14 @@
-function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
+function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 
-% function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
+% function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %
 % <X> is the design matrix (d x p) with different data points
-%   in the rows and different regressors in the columns
+%   in the rows and different regressors in the columns.
 % <fracs> is a vector (1 x f) of one or more fractions between 0 and 1.
 %   Fractions can be exactly 0 or exactly 1. However, values in between
 %   0 and 1 should be no less than 0.001 and no greater than 0.999.
 %   For example, <fracs> could be 0:.05:1 or 0:.1:1.
-% <y> is the data (d x t) with one or more target variables in the columns
+% <y> is the data (d x t) with one or more target variables in the columns.
 % <tol> (optional) is a tolerance value such that eigenvalues
 %   below the tolerance are treated as 0. Default: 1e-6.
 % <mode> (optional) can be:
@@ -18,6 +18,23 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 %     regression but does not involve the fraction-based tailoring method.
 %     In the case that <mode> is 1, the output <alphas> is returned as [].
 %   Default: 0.
+% <standardizemode> (optional) can be:
+%   0 means the default behavior (do not modify any of the regressors). In this case, 
+%     we do not add an offset term to the model. Note that the user may choose to include 
+%     an constant regressor in <X> if so desired.
+%   1 means to add an offset term to the model. In this case, the offset term is fully
+%     estimated using ordinary least squares, and ridge regression is applied to 
+%     de-meaned data and de-meaned regressors. (The user should not include a constant 
+%     regressor in <X> if using this mode.)
+%   2 means to standardize the regressors before performing ridge regression. In this case,
+%     an offset term is added to the model, and is fully estimated using ordinary least
+%     squares. Ridge regression is applied to de-meaned data and standardized
+%     regressors. The returned regression weights will refer to the original regressors
+%     (i.e., they will be adjusted for the effects of standardization). This mode may be
+%     preferred for most applications given that the effects of regularization are 
+%     influenced by the scale of the regressors. (The user should not include a constant
+%     regressor in <X> if using this mode.)
+%   Default: 0.
 %
 % return:
 %  <coef> as the estimated regression weights (p x f x t)
@@ -26,6 +43,9 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 %    requested fractions. Note that alpha values can be Inf
 %    in the case that the requested fraction is 0, and can
 %    be 0 in the case that the requested fraction is 1.
+%  <offset> as the offset term for each target variable (f x t).
+%    Note that when <standardizemode> is 0, no offset term is added,
+%    and <offset> is returned as all zeros.
 %
 % The basic idea is that we want ridge-regression solutions
 % whose vector lengths are controlled by the user. The vector
@@ -53,15 +73,15 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 % Notes:
 % - We silently ignore regressors that are all zeros.
 % - The class of <coef> and <alphas> is matched to the class of <X>.
-% - It is assumed that all values in <X> and <y> are finite.
+% - All values in <X> and <y> should be finite. (A check for this is performed.)
 % - If a given target variable consists of all zeros, this is
 %   a degenerate case, and we will return regression weights that
 %   are all zeros and alpha values that are all zeros.
 %
-% % Example 1:
+% % Example 1 (Demonstrate that fracridge achieves the correct fractional length)
 %
-% y = randn(100,1);
-% X = randn(100,10);
+% y = randn(1000,1);
+% X = randn(1000,10);
 % coef = inv(X'*X)*X'*y;
 % [coef2,alpha] = fracridge(X,0.3,y);
 % coef3 = inv(X'*X + alpha*eye(size(X,2)))*X'*y;
@@ -72,7 +92,7 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 % norm(coef2-coef3)
 % norm(coef4-coef3)
 %
-% % Example 2:
+% % Example 2 (Compare execution time between naive ridge regression and fracridge)
 %
 % y = randn(1000,300);        % 1000 data points x 300 target variables
 % X = randn(1000,3000);       % 1000 data points x 3000 predictors
@@ -97,7 +117,7 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 % toc;
 % assert(all(abs(coef(:)-coef3(:))<1e-4));
 %
-% % Example 3:
+% % Example 3 (Plot coefficient paths and vector length for a simple example)
 %
 % y = randn(100,1);
 % X = randn(100,6)*(1+rand(6,6));
@@ -112,6 +132,24 @@ function [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 % plot(fracs,sqrt(sum(coef.^2,1)),'ro-');
 % xlabel('Fraction');
 % ylabel('Vector length');
+%
+% % Example 4 (Demonstrate how fracridge handles standardization of regressors)
+%
+% X = 20 + randn(50,2);
+% y = X*rand(2,1) + randn(50,1);
+% fracs = 0.1:0.1:1;
+% [coef,alphas,offset] = fracridge(X,fracs,y,[],[],2);
+% modelfit = X*coef + repmat(offset',[50 1]);
+% figure; hold on;
+% cmap0 = copper(length(fracs));
+% h = [];
+% legendstr = {};
+% for p=1:length(fracs)
+%   h(p) = plot(modelfit(:,p),'-','Color',cmap0(p,:));
+%   legendstr{p} = sprintf('Frac %.1f',fracs(p));
+% end
+% hdata = plot(y,'k-','LineWidth',2);
+% legend([hdata h],['Data' legendstr],'Location','EastOutside');
 
 %% %%%%%% SETUP
 
@@ -121,6 +159,9 @@ if ~exist('tol','var') || isempty(tol)
 end
 if ~exist('mode','var') || isempty(mode)
   mode = 0;
+end
+if ~exist('standardizemode','var') || isempty(standardizemode)
+  standardizemode = 0;
 end
 
 % internal constants
@@ -133,12 +174,42 @@ debugmode = 0;    % if set to 1, we do some optional sanity checks
 assert(size(X,1)==size(y,1),'number of rows in X and y should match');
 assert(ismember(class(X),{'single' 'double'}),'X should be in single or double format');
 assert(ismember(class(y),{'single' 'double'}),'y should be in single or double format');
+assert(all(isfinite(X(:))),'X must have only finite values');
+assert(all(isfinite(y(:))),'y must have only finite values');
 
 % ignore bad regressors (those that are all zeros)
 bad = all(X==0,1);
 if any(bad)
   fprintf('WARNING: bad regressors detected (all zero). ignoring these regressors.\n');
   X = X(:,~bad);
+end
+
+% deal with standardization
+switch standardizemode
+
+case 0
+
+  % do nothing
+
+case 1
+
+  % de-mean the data and the regressors
+  mnX = mean(X,1);
+  mny = mean(y,1);
+  X = X - repmat(mnX,[size(X,1) 1]);
+  y = y - repmat(mny,[size(y,1) 1]);
+  assert(~any(all(X==0,1)),'in <standardizemode>==1, there should not be a constant term in <X>');
+
+case 2
+
+  % standardize predictors and de-mean the data
+  mnX = mean(X,1);
+  sdX = std(X,[],1);
+  mny = mean(y,1);
+  X = (X - repmat(mnX,[size(X,1) 1])) ./ repmat(sdX,[size(X,1) 1]);
+  y = y - repmat(mny,[size(y,1) 1]);
+  assert(~any(sdX==0),'in <standardizemode>==2, there should not be a constant term in <X>');
+
 end
 
 % calc
@@ -211,6 +282,7 @@ if d >= p
 else
   coef = zeros(d,f*t,class(X));  % in this case, the final rotation will change from d dimensions to p dimensions.
 end
+offset = zeros(f,t,class(X));
 
 % we have two modes of operation...
 switch mode
@@ -317,8 +389,6 @@ case 0
   % if all went well, no value should be NaN (but can be Inf)
   assert(~any(isnan(alphas(:))),'NaN encountered in alphas. Is an element in <fracs> too close to 0?');
 
-  % rotate solution to the original space
-  coef = reshape(v*coef,[p f t]);
 
 % this is the case of conventional alphas being requested
 case 1
@@ -336,12 +406,23 @@ case 1
     coef(:,(ii-1)*f+(1:f)) = sc .* repmat(ynew(:,ii),[1 f]);
   end
 
-  % rotate solution to the original space
-  coef = reshape(v*coef,[p f t]);
-
   % deal with output (alphas is irrelevant, so set to [])
   alphas = cast([],class(X));
 
+end
+
+% rotate solution to the original space
+if standardizemode==2
+  coef = reshape((v./repmat(sdX',[1 size(v,2)]))*coef,[p f t]);  % adjust the regression weights for standardization effects on-the-fly
+else
+  coef = reshape(v*coef,[p f t]);
+end
+
+% calculate offset term
+if ismember(standardizemode,[1 2])
+  for ff=1:f
+    offset(ff,:) = mny - mnX*permute(coef(:,ff,:),[1 3 2]);  % 1 x t - (1 x p)*(p x t)
+  end
 end
 
 % deal with bad regressors
