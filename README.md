@@ -44,4 +44,4 @@ Or a sklearn-compatible OO API:
 
 ## How to cite
 
-"Improved hyperparameter selection through fractional ridge regression", Rokem & Kay (in preparation)
+"Fractional ridge regression: a fast, interpretable reparameterization of ridge regression", Rokem & Kay (in preparation)
