@@ -2,11 +2,11 @@
 
 Is an implementation of fractional ridge regression (FRR).
 
-## Installation: 
+## Installation:
 
 ### Matlab
 
-Download and copy the files from the [https://github.com/arokem/fracridge/tree/master/matlab](Matlab directory) into your 
+Download and copy the files from the [https://github.com/nrdg/fracridge/tree/master/matlab](Matlab directory) into your
 Matlab path.
 
 ### Python
@@ -15,9 +15,9 @@ To install the release version:
 
     pip install fracridge
 
-Or to install the development version: 
+Or to install the development version:
 
-    pip install -r requirements.txt 
+    pip install -r requirements.txt
     pip install .
 
 ## Usage
@@ -29,12 +29,12 @@ Or to install the development version:
 
 ### Python
 
-There's a functional API: 
+There's a functional API:
 
-    from fracridge import fracridge 
+    from fracridge import fracridge
     coefs, alphas = fracridge(X, y, fracs)
 
-Or a sklearn-compatible OO API: 
+Or a sklearn-compatible OO API:
 
     from fracridge import FracRidge
     fr = FracRridge(fracs=fracs)
