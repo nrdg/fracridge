@@ -24,7 +24,6 @@ with open(op.join(here, 'requirements.txt')) as f:
 with open(op.join(here, 'README.md'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
-
 def local_version(version):
     """
     Patch in a version that can be uploaded to test PyPI
@@ -47,6 +46,7 @@ opts = dict(name=NAME,
             maintainer_email=MAINTAINER_EMAIL,
             description=DESCRIPTION,
             long_description=LONG_DESCRIPTION,
+            long_description_content_type="text/markdown",
             url=URL,
             download_url=DOWNLOAD_URL,
             license=LICENSE,
