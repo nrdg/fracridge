@@ -14,7 +14,7 @@
   "description": "<p>Ridge regression is a key regularization technique that penalizes the L2-norm of the coefficient values in linear regression. One of the challenges of using ridge regression is the need to set a hyperparameter alpha that controls the amount of regularization. Cross-validation is typically used to select the best alpha from a set of candidate values. However, efficient and appropriate selection of alpha can be challenging, particularly in data-driven research where large amounts of data are analyzed. Moreover, the selected alpha depends on the scale of the data and the scale of the model predictors and is, therefore, not straightforwardly interpretable. Here, we propose to reparameterize ridge regression in terms of the ratio or fraction gamma between the L2-norm of the regularized solution and the L2-norm of the unregularized solution. This approach, called fractional ridge regression (FRR), has several benefits: the solutions obtained for different gamma are guaranteed to vary, thus guarding against wasted calculations, and the solutions automatically span the relevant range of regularization, thus avoiding the need for arduous manual exploration. We provide an algorithm to solve FRR, as well as open-source software implementations in Python and MATLAB. We show that the proposed method is fast and scalable for large-scale data problems and delivers results that are straightforward to interpret and compare across models and datasets.</p>",
   "keywords": [
     "Statistics",
-    "Machine learning"
+    "Machine learning",
     "Ridge regression",
     "AutoML",
     "Hyperparameters",
