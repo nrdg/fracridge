@@ -44,6 +44,10 @@ Or a sklearn-compatible OO API:
     coefs = fr.coef_
     alphas = fr.alpha_
 
+## Online documentation
+
+[https://nrdg.github.io/fracridge/](https://nrdg.github.io/fracridge/)
+
 ## How to cite
 
 "Fractional ridge regression: a fast, interpretable reparameterization of ridge regression", Rokem & Kay (in preparation)
