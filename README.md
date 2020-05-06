@@ -1,5 +1,7 @@
 # fracridge
 
+[![DOI](https://zenodo.org/badge/261540866.svg)](https://zenodo.org/badge/latestdoi/261540866)
+
 Is an implementation of fractional ridge regression (FRR).
 
 ## Installation:
