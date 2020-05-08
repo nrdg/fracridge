@@ -5,8 +5,8 @@
 
 Computation times
 =================
-**00:03.357** total execution time for **auto_examples** files:
+**00:03.436** total execution time for **auto_examples** files:
 
 +-----------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_diabetes.py` (``plot_diabetes.py``) | 00:03.357 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_diabetes.py` (``plot_diabetes.py``) | 00:03.436 | 0.0 MB |
 +-----------------------------------------------------------------------+-----------+--------+

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>fracridge : Ridge regression with fraction regularization &#8212; fracridge  documentation</title>
+    <title>fracridge : fractional ridge regression &#8212; fracridge  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/gallery.css" />
@@ -34,10 +34,26 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="fracridge-ridge-regression-with-fraction-regularization">
-<h1><cite>fracridge</cite> : Ridge regression with fraction regularization<a class="headerlink" href="#fracridge-ridge-regression-with-fraction-regularization" title="Permalink to this headline">¶</a></h1>
-<p>This software automatically finds regularization metaparameters for ridge
-regression</p>
+  <div class="section" id="fracridge-fractional-ridge-regression">
+<h1><cite>fracridge</cite> : fractional ridge regression<a class="headerlink" href="#fracridge-fractional-ridge-regression" title="Permalink to this headline">¶</a></h1>
+<p>Ridge regression (RR) is a regularization technique that penalizes the L2-norm
+of the coefficients in linear regression. One of the challenges of using RR is
+the need to set a hyperparameter (α) that controls the amount of regularization.
+Cross-validation is typically used to select the best α from a set of
+candidates. However, efficient and appropriate selection of α can be
+challenging, particularly where large amounts of data are analyzed. Because the
+selected α depends on the scale of the data and predictors, it is also not
+straightforwardly interpretable.</p>
+<p>Here, we reparameterize RR in terms of the ratio γ between the L2-norms of the
+regularized and unregularized coefficients.</p>
+<p>This approach, called fractional RR (FRR), has several benefits:
+the solutions obtained for different γ are guaranteed to vary, guarding against
+wasted calculations, and automatically span the relevant range of
+regularization, avoiding the need for arduous manual exploration.</p>
+<p>In a <a class="reference external" href="https://arxiv.org/abs/2005.03220">companion preprint article</a>, we show
+that the proposed method is fast and scalable for large-scale data problems, and
+delivers results that are straightforward to interpret and compare across models
+and datasets.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
