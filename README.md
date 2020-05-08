@@ -6,10 +6,11 @@ Is an implementation of fractional ridge regression (FRR).
 
 ## Installation:
 
-### Matlab
+### MATLAB
 
-Download and copy the files from the [https://github.com/nrdg/fracridge/tree/master/matlab](Matlab directory) into your
-Matlab path.
+Download and copy the files from the
+[https://github.com/nrdg/fracridge/tree/master/matlab](MATLAB directory) into
+your MATLAB path.
 
 ### Python
 
@@ -24,7 +25,7 @@ Or to install the development version:
 
 ## Usage
 
-### Matlab
+### MATLAB
 
     [coef,alphas] = fracridge(X,fracs,y,tol,mode)
 
@@ -50,4 +51,6 @@ Or a sklearn-compatible OO API:
 
 ## How to cite
 
-"Fractional ridge regression: a fast, interpretable reparameterization of ridge regression", Rokem & Kay (in preparation)
+Please cite our preprint: "Fractional ridge regression: a fast, interpretable
+reparameterization of ridge regression" (2020), Rokem & Kay,
+https://arxiv.org/abs/2005.03220
