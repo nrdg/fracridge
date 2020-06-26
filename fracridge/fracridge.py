@@ -27,7 +27,7 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidge"]
 
 
-def fracridge(X, y, fracs=None, tol=1e-6):
+def fracridge(X, y, fracs=None, tol=1e-6, return_coef=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -45,6 +45,9 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
 
+    return_coef : bool, optional
+        Whether to calculate the resulting coefficients, or return only
+        the best alphas.
 
     Returns
     -------
@@ -116,10 +119,13 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
         coef[..., ii] = (sc * ols_coef[..., ii]).T
 
-    coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
+    if return_coef:
+        coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
 
-    return coef.squeeze(), alphas
+        return coef.squeeze(), alphas
+    else:
+        return alphas
 
 
 class FracRidge(BaseEstimator, MultiOutputMixin):
