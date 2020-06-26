@@ -39,6 +39,8 @@ def test_fracridge_ols(nn, pp, bb):
     coef = coef[:, -1, ...]
     assert np.allclose(coef, coef_ols, atol=10e-3)
     assert np.all(np.diff(alpha, axis=0) <= 0)
+    alpha = fracridge(X, y, fracs=fracs, return_coef=False)
+    assert np.all(np.diff(alpha, axis=0) <= 0)
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
