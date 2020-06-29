@@ -1,3 +1,8 @@
+Version 1.1 (June 29, 2020)
+===================
+
+This version adds more documentation
+
 Version 1.0 (May 07, 2020)
 ==========================
 
