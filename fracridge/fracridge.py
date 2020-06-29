@@ -2,13 +2,6 @@
 
 """
 import numpy as np
-try:
-    from ._linalg import svd
-except ImportError:
-    from functools import partial
-    from scipy.linalg import svd
-    svd = partial(svd, full_matrices=False)
-
 from numpy import interp
 import warnings
 
@@ -27,7 +20,7 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidge"]
 
 
-def fracridge(X, y, fracs=None, tol=1e-6):
+def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -45,6 +38,10 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
 
+    jit : bool, optional
+        Whether to speed up computations by using a just-in-time compiled
+        version of core computations. This may not work well with very large
+        datasets. Default: True
 
     Returns
     -------
@@ -55,12 +52,51 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         The alpha coefficients associated with each solution
     Examples
     --------
+    Generate random data:
+    >>> np.random.seed(0)
+    >>> y = np.random.randn(100)
+    >>> X = np.random.randn(100, 10)
+
+    Calculate coefficients with naive OLS
+    >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
+    >>> print(np.linalg.norm(coef))
+    0.3466634533412224
+
+    Call fracridge function:
+    >>> coef2, alpha = fracridge(X, y, 0.3)
+    >>> print(np.linalg.norm(coef2))
+    0.10351637925497272
+
+    >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))
+    0.2986077080155348
+
+    Calculate coefficients with naive RR
+    >>> alphaI = alpha * np.eye(X.shape[1])
+    >>> coef3 = np.linalg.inv(X.T @ X + alphaI) @ X.T @ y
+    >>> print(np.linalg.norm(coef2 - coef3))
+    1.2040405611864207e-16
     """
+    use_scipy = False
+    if jit:
+        try:
+            from ._linalg import svd
+        except ImportError:
+            warnings.warn("The `jit` key-word argument is set to `True` ",
+                          "but numba could not be imported, or just-in time ",
+                          "compilation failed. Falling back to ",
+                          "`scipy.linalg.svd`")
+            use_scipy = True
+
+    if not jit or use_scipy:
+        from functools import partial
+        from scipy.linalg import svd  # noqa
+        svd = partial(svd, full_matrices=False)
+
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    if not hasattr(fracs , "__len__"):
-            fracs = [fracs]
+    if not hasattr(fracs, "__len__"):
+        fracs = [fracs]
     fracs = np.array(fracs)
 
     nn, pp = X.shape

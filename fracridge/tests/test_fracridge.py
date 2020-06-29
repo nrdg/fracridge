@@ -4,16 +4,17 @@ from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
 
-def run_fracridge(X, y, fracs):
-    fracridge(X, y, fracs=fracs)
+def run_fracridge(X, y, fracs, jit):
+    fracridge(X, y, fracs=fracs, jit=jit)
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
-def test_benchmark_fracridge(nn, pp, bb, benchmark):
+@pytest.mark.parametrize("jit", [True, False])
+def test_benchmark_fracridge(nn, pp, bb, jit, benchmark):
     X, y, _, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    benchmark(run_fracridge, X, y, fracs)
+    benchmark(run_fracridge, X, y, fracs, jit)
 
 
 def make_data(nn, pp, bb, fit_intercept=False):
