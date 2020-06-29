@@ -75,6 +75,8 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
     0.0
     """
+    # Per default, we'll try to use the jit-compiled SVD, which should be
+    # more performant:
     use_scipy = False
     if jit:
         try:
@@ -86,6 +88,7 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
                           "`scipy.linalg.svd`")
             use_scipy = True
 
+    # If that doesn't work, or you asked not to, we'll use scipy SVD:
     if not jit or use_scipy:
         from functools import partial
         from scipy.linalg import svd  # noqa
@@ -107,6 +110,7 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
 
     uu, selt, v_t = svd(X)
 
+    # This rotates the targets by the unitary matrix uu.T:
     ynew = uu.T @ y
     del uu
 
@@ -121,19 +125,23 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
 
     ols_coef[isbad, ...] = 0
 
+    # Limits on the grid of candidate alphas used for interpolation:
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
 
+    # Generates the grid of candidate alphas used in interpolation:
     alphagrid = np.concatenate(
         [np.array([0]),
          10 ** np.arange(np.floor(np.log10(val2)),
                          np.ceil(np.log10(val1)), BIAS_STEP)])
 
+    # The scaling factor applied to coefficients in the rotated space is
+    # lambda**2 / (lambda**2 + alpha), where lambda are the singular values
     seltsq = selt**2
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
 
-    # Prellocate the solution
+    # Prellocate the solution:
     if nn >= pp:
         first_dim = pp
     else:
@@ -142,15 +150,28 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     coef = np.empty((first_dim, ff, bb))
     alphas = np.empty((ff, bb))
 
+    # The main loop is over targets:
     for ii in range(y.shape[-1]):
+        # Applies the scaling factors per alpha
         newlen = np.sqrt(sclg_sq @ ols_coef[..., ii]**2).T
+        # Normalize to the length of the unregularized solution,
+        # because (alphagrid[0] == 0)
         newlen = (newlen / newlen[0])
+        # Perform interpolation in a log transformed space (so it behaves
+        # nicely), avoiding log of 0.
         temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        # Undo the log transform from the previous step
         targetalphas = np.exp(temp) - 1
+        # Allocate the alphas for this target:
         alphas[:, ii] = targetalphas
+        # Calculate the new scaling factor, based on the interpolated alphas:
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
+        # Use the scaling factor to calculate coefficients in the rotated
+        # space:
         coef[..., ii] = (sc * ols_coef[..., ii]).T
 
+    # After iterating over all targets, we unrotate using the unitary v
+    # matrix and reshape to conform to desired output:
     coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
 
