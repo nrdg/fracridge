@@ -59,21 +59,21 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
 
     Calculate coefficients with naive OLS:
     >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
-    >>> print(np.linalg.norm(coef))
-    0.3466634533412224
+    >>> print(np.linalg.norm(coef))  # doctest: +NUMBER
+    0.35
 
     Call fracridge function:
     >>> coef2, alpha = fracridge(X, y, 0.3)
-    >>> print(np.linalg.norm(coef2))
-    0.10351637925497272
-    >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))
-    0.2986077080155348
+    >>> print(np.linalg.norm(coef2))  # doctest: +NUMBER
+    0.10
+    >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))  # doctest: +NUMBER
+    0.3
 
     Calculate coefficients with naive RR:
     >>> alphaI = alpha * np.eye(X.shape[1])
     >>> coef3 = np.linalg.inv(X.T @ X + alphaI) @ X.T @ y
-    >>> print(np.linalg.norm(coef2 - coef3))
-    1.2040405611864207e-16
+    >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
+    0.0
     """
     use_scipy = False
     if jit:
@@ -190,10 +190,10 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
               normalize=False, tol=1e-06)
 
     Check results:
-    >>> coef_oo = fr.coef_
-    >>> alpha_oo = fr.alpha_
-    >>> print(np.linalg.norm(coef_oo) / np.linalg.norm(coef))
-    0.2999921377408112
+    >>> coef_ = fr.coef_
+    >>> alpha_ = fr.alpha_
+    >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
+    0.29
     """
     def _more_tags(self):
         return {'multioutput': True}
