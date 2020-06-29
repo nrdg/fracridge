@@ -52,6 +52,29 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
         The alpha coefficients associated with each solution
     Examples
     --------
+    Generate random data:
+    >>> np.random.seed(0)
+    >>> y = np.random.randn(100)
+    >>> X = np.random.randn(100, 10)
+
+    Calculate coefficients with naive OLS
+    >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
+    >>> print(np.linalg.norm(coef))
+    0.3466634533412224
+
+    Call fracridge function:
+    >>> coef2, alpha = fracridge(X, y, 0.3)
+    >>> print(np.linalg.norm(coef2))
+    0.10351637925497272
+
+    >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))
+    0.2986077080155348
+
+    Calculate coefficients with naive RR
+    >>> alphaI = alpha * np.eye(X.shape[1])
+    >>> coef3 = np.linalg.inv(X.T @ X + alphaI) @ X.T @ y
+    >>> print(np.linalg.norm(coef2 - coef3))
+    1.2040405611864207e-16
     """
     use_scipy = False
     if jit:
