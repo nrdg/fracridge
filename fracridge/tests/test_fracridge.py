@@ -84,10 +84,11 @@ def test_FracRidge_fracs(nn, pp, bb, frac):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
-def test_FracRidge_predict(nn, pp, bb, fit_intercept):
+@pytest.mark.parametrize("jit", [True, False])
+def test_FracRidge_predict(nn, pp, bb, fit_intercept, jit):
     X, y, coef_ols, pred_ols = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
+    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept, jit=jit)
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
