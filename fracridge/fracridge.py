@@ -207,8 +207,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
 
     Fit estimator:
     >>> fr.fit(X, y)
-    FracRidge(copy_X=True, fit_intercept=False, fracs=0.3, jit=True,
-              normalize=False, tol=1e-06)
+    FracRidge(fracs=0.3)
 
     Check results:
     >>> coef_ = fr.coef_
