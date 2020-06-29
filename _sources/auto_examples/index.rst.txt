@@ -11,11 +11,12 @@ Example `fracridge` usage
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="We&#x27;re going to compare the performance of the fracrdige algorithm with the performance of a sta...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use...">
 
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_diabetes_thumb.png
+     :alt: Example using scikit learn diabetes data
 
      :ref:`sphx_glr_auto_examples_plot_diabetes.py`
 
