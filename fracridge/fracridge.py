@@ -2,13 +2,6 @@
 
 """
 import numpy as np
-try:
-    from ._linalg import svd
-except ImportError:
-    from functools import partial
-    from scipy.linalg import svd
-    svd = partial(svd, full_matrices=False)
-
 from numpy import interp
 import warnings
 
@@ -27,7 +20,7 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidge"]
 
 
-def fracridge(X, y, fracs=None, tol=1e-6):
+def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -45,6 +38,10 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         OLS solution. If 1d array, the shape is (f,).
         Default: np.arange(.1, 1.1, .1)
 
+    jit : bool, optional
+        Whether to speed up computations by using a just-in-time compiled
+        version of core computations. This may not work well with very large
+        datasets. Default: True
 
     Returns
     -------
@@ -55,12 +52,53 @@ def fracridge(X, y, fracs=None, tol=1e-6):
         The alpha coefficients associated with each solution
     Examples
     --------
+    Generate random data:
+    >>> np.random.seed(0)
+    >>> y = np.random.randn(100)
+    >>> X = np.random.randn(100, 10)
+
+    Calculate coefficients with naive OLS:
+    >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
+    >>> print(np.linalg.norm(coef))  # doctest: +NUMBER
+    0.35
+
+    Call fracridge function:
+    >>> coef2, alpha = fracridge(X, y, 0.3)
+    >>> print(np.linalg.norm(coef2))  # doctest: +NUMBER
+    0.10
+    >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))  # doctest: +NUMBER
+    0.3
+
+    Calculate coefficients with naive RR:
+    >>> alphaI = alpha * np.eye(X.shape[1])
+    >>> coef3 = np.linalg.inv(X.T @ X + alphaI) @ X.T @ y
+    >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
+    0.0
     """
+    # Per default, we'll try to use the jit-compiled SVD, which should be
+    # more performant:
+    use_scipy = False
+    if jit:
+        try:
+            from ._linalg import svd
+        except ImportError:
+            warnings.warn("The `jit` key-word argument is set to `True` ",
+                          "but numba could not be imported, or just-in time ",
+                          "compilation failed. Falling back to ",
+                          "`scipy.linalg.svd`")
+            use_scipy = True
+
+    # If that doesn't work, or you asked not to, we'll use scipy SVD:
+    if not jit or use_scipy:
+        from functools import partial
+        from scipy.linalg import svd  # noqa
+        svd = partial(svd, full_matrices=False)
+
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    if not hasattr(fracs , "__len__"):
-            fracs = [fracs]
+    if not hasattr(fracs, "__len__"):
+        fracs = [fracs]
     fracs = np.array(fracs)
 
     nn, pp = X.shape
@@ -72,6 +110,7 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
     uu, selt, v_t = svd(X)
 
+    # This rotates the targets by the unitary matrix uu.T:
     ynew = uu.T @ y
     del uu
 
@@ -86,19 +125,23 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
     ols_coef[isbad, ...] = 0
 
+    # Limits on the grid of candidate alphas used for interpolation:
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
 
+    # Generates the grid of candidate alphas used in interpolation:
     alphagrid = np.concatenate(
         [np.array([0]),
          10 ** np.arange(np.floor(np.log10(val2)),
                          np.ceil(np.log10(val1)), BIAS_STEP)])
 
+    # The scaling factor applied to coefficients in the rotated space is
+    # lambda**2 / (lambda**2 + alpha), where lambda are the singular values
     seltsq = selt**2
     sclg = seltsq / (seltsq + alphagrid[:, None])
     sclg_sq = sclg**2
 
-    # Prellocate the solution
+    # Prellocate the solution:
     if nn >= pp:
         first_dim = pp
     else:
@@ -107,15 +150,28 @@ def fracridge(X, y, fracs=None, tol=1e-6):
     coef = np.empty((first_dim, ff, bb))
     alphas = np.empty((ff, bb))
 
+    # The main loop is over targets:
     for ii in range(y.shape[-1]):
+        # Applies the scaling factors per alpha
         newlen = np.sqrt(sclg_sq @ ols_coef[..., ii]**2).T
+        # Normalize to the length of the unregularized solution,
+        # because (alphagrid[0] == 0)
         newlen = (newlen / newlen[0])
+        # Perform interpolation in a log transformed space (so it behaves
+        # nicely), avoiding log of 0.
         temp = interp(fracs, newlen[::-1], np.log(1 + alphagrid)[::-1])
+        # Undo the log transform from the previous step
         targetalphas = np.exp(temp) - 1
+        # Allocate the alphas for this target:
         alphas[:, ii] = targetalphas
+        # Calculate the new scaling factor, based on the interpolated alphas:
         sc = seltsq / (seltsq + targetalphas[np.newaxis].T)
+        # Use the scaling factor to calculate coefficients in the rotated
+        # space:
         coef[..., ii] = (sc * ols_coef[..., ii]).T
 
+    # After iterating over all targets, we unrotate using the unitary v
+    # matrix and reshape to conform to desired output:
     coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
 
@@ -124,22 +180,52 @@ def fracridge(X, y, fracs=None, tol=1e-6):
 
 class FracRidge(BaseEstimator, MultiOutputMixin):
     """
-    Fraction Ridge estimator
+    Fractional Ridge Regression estimator
+
+
 
     Parameters
     ----------
     fracs : float or sequence
+        The desired fractions of the parameter vector length, relative to
+        OLS solution. If 1d array, the shape is (f,).
+        Default: np.arange(.1, 1.1, .1)
 
+
+    Examples
+    --------
+    Generate random data:
+    >>> np.random.seed(1)
+    >>> y = np.random.randn(100)
+    >>> X = np.random.randn(100, 10)
+
+    Calculate coefficients with naive OLS:
+    >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
+
+    Initialize the estimator with a single fraction:
+    >>> fr = FracRidge(fracs=0.3)
+
+    Fit estimator:
+    >>> fr.fit(X, y)
+    FracRidge(fracs=0.3)
+
+    Check results:
+    >>> coef_ = fr.coef_
+    >>> alpha_ = fr.alpha_
+    >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
+    0.29
     """
     def _more_tags(self):
         return {'multioutput': True}
 
     def __init__(self, fracs=None, fit_intercept=False, normalize=False,
-                 copy_X=True):
+                 copy_X=True, tol=1e-6, jit=True):
         self.fracs = fracs
         self.fit_intercept = fit_intercept
         self.normalize = normalize
         self.copy_X = copy_X
+        self.tol = tol
+        self.jit = jit
 
     def fit(self, X, y, sample_weight=None):
         X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
@@ -158,7 +244,8 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
             X, y = _rescale_data(X, y, sample_weight)
 
         self.is_fitted_ = True
-        coef, alpha = fracridge(X, y, fracs=self.fracs)
+        coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
+                                jit=self.jit)
         self.alpha_ = alpha
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
