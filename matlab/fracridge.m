@@ -358,7 +358,7 @@ case 0
 
     % use linear interpolation to determine alphas that achieve the desired fractional levels.
     % we interpolate in log(1+x) space in order to help achieve good quality interpolation.
-    iix = [true; diff(len) ~= 0];                   % we need to ensure monotonically increasing x-coordinates!!
+    iix = [true; abs(diff(len)) > 1e-5];            % we need to ensure monotonically increasing x-coordinates!!
     temp = interp1qr(len(iix),logalpha(iix),fracs');  % f x 1 (if out of range, will be NaN; we check this later)
     temp = exp(temp)-1;                             % undo the log transform
     temp(fracisz) = Inf;                            % when frac is exactly 0, we are out of range, so handle explicitly
