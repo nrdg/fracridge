@@ -9,7 +9,7 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %   0 and 1 should be no less than 0.001 and no greater than 0.999.
 %   For example, <fracs> could be 0:.05:1 or 0:.1:1.
 % <y> is the data (d x t) with one or more target variables in the columns.
-% <tol> (optional) is a tolerance value such that eigenvalues
+% <tol> (optional) is a tolerance value such that singular values
 %   below the tolerance are treated as 0. Default: 1e-6.
 % <mode> (optional) can be:
 %   0 means the default behavior
@@ -228,7 +228,7 @@ if d >= p
   % avoid making a large u
   [~,s,v] = svd(X'*X,'econ');
 
-  % extract the eigenvalues
+  % extract the singular values
   selt = sqrt(diag(s));  % p x 1
   clear s;               % clean up to save memory
 
@@ -246,7 +246,7 @@ else
   % do it
   [u,s,v] = svd(X,'econ');
 
-  % extract the eigenvalues
+  % extract the singular values
   selt = diag(s);  % d x 1
   clear s;         % clean up to save memory
 
@@ -259,11 +259,11 @@ end
 % calc
 sz = length(selt);  % the size (rank) of the problem (either p or d)
 
-% mark eigenvalues that are essentially zero
+% mark singular values that are essentially zero
 isbad = selt < tol;      % p x 1 (OR d x 1)
 anyisbad = any(isbad);
 if anyisbad
-  fprintf('WARNING: some eigenvalues are being treated as 0.\n');
+  fprintf('WARNING: some singular values are being treated as 0.\n');
 end
 
 %% %%%%%% COMPUTE OLS SOLUTION IN ROTATED SPACE
@@ -271,7 +271,7 @@ end
 % compute the OLS (or pseudoinverse) solution in the rotated space
 ynew = ynew ./ repmat(selt,[1 t]);  % p x t (OR d x t)
 if anyisbad
-  ynew(isbad,:) = 0;  % the solution will be 0 along directions associated with eigenvalues that are essentially zero
+  ynew(isbad,:) = 0;  % the solution will be 0 along directions associated with singular values that are essentially zero
 end
 
 %% %%%%%% DO THE MAIN STUFF
@@ -293,8 +293,8 @@ case 0
   %% %%%%% DO SOME SETUP
 
   % figure out a reasonable grid for alpha at reasonable level of granularity
-  val1 = bbig*selt(1)^2;              % huge bias (take the biggest eigenvalue down massively)
-  val2 = bsmall*min(selt(~isbad))^2;  % tiny bias (just add a small amount to the smallest eigenvalue)
+  val1 = bbig*selt(1)^2;              % huge bias (take the biggest singular value down massively)
+  val2 = bsmall*min(selt(~isbad))^2;  % tiny bias (just add a small amount to the smallest singular value)
   alphagrid = fliplr([0 10.^(floor(log10(val2)):bstep:ceil(log10(val1)))]);  % huge bias to tiny bias to no bias (1 x g)
   g = length(alphagrid);
 
@@ -311,7 +311,7 @@ case 0
   scLG = repmat(seltSQ,[1 g]);                                          % p x g (OR d x g)
   scLG = scLG ./ (scLG + repmat(alphagrid,[size(scLG,1) 1]));
   if anyisbad
-    scLG(isbad,:) = 0;                                                  % for safety, ensure bad eigenvalues get scalings of 0
+    scLG(isbad,:) = 0;                                                  % for safety, ensure bad singular values get scalings of 0
   end
 
   % pre-compute for speed
@@ -382,7 +382,7 @@ case 0
     plot([0 1],[0 1],'g-');
   end
 
-  % for safety, ensure bad eigenvalues get scalings of 0
+  % for safety, ensure bad singular values get scalings of 0
   if anyisbad
     coef(isbad,:) = 0;
   end
@@ -398,7 +398,7 @@ case 1
   sc = repmat(selt.^2,[1 f]);                                 % p x f (OR d x f)
   sc = sc ./ (sc + repmat(fracs,[size(sc,1) 1]));             % p x f (OR d x f)
   if anyisbad
-    sc(isbad,:) = 0;                                          % for safety, ensure bad eigenvalues get scalings of 0
+    sc(isbad,:) = 0;                                          % for safety, ensure bad singular values get scalings of 0
   end
 
   % apply scaling to the OLS solutions.
