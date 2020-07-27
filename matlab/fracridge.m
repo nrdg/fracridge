@@ -78,6 +78,10 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %   a degenerate case, and we will return regression weights that
 %   are all zeros and alpha values that are all zeros.
 %
+% History:
+% - 2020/07/26 - fix in interpolation to ensure monotonically increasing x-coordinates.
+%                (code would have failed assert, prior to this.)
+%
 % % Example 1 (Demonstrate that fracridge achieves the correct fractional length)
 %
 % y = randn(1000,1);
@@ -358,7 +362,8 @@ case 0
 
     % use linear interpolation to determine alphas that achieve the desired fractional levels.
     % we interpolate in log(1+x) space in order to help achieve good quality interpolation.
-    iix = [true; abs(diff(len)) > 1e-5];            % we need to ensure monotonically increasing x-coordinates!!
+    iix = flipud([true; diff(flipud(len)) < -1e-5]);  % we need to ensure monotonically increasing x-coordinates!!
+                                                      % note that we flipud to ensure that 1 is an "anchor" for this culling
     temp = interp1qr(len(iix),logalpha(iix),fracs');  % f x 1 (if out of range, will be NaN; we check this later)
     temp = exp(temp)-1;                             % undo the log transform
     temp(fracisz) = Inf;                            % when frac is exactly 0, we are out of range, so handle explicitly
