@@ -32,7 +32,7 @@ for p=1:length(allimix)
     imwrite(rgb2gray(im0),'sampleimagegray.png');
   end
   im = single(rgb2gray(im0));  % convert to grayscale and to single format
-  im = (im/255).^2;                            % convert to [0,1] and square to match display gamma
+  im = (im/255).^2;            % convert to [0,1] and square to match display gamma
   ims(:,:,p) = im;
 end
 
@@ -49,6 +49,9 @@ end
 
 % clean
 clear ims;
+
+% save a cached version of <imagecon> for convenience
+save('stimuluscache.mat','imagecon');
 
 %% Do some experimental-design preparation
 
@@ -234,6 +237,14 @@ for zz=1:length(rowiis)
   end
 end
 
+% record some numbers
+mxs([41 52],:)
+% 
+% ans =
+% 
+%         0.0817369669675827        0.0817369669675827        0.0817369669675827
+%          0.156348064541817         0.156348064541817         0.156348064541817
+
 figureprep([100 100 300 300]); hold on;
 imagesc((0:20)/20,[0 1]); colormap(copper(256)); colorbar;
 figurewrite('colorbarcopper',[],-1,pwd);
@@ -255,7 +266,7 @@ end
 % do it
 for zzz=1:length(voxelix)
   figureprep([100 100 700*.75 550*.75]);
-  ax1 = []; touserng = [];
+  ax1 = []; touserng = []; firstyrng = []; secondyrng = [];
   for qq=3:-1:1  % 1 is standard, 2 is DOF, 3 is frac
 
     switch qq
@@ -300,7 +311,8 @@ for zzz=1:length(voxelix)
     yyaxis left;
     plot(touse,trainerr,'ro-');
     ylabel('Training {\itR}^2 (%)');
-    set(gca,'YColor','r')
+    set(gca,'YColor','r');
+    firstyrng(qq,:) = ylim;
     ax1(qq,1) = gca;
     yyaxis right;
     plot(touse,testerr,'ro-','Color',[.3 .3 1]);
@@ -308,13 +320,14 @@ for zzz=1:length(voxelix)
     set(gca,'YColor',[.3 .3 1]);
     [mmx,iix] = max(testerr);
     scatter(touse(iix),mmx,'bo','filled');
+    secondyrng(qq,:) = ylim;
     ax1(qq,2) = gca;
     yyaxis left;
 
     % plot more
     subplot(3,3,qq+3); hold on;
     plot(touse,vectorlength(h,1),'ro-');
-    ylabel('Vector length of solution');
+    ylabel('Vector length');
     ax1(qq,3) = gca;
 
     % plot more
@@ -325,7 +338,14 @@ for zzz=1:length(voxelix)
   
   end
 
-  % enforce same y-axis for rows 2 and 3
+  % enforce same y-axis
+  for qq=1:3
+    subplot(3,3,qq);
+    yyaxis left;
+    ylim([min(firstyrng(:,1)) max(firstyrng(:,2))]);
+    yyaxis right;
+    ylim([min(secondyrng(:,1)) max(secondyrng(:,2))]);
+  end
   linkaxes(ax1(:,3),'y');
   linkaxes(ax1(:,4),'y');
 
@@ -346,6 +366,7 @@ for zzz=1:length(voxelix)
           yyaxis left;
         end
         h0 = straightline(-log10(alphas0),'v','k-');  % show where frac is in the -log10(alpha) space
+        set(gca,'XTick',-4:2:4);
         set(gca,'XTickLabel',-get(gca,'XTick'));
         xlabel('Log_{10}alpha');
       case 2  % DOF
@@ -354,10 +375,11 @@ for zzz=1:length(voxelix)
           dof2(zz) = sum(ds./(ds+alphas0(zz)));
         end
         h0 = straightline(dof2,'v','k-');           % show where frac's DOFs would be
+        set(gca,'XTick',0:300:600);
         xlabel('Degrees of freedom');
       case 3  % frac approach
         h0 = straightline(fracs,'v','k-');
-        set(gca,'XTick',0:0.2:1);
+        set(gca,'XTick',0:.5:1);
         xlabel('Fraction');
       end
       set(h0,'Color',[.7 .7 .7]);
