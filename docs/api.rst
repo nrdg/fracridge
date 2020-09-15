@@ -22,4 +22,4 @@ fracridge.FracRidge
    :toctree: generated/
    :template: class.rst
 
-   FraceRidge
+   FracRidge
