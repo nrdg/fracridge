@@ -29,7 +29,7 @@ and datasets.
    :caption: Contents:
 
    auto_examples/index.rst
-
+   api.rst
 
 Indices and tables
 ==================

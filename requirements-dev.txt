@@ -3,3 +3,6 @@ pytest
 pytest-benchmark
 sphinx
 sphinx-gallery
+numpydoc
+sphinx_rtd_theme
+sphinx_copybutton

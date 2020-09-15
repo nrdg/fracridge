@@ -29,13 +29,39 @@ author = 'Kendrick Kay and Ariel Rokem'
 # ones.
 extensions = [
     'sphinx_gallery.gen_gallery',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'numpydoc',
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.viewcode",
     ]
 
+# Automatically generate stub pages for API
+autoclass_content = "both"  # include both class docstring and __init__
+autodoc_default_flags = ["members", "inherited-members"]
+autosummary_generate = True
+
+# Napoleon settings (other than default)
+napoleon_google_docstring = False
+napoleon_use_rtype = False
 
 sphinx_gallery_conf = {
-     'examples_dirs': '../../examples',   # path to your example scripts
-     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+    # path to your examples scripts
+    "examples_dirs": "../../examples",
+    # path where to save gallery generated examples
+    "gallery_dirs": "auto_examples",
+    # To auto-generate example sections in the API
+    "doc_module": ("fracridge",),
+    # Auto-generated mini-galleries go here
+    "backreferences_dir": "gen_api",
 }
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
