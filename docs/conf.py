@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+# Fracridge sphinx configuration file, based on the sklearn
 # project-template documentation build configuration file, created by
 # sphinx-quickstart on Mon Jan 18 14:44:12 2016.
 #
@@ -213,7 +213,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'project-templatedoc'
+htmlhelp_basename = 'fracridgedoc'
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
