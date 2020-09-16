@@ -49,12 +49,17 @@ and datasets.
 `Getting started <quick_start.html>`_
 -------------------------------------
 
-Information regarding this template and how to modify it for your own project.
+Information regarding installation and basic usage.
 
 `User Guide <user_guide.html>`_
 -------------------------------
 
-An example of narrative documentation.
+How to use the software.
+
+`Contributing to Fracridge development <contributing.html>`_
+-------------------------------------------------------------
+
+How to report issue and contribute enhancements to the software.
 
 `API Documentation <api.html>`_
 -------------------------------
