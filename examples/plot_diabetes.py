@@ -20,8 +20,9 @@ very strong regularization.
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 ##########################################################################
-# This is the fracridge sklearn-style estimator:
+# This is the Fracridge sklearn-style estimator:
 #
 from fracridge import FracRidgeRegressor
 
@@ -70,16 +71,14 @@ fr_pred = cross_val_predict(FR, X, y)
 
 ##########################################################################
 # We plot the results. First, the FRR coefficients as a function of requested
-# fractions:
+# fractions and then the RR coefficient as a function of the requested
+# log-spaced alpha:
 
 fig, ax = plt.subplots(1, 2)
 ax[0].plot(fracs, FR.coef_.T)
 ylims = ax[0].get_ylim()
 ax[0].vlines(fracs, ylims[0], ylims[1], linewidth=0.5, color='gray')
 ax[0].set_ylim(*ylims)
-
-##########################################################################
-# Next, the RR as a function of the requested log-spaced alpha:
 ax[1].plot(np.log(rr_alphas[::-1]), rr_coefs.T)
 ylims = ax[1].get_ylim()
 ax[1].vlines(np.log(rr_alphas[::-1]), ylims[0], ylims[1], linewidth=0.5,
