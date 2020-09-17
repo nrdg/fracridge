@@ -1,5 +1,9 @@
 import numpy as np
+<<<<<<< HEAD
 from fracridge import fracridge, vec_len, FracRidge, FracRidgeCV
+=======
+from fracridge import fracridge, vec_len, FracRidgeRegressor
+>>>>>>> Update tests.
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
@@ -54,17 +58,19 @@ def test_fracridge_fracs(frac, nn, pp, bb):
             frac -
             vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
+
 def test_FracRidge_estimator():
     check_estimator(FracRidge())
     check_estimator(FracRidgeCV())
 
+
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [False])
-def test_FracRidge_ols(nn, pp, bb, fit_intercept):
+def test_v_ols(nn, pp, bb, fit_intercept):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
     FR.fit(X, y)
     assert np.allclose(FR.coef_[:, -1, ...], coef_ols, atol=10e-3)
 
@@ -72,9 +78,9 @@ def test_FracRidge_ols(nn, pp, bb, fit_intercept):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
-def test_FracRidge_fracs(nn, pp, bb, frac):
+def test_v_fracs(nn, pp, bb, frac):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
-    FR = FracRidge(fracs=frac)
+    FR = FracRidgeRegressor(fracs=frac)
     FR.fit(X, y)
     assert np.all(
         np.abs(
@@ -86,10 +92,10 @@ def test_FracRidge_fracs(nn, pp, bb, frac):
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
-def test_FracRidge_predict(nn, pp, bb, fit_intercept, jit):
+def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, jit):
     X, y, coef_ols, pred_ols = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept, jit=jit)
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept, jit=jit)
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
