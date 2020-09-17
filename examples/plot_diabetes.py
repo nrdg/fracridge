@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 ##########################################################################
 # This is the fracridge sklearn-style estimator:
 #
-from fracridge import FracRidge
+from fracridge import FracRidgeRegressor
 
 from sklearn import datasets
 from sklearn.linear_model import Ridge
@@ -64,7 +64,7 @@ for aa in range(len(rr_alphas)):
 # predictions are generated:
 
 fracs = np.linspace(0, 1, n_alphas)
-FR = FracRidge(fracs=fracs, fit_intercept=True)
+FR = FracRidgeRegressor(fracs=fracs, fit_intercept=True)
 FR.fit(X, y)
 fr_pred = cross_val_predict(FR, X, y)
 

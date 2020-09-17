@@ -37,6 +37,7 @@ and datasets.
    :caption: Documentation
 
    user_guide
+   contributing
    api
 
 .. toctree::

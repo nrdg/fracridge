@@ -18,7 +18,8 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
-__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
+__all__ = ["fracridge", "vec_len", "FracRidgeRegressor",
+           "FracRidgeRegressorCV"]
 
 
 def _do_svd(X, y, jit=True):
@@ -95,6 +96,7 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
         desired fraction.
     alphas : ndarray, shape (f, b)
         The alpha coefficients associated with each solution
+
     Examples
     --------
 
@@ -110,9 +112,9 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     >>> print(np.linalg.norm(coef))  # doctest: +NUMBER
     0.35
 
-    Call fracridge function:
+    Call ``fracs`` function:
 
-    >>> coef2, alpha = fracridge(X, y, 0.3)
+    >>> coef2, alpha = ``fracs``(X, y, 0.3)
     >>> print(np.linalg.norm(coef2))  # doctest: +NUMBER
     0.10
     >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))  # doctest: +NUMBER
@@ -202,10 +204,8 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     return coef.squeeze(), alphas
 
 
-class FracRidge(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     """
-    Fractional Ridge Regression estimator
-
     Parameters
     ----------
     fracs : float or sequence
@@ -216,22 +216,28 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
 
     Examples
     --------
+
     Generate random data:
+
     >>> np.random.seed(1)
     >>> y = np.random.randn(100)
     >>> X = np.random.randn(100, 10)
 
     Calculate coefficients with naive OLS:
+
     >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
 
     Initialize the estimator with a single fraction:
-    >>> fr = FracRidge(fracs=0.3)
+
+    >>> fr = FracRidgeRegressor(fracs=0.3)
 
     Fit estimator:
+
     >>> fr.fit(X, y)
-    FracRidge(fracs=0.3)
+    FracRidgeRegressor(fracs=0.3)
 
     Check results:
+
     >>> coef_ = fr.coef_
     >>> alpha_ = fr.alpha_
     >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
@@ -310,7 +316,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         return {'multioutput': True}
 
 
-class FracRidgeCV(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressorCV(BaseEstimator, MultiOutputMixin):
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
 

@@ -39,7 +39,11 @@ extensions = [
     'sphinx.ext.viewcode',
     'numpydoc',
     'sphinx_gallery.gen_gallery',
+    'sphinxcontrib.matlab',
 ]
+
+# Matlab documentation config:
+matlab_src_dir = '../matlab'
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
@@ -53,7 +57,13 @@ if LooseVersion(sphinx.__version__) < LooseVersion('1.4'):
 else:
     extensions.append('sphinx.ext.imgmath')
 
-autodoc_default_flags = ['members', 'inherited-members']
+# autodoc_default_flags = ['members', 'inherited-members']
+
+# autodoc_default_options = True
+
+autodoc_default_options = {
+    'members': True,
+    'inherited-members': True}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -112,7 +122,7 @@ exclude_patterns = ['_build', '_templates']
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
