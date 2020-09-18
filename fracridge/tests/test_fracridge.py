@@ -1,5 +1,5 @@
 import numpy as np
-from fracridge import fracridge, vec_len, FracRidge
+from fracridge import fracridge, vec_len, FracRidge, FracRidgeCV
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
@@ -56,7 +56,7 @@ def test_fracridge_fracs(frac, nn, pp, bb):
 
 
 check_estimator(FracRidge)
-
+check_estimator(FracRidgeCV)
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [False])

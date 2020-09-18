@@ -10,6 +10,7 @@ from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
                                       _check_sample_weight)
 
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
+from sklearn.model_selection import GridSearchCV
 
 # Module-wide constants
 BIG_BIAS = 10e3
@@ -17,7 +18,7 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
-__all__ = ["fracridge", "vec_len", "FracRidge"]
+__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
 
 
 def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
@@ -272,60 +273,45 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         else:
             self.intercept_ = 0.
 
+    def score(self, X, y, sample_weight=None):
+        """
+        Score the fracridge fit
+        """
+        from sklearn.metrics import r2_score
+        y_pred = self.predict(X)
+        if len(y_pred.shape) > len(y.shape):
+            y = y[..., np.newaxis]
+        y = np.broadcast_to(y, y_pred.shape)
+        return r2_score(y, y_pred, sample_weight=sample_weight,
+                        multioutput='raw_values')
+
+class FracRidgeCV(FracRidge):
+    def __init__(self, fracs=None, fit_intercept=False, normalize=False,
+                 copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
+
+        super().__init__(fracs=fracs, fit_intercept=fit_intercept,
+                         normalize=normalize,
+                         copy_X=copy_X, tol=tol, jit=jit)
+        self.cv = cv
+        self.scoring = scoring
+
+    def fit(self, X, y, sample_weight=None):
+        if self.fracs is None:
+            self.fracs = np.arange(.1, 1.1, .1)
+
+        parameters = {'fracs': self.fracs}
+        gs = GridSearchCV(
+                FracRidge(
+                    fit_intercept=self.fit_intercept,
+                    normalize=self.normalize),
+                parameters, cv=self.cv, scoring=self.scoring)
+
+        gs.fit(X, y, sample_weight=sample_weight)
+        estimator = gs.best_estimator_
+        self.best_score_ = gs.best_score_
+        self.coef_ = estimator.coef_
+        self.intercept_ = estimator.intercept_
+
 
 def vec_len(vec, axis=0):
     return np.sqrt((vec * vec).sum(axis=axis))
-
-
-def optimize_for_frac(X, fracs):
-    """
-    Empirically find the alpha that gives frac reduction in vector length of
-    the solution
-
-    """
-    u, s, v = svd(X)
-
-    val1 = 10e3 * s[0] ** 2  # Huge bias
-    val2 = 10e-3 * s[-1] ** 2  # Tiny bias
-
-    alphas = np.concatenate(
-        [np.array([0]), 10 ** np.arange(np.floor(np.log10(val2)),
-                                        np.ceil(np.log10(val1)), 0.1)])
-
-    results = np.zeros(alphas.shape[0])
-    for ii, alpha in enumerate(alphas):
-        results[ii] = frac_reduction(X, alpha, s=s)
-
-    return interp1d(results, alphas, bounds_error=False, fill_value="extrapolate")(np.asarray(fracs))
-
-
-def frac_reduction(X, alpha, s=None):
-    """
-    Calculates the expected fraction reduction in the length of the
-    coefficient vector $\beta$ from OLS to ridge, given a design matrix X and
-    a regularization metaparameter alpha.
-    """
-    if s is None:
-        u, s, v = svd(X)
-    new = s / (s ** 2 + alpha)
-    olslen = np.sqrt(np.sum((1 / s) ** 2))
-    rrlen = np.sqrt(np.sum(new ** 2))
-    return rrlen / olslen
-
-
-def frac_reduction_flat(X, alpha, s=None):
-    """
-    This is the version that assumes a flat eigenvalue spectrum
-    """
-    if s is None:
-        u, s, v = svd(X)
-    return np.mean(s ** 2 / (s ** 2 + alpha))
-
-
-def reg_alpha_flat(X, gamma, s=None):
-    """
-    This is the version that assumes a flat eigenvalue spectrum
-    """
-    if s is None:
-        u, s, v = svd(X)
-    return (s ** 2) * (1 / gamma - 1)
