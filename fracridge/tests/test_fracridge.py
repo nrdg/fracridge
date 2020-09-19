@@ -55,8 +55,9 @@ def test_fracridge_fracs(frac, nn, pp, bb):
             vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
 
-check_estimator(FracRidge)
-check_estimator(FracRidgeCV)
+check_estimator(FracRidge())
+# check_estimator(FracRidgeCV())
+
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [False])
@@ -92,3 +93,17 @@ def test_FracRidge_predict(nn, pp, bb, fit_intercept, jit):
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
+
+
+# @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+# @pytest.mark.parametrize("bb", [(1), (2)])
+# @pytest.mark.parametrize("fit_intercept", [True, False])
+# @pytest.mark.parametrize("jit", [True, False])
+# def test_FracRidge_predict(nn, pp, bb, fit_intercept, jit):
+#     X, y, coef_ols, pred_ols = make_data(nn, pp, bb, fit_intercept)
+#     frac_grid = np.arange(.1, 1.1, .1)
+#     FR = FracRidgeCV(frac_grid=frac_grid, fit_intercept=fit_intercept, jit=jit)
+#     FR.fit(X, y)
+#     pred_fr = FR.predict(X)
+#     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
+

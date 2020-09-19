@@ -7,9 +7,10 @@ import warnings
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
-                                      _check_sample_weight)
+                                      _check_sample_weight, _deprecate_positional_args)
 
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
+from sklearn.linear_model import RidgeCV
 from sklearn.model_selection import GridSearchCV
 
 # Module-wide constants
@@ -21,7 +22,30 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
 
 
-def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
+def _do_svd(X, jit):
+        # Per default, we'll try to use the jit-compiled SVD, which should be
+    # more performant:
+    use_scipy = False
+    if jit:
+        try:
+            from ._linalg import svd
+        except ImportError:
+            warnings.warn("The `jit` key-word argument is set to `True` ",
+                          "but numba could not be imported, or just-in time ",
+                          "compilation failed. Falling back to ",
+                          "`scipy.linalg.svd`")
+            use_scipy = True
+
+    # If that doesn't work, or you asked not to, we'll use scipy SVD:
+    if not jit or use_scipy:
+        from functools import partial
+        from scipy.linalg import svd  # noqa
+        svd = partial(svd, full_matrices=False)
+
+    return svd(X)
+
+
+def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -43,6 +67,10 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
         Whether to speed up computations by using a just-in-time compiled
         version of core computations. This may not work well with very large
         datasets. Default: True
+
+    pre_svd : tuple, optional
+        If provided, this should be (u, s, v_t) corresponding to the
+        results of a singular value decompisition: $X = USV ^{\intercal}$
 
     Returns
     -------
@@ -76,25 +104,6 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
     0.0
     """
-    # Per default, we'll try to use the jit-compiled SVD, which should be
-    # more performant:
-    use_scipy = False
-    if jit:
-        try:
-            from ._linalg import svd
-        except ImportError:
-            warnings.warn("The `jit` key-word argument is set to `True` ",
-                          "but numba could not be imported, or just-in time ",
-                          "compilation failed. Falling back to ",
-                          "`scipy.linalg.svd`")
-            use_scipy = True
-
-    # If that doesn't work, or you asked not to, we'll use scipy SVD:
-    if not jit or use_scipy:
-        from functools import partial
-        from scipy.linalg import svd  # noqa
-        svd = partial(svd, full_matrices=False)
-
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
@@ -109,7 +118,11 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
-    uu, selt, v_t = svd(X)
+    # Maybe you already SVD'd this matrix:
+    if pre_svd is None:
+        uu, selt, v_t = _do_svd(X, jit)
+    else:
+        uu, selt, v_t = pre_svd
 
     # This rotates the targets by the unitary matrix uu.T:
     ynew = uu.T @ y
@@ -182,8 +195,6 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
 class FracRidge(BaseEstimator, MultiOutputMixin):
     """
     Fractional Ridge Regression estimator
-
-
 
     Parameters
     ----------
@@ -285,25 +296,33 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         return r2_score(y, y_pred, sample_weight=sample_weight,
                         multioutput='raw_values')
 
-class FracRidgeCV(FracRidge):
-    def __init__(self, fracs=None, fit_intercept=False, normalize=False,
+
+class FracRidgeCV(BaseEstimator):
+    def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
 
-        super().__init__(fracs=fracs, fit_intercept=fit_intercept,
-                         normalize=normalize,
-                         copy_X=copy_X, tol=tol, jit=jit)
+        self.frac_grid = frac_grid
+        self.fit_intercept = fit_intercept
+        self.normalize = normalize
+        self.copy_X = copy_X
+        self.tol = tol
+        self.jit = jit
+
         self.cv = cv
         self.scoring = scoring
 
     def fit(self, X, y, sample_weight=None):
-        if self.fracs is None:
-            self.fracs = np.arange(.1, 1.1, .1)
+        if self.frac_grid is None:
+            self.frac_grid = np.arange(.1, 1.1, .1)
 
-        parameters = {'fracs': self.fracs}
+        parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
                 FracRidge(
                     fit_intercept=self.fit_intercept,
-                    normalize=self.normalize),
+                    normalize=self.normalize,
+                    copy_X=self.copy_X,
+                    tol=self.tol,
+                    jit=self.jit),
                 parameters, cv=self.cv, scoring=self.scoring)
 
         gs.fit(X, y, sample_weight=sample_weight)
@@ -311,6 +330,12 @@ class FracRidgeCV(FracRidge):
         self.best_score_ = gs.best_score_
         self.coef_ = estimator.coef_
         self.intercept_ = estimator.intercept_
+        self.is_fitted_ = True
+
+        return self
+
+    def _more_tags(self):
+        return {'multioutput': True}
 
 
 def vec_len(vec, axis=0):
