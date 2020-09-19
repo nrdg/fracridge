@@ -48,7 +48,6 @@ def _do_svd(X, y, jit):
     if X.shape[0] > X.shape[0]:
         uu, ss, v_t = svd(X.T @ X)
         selt = np.sqrt(ss)
-        v_t
         if y.shape[-1] >= X.shape[0]:
             ynew = (np.diag(1./selt) @ v_t * X.T) @ y
         else:
@@ -86,7 +85,10 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
         datasets. Default: True
 
     pre_svd : tuple, optional
-        If provided, this should be (selt, v_t, ynew)
+        If provided, this should be the outputs of the :func:`_pre_svd`
+        function: (selt, v_t, ynew), where selt and v_t are the singular values
+        and the $V^{\intercal}$ results from the SVD: $X = U S V^{\intercal}$,
+        y_new is the projection of y by $U^{\intercal} y$.
 
     Returns
     -------
