@@ -22,8 +22,11 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
 
 
-def _do_svd(X, jit):
-        # Per default, we'll try to use the jit-compiled SVD, which should be
+def _do_svd(X, y, jit):
+    """
+    Helper function to produce SVD outputs
+    """
+    # Per default, we'll try to use the jit-compiled SVD, which should be
     # more performant:
     use_scipy = False
     if jit:
@@ -42,7 +45,21 @@ def _do_svd(X, jit):
         from scipy.linalg import svd  # noqa
         svd = partial(svd, full_matrices=False)
 
-    return svd(X)
+    if X.shape[0] > X.shape[0]:
+        uu, ss, v_t = svd(X.T @ X)
+        selt = np.sqrt(ss)
+        v_t
+        if y.shape[-1] >= X.shape[0]:
+            ynew = (np.diag(1./selt) @ v_t * X.T) @ y
+        else:
+            ynew = np.diag(1./selt) @ v_t @ (X.T @ y)
+
+    else:
+        # This rotates the targets by the unitary matrix uu.T:
+        uu, selt, v_t =  svd(X)
+        ynew = uu.T @ y
+
+    return selt, v_t, ynew
 
 
 def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
@@ -69,8 +86,7 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
         datasets. Default: True
 
     pre_svd : tuple, optional
-        If provided, this should be (u, s, v_t) corresponding to the
-        results of a singular value decompisition: $X = USV ^{\intercal}$
+        If provided, this should be (selt, v_t, ynew)
 
     Returns
     -------
@@ -120,13 +136,9 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
 
     # Maybe you already SVD'd this matrix:
     if pre_svd is None:
-        uu, selt, v_t = _do_svd(X, jit)
+        selt, v_t, ynew = _do_svd(X, y, jit)
     else:
-        uu, selt, v_t = pre_svd
-
-    # This rotates the targets by the unitary matrix uu.T:
-    ynew = uu.T @ y
-    del uu
+        selt, v_t, ynew = pre_svd
 
     # Solve OLS for the rotated problem and replace y:
     ols_coef = (ynew.T / selt).T
