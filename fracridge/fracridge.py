@@ -349,7 +349,7 @@ class FracRidgeRegressorCV(BaseEstimator, MultiOutputMixin):
 
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
-                FracRidge(
+                FracRidgeRegressor(
                     fit_intercept=self.fit_intercept,
                     normalize=self.normalize,
                     copy_X=self.copy_X,
