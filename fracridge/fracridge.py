@@ -10,7 +10,6 @@ from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
                                       _check_sample_weight)
 
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
-from sklearn.linear_model import RidgeCV
 from sklearn.model_selection import GridSearchCV
 
 # Module-wide constants
