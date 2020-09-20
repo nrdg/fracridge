@@ -51,8 +51,8 @@ def test_fracridge_fracs(frac, nn, pp, bb):
     coef, _ = fracridge(X, y, fracs=np.array([frac]))
     assert np.all(
         np.abs(
-            frac -
-            vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
+            frac
+            - vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
 
 def test_FracRidge_estimator():
@@ -80,8 +80,8 @@ def test_v_fracs(nn, pp, bb, frac):
     FR.fit(X, y)
     assert np.all(
         np.abs(
-            frac -
-            vec_len(FR.coef_, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
+            frac
+            - vec_len(FR.coef_, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
