@@ -19,7 +19,7 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
-__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV", "_do_svd"]
+__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
 
 
 def _do_svd(X, y, jit=True):
@@ -61,10 +61,12 @@ def _do_svd(X, y, jit=True):
         uu, selt, v_t = svd(X)
         ynew = uu.T @ y
 
-    return selt, v_t, ynew
+    ols_coef = (ynew.T / selt).T
+
+    return selt, v_t, ols_coef
 
 
-def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
+def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -86,12 +88,6 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
         Whether to speed up computations by using a just-in-time compiled
         version of core computations. This may not work well with very large
         datasets. Default: True
-
-    pre_svd : tuple, optional
-        If provided, this should be the outputs of the :func:`_pre_svd`
-        function: (selt, v_t, ynew), where selt and v_t are the singular values
-        and the $V^{\intercal}$ results from the SVD: $X = U S V^{\intercal}$,
-        y_new is the projection of y by $U^{\intercal} y$.
 
     Returns
     -------
@@ -139,15 +135,8 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
     bb = y.shape[-1]
     ff = fracs.shape[0]
 
-    # Maybe you already SVD'd this matrix:
-    if pre_svd is None:
-        selt, v_t, ynew = _do_svd(X, y, jit=jit)
-    else:
-        selt, v_t, ynew = pre_svd # _do_svd(X, y, jit=jit)
-
-    # Solve OLS for the rotated problem and replace y:
-    ols_coef = (ynew.T / selt).T
-    del ynew
+    # Calculate the rotation of the data
+    selt, v_t, ols_coef = _do_svd(X, y, jit=jit)
 
     # Set solutions for small eigenvalues to 0 for all targets:
     isbad = selt < tol
@@ -244,9 +233,6 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
     >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
     0.29
     """
-    def _more_tags(self):
-        return {'multioutput': True}
-
     def __init__(self, fracs=None, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-6, jit=True):
         self.fracs = fracs
@@ -256,7 +242,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         self.tol = tol
         self.jit = jit
 
-    def fit(self, X, y, sample_weight=None, pre_svd=None):
+    def fit(self, X, y, sample_weight=None):
         X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
 
         if sample_weight is not None:
@@ -273,7 +259,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
             X, y = _rescale_data(X, y, sample_weight)
 
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
-                                jit=self.jit, pre_svd=pre_svd)
+                                jit=self.jit)
         self.alpha_ = alpha
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
@@ -313,6 +299,9 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         return r2_score(y, y_pred, sample_weight=sample_weight,
                         multioutput='raw_values')
 
+    def _more_tags(self):
+        return {'multioutput': True}
+
 
 class FracRidgeCV(BaseEstimator):
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
@@ -331,7 +320,6 @@ class FracRidgeCV(BaseEstimator):
     def fit(self, X, y, sample_weight=None):
         if self.frac_grid is None:
             self.frac_grid = np.arange(.1, 1.1, .1)
-        pre_svd = _do_svd(X, y, jit=self.jit)
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
                 FracRidge(

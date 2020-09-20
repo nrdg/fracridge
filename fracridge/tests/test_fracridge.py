@@ -1,25 +1,20 @@
 import numpy as np
-from fracridge import fracridge, vec_len, FracRidge, FracRidgeCV, _do_svd
+from fracridge import fracridge, vec_len, FracRidge, FracRidgeCV
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
 
-def run_fracridge(X, y, fracs, jit, pre_svd):
-    fracridge(X, y, fracs=fracs, jit=jit, pre_svd=pre_svd)
+def run_fracridge(X, y, fracs, jit):
+    fracridge(X, y, fracs=fracs, jit=jit)
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("jit", [True, False])
-@pytest.mark.parametrize("pre_svd", [True, False])
-def test_benchmark_fracridge(nn, pp, bb, jit, pre_svd, benchmark):
+def test_benchmark_fracridge(nn, pp, bb, jit, benchmark):
     X, y, _, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    if pre_svd:
-        pre_svd = _do_svd(X, y)
-    else:
-        pre_svd = None
-    benchmark(run_fracridge, X, y, fracs, jit, pre_svd)
+    benchmark(run_fracridge, X, y, fracs, jit)
 
 
 def make_data(nn, pp, bb, fit_intercept=False):
@@ -72,9 +67,7 @@ def test_FracRidge_ols(nn, pp, bb, fit_intercept):
     FR = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
     FR.fit(X, y)
     assert np.allclose(FR.coef_[:, -1, ...], coef_ols, atol=10e-3)
-    FR2 = FracRidge(fracs=fracs, fit_intercept=fit_intercept)
-    FR2.fit(X, y, pre_svd=_do_svd(X, y))
-    assert np.allclose(FR.coef_, FR.coef_)
+
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
