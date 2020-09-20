@@ -1,28 +1,8 @@
-from setuptools import find_packages
+from setuptools import setup
 import string
 import os.path as op
 from setuptools_scm import get_version
 
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-
-here = op.abspath(op.dirname(__file__))
-
-meta_file = op.join(here, 'fracridge', '_meta.py')
-with open(meta_file) as f:
-    exec(f.read())
-
-REQUIRES = []
-with open(op.join(here, 'requirements.txt')) as f:
-    ll = f.readline()[:-1]
-    while ll:
-        REQUIRES.append(ll)
-        ll = f.readline()[:-1]
-
-with open(op.join(here, 'README.md'), encoding='utf-8') as f:
-    LONG_DESCRIPTION = f.read()
 
 def local_version(version):
     """
@@ -41,26 +21,12 @@ def local_version(version):
         return ""
 
 
-opts = dict(name=NAME,
-            maintainer=MAINTAINER,
-            maintainer_email=MAINTAINER_EMAIL,
-            description=DESCRIPTION,
-            long_description=LONG_DESCRIPTION,
-            long_description_content_type="text/markdown",
-            url=URL,
-            download_url=DOWNLOAD_URL,
-            license=LICENSE,
-            classifiers=CLASSIFIERS,
-            author=AUTHOR,
-            author_email=AUTHOR_EMAIL,
-            platforms=PLATFORMS,
-            packages=find_packages(),
-            install_requires=REQUIRES,
-            python_requires=PYTHON_REQUIRES,
-            use_scm_version={"root": ".", "relative_to": __file__,
-                             "write_to": "fracridge/version.py",
-                             "local_scheme": local_version},
-            setup_requires=['setuptools_scm'])
+opts = dict(
+    use_scm_version={"root": ".", "relative_to": __file__,
+                     "write_to": op.join("fracridge", "version.py"),
+                     "local_scheme": local_version}
+            )
+
 
 
 if __name__ == '__main__':
