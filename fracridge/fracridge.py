@@ -7,7 +7,7 @@ import warnings
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
-                                      _check_sample_weight, _deprecate_positional_args)
+                                      _check_sample_weight)
 
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
 from sklearn.linear_model import RidgeCV
@@ -19,13 +19,16 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
-__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
+__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV", "_do_svd"]
 
 
-def _do_svd(X, y, jit):
+def _do_svd(X, y, jit=True):
     """
     Helper function to produce SVD outputs
     """
+    if len(y.shape) == 1:
+        y = y[:, np.newaxis]
+
     # Per default, we'll try to use the jit-compiled SVD, which should be
     # more performant:
     use_scipy = False
@@ -45,17 +48,17 @@ def _do_svd(X, y, jit):
         from scipy.linalg import svd  # noqa
         svd = partial(svd, full_matrices=False)
 
-    if X.shape[0] > X.shape[0]:
+    if X.shape[0] > X.shape[1]:
         uu, ss, v_t = svd(X.T @ X)
         selt = np.sqrt(ss)
         if y.shape[-1] >= X.shape[0]:
-            ynew = (np.diag(1./selt) @ v_t * X.T) @ y
+            ynew = (1/selt) @ v_t @ X.T @ y
         else:
             ynew = np.diag(1./selt) @ v_t @ (X.T @ y)
 
     else:
         # This rotates the targets by the unitary matrix uu.T:
-        uu, selt, v_t =  svd(X)
+        uu, selt, v_t = svd(X)
         ynew = uu.T @ y
 
     return selt, v_t, ynew
@@ -138,9 +141,9 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True, pre_svd=None):
 
     # Maybe you already SVD'd this matrix:
     if pre_svd is None:
-        selt, v_t, ynew = _do_svd(X, y, jit)
+        selt, v_t, ynew = _do_svd(X, y, jit=jit)
     else:
-        selt, v_t, ynew = pre_svd
+        selt, v_t, ynew = pre_svd # _do_svd(X, y, jit=jit)
 
     # Solve OLS for the rotated problem and replace y:
     ols_coef = (ynew.T / selt).T
@@ -253,7 +256,7 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         self.tol = tol
         self.jit = jit
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, pre_svd=None):
         X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
 
         if sample_weight is not None:
@@ -269,12 +272,12 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
             # Sample weight can be implemented via a simple rescaling.
             X, y = _rescale_data(X, y, sample_weight)
 
-        self.is_fitted_ = True
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
-                                jit=self.jit)
+                                jit=self.jit, pre_svd=pre_svd)
         self.alpha_ = alpha
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
+        self.is_fitted_ = True
         return self
 
     def predict(self, X):
@@ -328,7 +331,7 @@ class FracRidgeCV(BaseEstimator):
     def fit(self, X, y, sample_weight=None):
         if self.frac_grid is None:
             self.frac_grid = np.arange(.1, 1.1, .1)
-
+        pre_svd = _do_svd(X, y, jit=self.jit)
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
                 FracRidge(
