@@ -1,5 +1,5 @@
 import numpy as np
-from fracridge import fracridge, vec_len, FracRidge
+from fracridge import fracridge, vec_len, FracRidge, FracRidgeCV
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
@@ -54,8 +54,9 @@ def test_fracridge_fracs(frac, nn, pp, bb):
             frac -
             vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
-
-check_estimator(FracRidge)
+def test_FracRidge_estimator():
+    check_estimator(FracRidge())
+    check_estimator(FracRidgeCV())
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
 @pytest.mark.parametrize("bb", [(1), (2)])
@@ -92,3 +93,14 @@ def test_FracRidge_predict(nn, pp, bb, fit_intercept, jit):
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
+
+
+def test_FracRidge_singleton_frac():
+    X = np.array([[1.64644051],
+                  [2.1455681]])
+    y = np.array([1., 2.])
+    fracs = 0.1
+    FR = FracRidge(fracs=fracs)
+    FR.fit(X, y)
+    pred_fr = FR.predict(X)
+    assert pred_fr.shape == y.shape
