@@ -269,7 +269,11 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
     def predict(self, X):
         X = check_array(X, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
-        pred = np.tensordot(X, self.coef_, axes=(1))
+        if len(self.coef_.shape) == 0:
+            pred_coef = self.coef_[np.newaxis]
+        else:
+            pred_coef = self.coef_
+        pred = np.tensordot(X, pred_coef, axes=(1))
         if self.fit_intercept:
             pred = pred + self.intercept_
         return pred
@@ -296,18 +300,19 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         if len(y_pred.shape) > len(y.shape):
             y = y[..., np.newaxis]
         y = np.broadcast_to(y, y_pred.shape)
-        return r2_score(y, y_pred, sample_weight=sample_weight,
-                        multioutput='raw_values')
+        return r2_score(y, y_pred, sample_weight=sample_weight)
 
     def _more_tags(self):
         return {'multioutput': True}
 
 
-class FracRidgeCV(BaseEstimator):
+class FracRidgeCV(BaseEstimator, MultiOutputMixin):
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
 
         self.frac_grid = frac_grid
+        if self.frac_grid is None:
+            self.frac_grid = (0.1, 0.3, 0.6, 0.9)
         self.fit_intercept = fit_intercept
         self.normalize = normalize
         self.copy_X = copy_X
@@ -318,8 +323,20 @@ class FracRidgeCV(BaseEstimator):
         self.scoring = scoring
 
     def fit(self, X, y, sample_weight=None):
-        if self.frac_grid is None:
-            self.frac_grid = np.arange(.1, 1.1, .1)
+
+        # XXX The checks below are identical to those in FracRidge.fit.
+        # Should make that a decorator
+        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
+
+        if sample_weight is not None:
+            sample_weight = _check_sample_weight(sample_weight, X,
+                                                 dtype=X.dtype)
+
+        X, y, X_offset, y_offset, X_scale = _preprocess_data(
+            X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
+            copy=self.copy_X, sample_weight=sample_weight,
+            return_mean=True)
+
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
                 FracRidge(
