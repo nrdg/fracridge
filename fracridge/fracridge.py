@@ -112,9 +112,9 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     >>> print(np.linalg.norm(coef))  # doctest: +NUMBER
     0.35
 
-    Call ``fracs`` function:
+    Call fracridge function:
 
-    >>> coef2, alpha = ``fracs``(X, y, 0.3)
+    >>> coef2, alpha = fracridge(X, y, 0.3)
     >>> print(np.linalg.norm(coef2))  # doctest: +NUMBER
     0.10
     >>> print(np.linalg.norm(coef2) / np.linalg.norm(coef))  # doctest: +NUMBER
