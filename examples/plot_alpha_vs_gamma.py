@@ -90,7 +90,7 @@ print(srr_r2)
 # In addition to a direct comparison of performance, we might ask what are the
 # differences in terms of how the models have reached this point.
 # The FRR CV estimator has a property that tells us what has been discovered
-# as the best fraction (or $\gamma$) to use:
+# as the best fraction (or 'gamma') to use:
 
 print(frr.best_frac_)
 
