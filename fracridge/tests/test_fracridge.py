@@ -113,7 +113,7 @@ def test_FracRidge_singleton_frac():
 @pytest.mark.parametrize("bb", [(1), (2)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
-def test_FracRidgeRegressorCV_predict(nn, pp, bb, fit_intercept, jit):
+def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
     X, y, _, _ = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
     FRCV = FracRidgeRegressorCV(frac_grid=fracs, fit_intercept=fit_intercept,
