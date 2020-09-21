@@ -1,5 +1,7 @@
 import numpy as np
-from fracridge import (fracridge, vec_len, FracRidgeRegressor, FracRidgeRegressorCV)
+from fracridge import (fracridge, vec_len, FracRidgeRegressor,
+                       FracRidgeRegressorCV)
+from sklearn.linear_model import Ridge
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
@@ -106,3 +108,25 @@ def test_FracRidge_singleton_frac():
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert pred_fr.shape == y.shape
+
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("fit_intercept", [True, False])
+@pytest.mark.parametrize("jit", [True, False])
+def test_FracRidgeRegressorCV_predict(nn, pp, bb, fit_intercept, jit):
+    X, y, _, _ = make_data(nn, pp, bb, fit_intercept)
+    fracs = np.arange(.1, 1.1, .1)
+    FRCV = FracRidgeRegressorCV(frac_grid=fracs, fit_intercept=fit_intercept,
+                                jit=jit)
+    FRCV.fit(X, y)
+    FR = FracRidgeRegressor(fracs=FRCV.best_frac_)
+    FR.fit(X, y)
+    assert np.allclose(FR.coef_, FRCV.coef_, atol=10e-3)
+    RR = Ridge(alpha=FRCV.alpha_, fit_intercept=fit_intercept,
+               solver='svd')
+    RR.fit(X, y)
+    # The coefficients in the sklearn object are transposed relative to
+    # our conventions:
+    assert np.allclose(RR.coef_.T, FRCV.coef_, atol=10e-3)
+
+

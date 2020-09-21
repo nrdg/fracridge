@@ -8,7 +8,6 @@ import warnings
 from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
                                       _check_sample_weight)
-
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
 from sklearn.model_selection import GridSearchCV
 
@@ -252,7 +251,10 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         self.tol = tol
         self.jit = jit
 
-    def fit(self, X, y, sample_weight=None):
+    def _validate_input(self, X, y, sample_weight=None):
+        """
+        Helper function to validate the inputs
+        """
         X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
 
         if sample_weight is not None:
@@ -267,7 +269,11 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         if sample_weight is not None:
             # Sample weight can be implemented via a simple rescaling.
             X, y = _rescale_data(X, y, sample_weight)
+        return X, y, X_offset, y_offset, X_scale
 
+    def fit(self, X, y, sample_weight=None):
+        X, y, X_offset, y_offset, X_scale = self._validate_input(
+            X, y, sample_weight=sample_weight)
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
                                 jit=self.jit)
         self.alpha_ = alpha
@@ -316,36 +322,21 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         return {'multioutput': True}
 
 
-class FracRidgeRegressorCV(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressorCV(FracRidgeRegressor):
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
 
         self.frac_grid = frac_grid
         if self.frac_grid is None:
             self.frac_grid = (0.1, 0.3, 0.6, 0.9)
-        self.fit_intercept = fit_intercept
-        self.normalize = normalize
-        self.copy_X = copy_X
-        self.tol = tol
-        self.jit = jit
-
+        super().__init__(self, fit_intercept=False, normalize=False,
+                         copy_X=True, tol=1e-6, jit=True,)
         self.cv = cv
         self.scoring = scoring
 
     def fit(self, X, y, sample_weight=None):
-
-        # XXX The checks below are identical to those in FracRidge.fit.
-        # Should make that a decorator
-        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
-
-        if sample_weight is not None:
-            sample_weight = _check_sample_weight(sample_weight, X,
-                                                 dtype=X.dtype)
-
-        X, y, X_offset, y_offset, X_scale = _preprocess_data(
-            X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
-            copy=self.copy_X, sample_weight=sample_weight,
-            return_mean=True)
+        X, y, X_offset, y_offset, X_scale = self._validate_input(
+            X, y, sample_weight=sample_weight)
 
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
@@ -362,6 +353,8 @@ class FracRidgeRegressorCV(BaseEstimator, MultiOutputMixin):
         self.best_score_ = gs.best_score_
         self.coef_ = estimator.coef_
         self.intercept_ = estimator.intercept_
+        self.best_frac_ = estimator.fracs
+        self.alpha_ = estimator.alpha_
         self.is_fitted_ = True
 
         return self
