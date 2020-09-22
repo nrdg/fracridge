@@ -4,6 +4,7 @@
 import numpy as np
 from numpy import interp
 import warnings
+import collections
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
@@ -80,8 +81,9 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
 
     fracs : float or 1d array, optional
         The desired fractions of the parameter vector length, relative to
-        OLS solution. If 1d array, the shape is (f,).
-        Default: np.arange(.1, 1.1, .1)
+        OLS solution. If 1d array, the shape is (f,). This input is required
+        to be sorted. Otherwise, raises ValueError.
+        Default: np.arange(.1, 1.1, .1).
 
     jit : bool, optional
         Whether to speed up computations by using a just-in-time compiled
@@ -129,7 +131,12 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    if not hasattr(fracs, "__len__"):
+    if hasattr(fracs, "__len__"):
+        if np.any(np.diff(fracs) < 0):
+            raise ValueError("The `frac` inputs to the `fracridge` function ",
+                             f"must be sorted. You provided: {fracs}")
+
+    else:
         fracs = [fracs]
     fracs = np.array(fracs)
 

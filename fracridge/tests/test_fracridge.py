@@ -130,3 +130,11 @@ def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
     assert np.allclose(RR.coef_.T, FRCV.coef_, atol=10e-3)
 
 
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
+@pytest.mark.parametrize("bb", [(1), (2)])
+def test_fracridge_unsorted(nn, pp, bb):
+    X, y, coef_ols, _ = make_data(nn, pp, bb)
+    fracs = np.array([0.1, 0.8, 1.0, 0.2])
+    # Frac input needs to be sorted:
+    with pytest.raises(ValueError):
+        coef, alpha = fracridge(X, y, fracs=fracs)
