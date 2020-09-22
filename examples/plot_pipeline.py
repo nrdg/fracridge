@@ -17,6 +17,7 @@ by a grid search to find the best fraction for the fraction parameter.
 #
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
@@ -46,11 +47,19 @@ X, y, coef_true = make_regression(
 # more and more dimensions in them. As the number of data dimensions grows, the
 # best fraction for FracRidge decreases.
 
+best_fracs = []
+
 for n_components in range(2, X.shape[-1], 5):
     pca = PCA(n_components=n_components)
     frcv = FracRidgeRegressorCV()
     pipeline = Pipeline(steps=[('pca', pca), ('fracridgecv', frcv)])
     pipeline.fit(X, y)
+    best_fracs.append(pipeline['fracridgecv'].best_frac_)
 
-    print(pipeline['fracridgecv'].best_frac_)
+fig, ax = plt.subplots()
+ax.plot(range(2, X.shape[-1], 5), best_fracs, 'o-')
+ax.set_ylim([0, 1])
+ax.set_ylabel("Best fraction")
+ax.set_xlabel("Number of PCA components")
 
+plt.show()
