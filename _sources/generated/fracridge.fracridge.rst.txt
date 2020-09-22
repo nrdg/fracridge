@@ -1,0 +1,12 @@
+﻿:mod:`fracridge`.fracridge
+=======================================
+
+.. currentmodule:: fracridge
+
+.. autofunction:: fracridge
+
+.. include:: fracridge.fracridge.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

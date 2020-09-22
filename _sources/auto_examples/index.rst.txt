@@ -9,6 +9,50 @@ Example `fracridge` usage
 ==========================
 
 
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Because Fracridge is implemented using a Scikit-Learn-compatible API, the objects in the librar...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_thumb.png
+     :alt: Integrating FracRidge objects into sklearn pipelines
+
+     :ref:`sphx_glr_auto_examples_plot_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_pipeline
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Here we compare parameterization using fractional ridge regression (FRR) and standard ridge reg...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_alpha_vs_gamma_thumb.png
+     :alt: Comparing alpha and fracs
+
+     :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_alpha_vs_gamma
+
 .. raw:: html
 
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use...">
@@ -55,13 +99,13 @@ The code in this directory relies on functions contained in:
 
   .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//home/runner/work/fracridge/fracridge/docs/source/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//home/runner/work/fracridge/fracridge/docs/source/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

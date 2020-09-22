@@ -1,0 +1,16 @@
+﻿:mod:`fracridge`.FracRidgeRegressor
+==========================================
+
+.. currentmodule:: fracridge
+
+.. autoclass:: FracRidgeRegressor
+
+   
+   .. automethod:: __init__
+   
+
+.. include:: fracridge.FracRidgeRegressor.examples
+
+.. raw:: html
+
+    <div style='clear:both'></div>

@@ -1,0 +1,332 @@
+.. only:: html
+
+    .. note::
+        :class: sphx-glr-download-link-note
+
+        Click :ref:`here <sphx_glr_download_auto_examples_plot_alpha_vs_gamma.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_plot_alpha_vs_gamma.py:
+
+
+========================================
+Comparing alpha and fracs
+========================================
+
+Here we compare parameterization using fractional ridge regression (FRR) and
+standard ridge regression (SRR).
+
+We will use the cross-validation objects implemented for both of these methods.
+In the case of SRR, we will use the Scikit Learn implementation in the
+:class:`sklearn.linear_model.RidgeCV` object. For FRR, we use the
+:class:`FracRidgeRegressorCV` object, which implements a similar API.
+
+Imports:
+
+
+
+.. code-block:: default
+
+
+    import numpy as np
+    from numpy.linalg import norm
+    from sklearn.datasets import make_regression
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import r2_score
+    from sklearn.linear_model import RidgeCV, LinearRegression
+    from fracridge import FracRidgeRegressorCV
+
+
+
+
+
+
+
+
+Here, we use a synthetic dataset. We generate a regression dataset
+with multiple targets, multiple samples, a large number of features
+and plenty of redundancy between them (set through the
+relatively small `effective_rank` of the design matrix):
+
+
+
+.. code-block:: default
+
+
+    np.random.seed(1984)
+
+    n_targets = 15
+    n_features = 80
+    effective_rank = 20
+    X, y, coef_true = make_regression(
+                        n_samples=250,
+                        n_features=n_features,
+                        effective_rank=effective_rank,
+                        n_targets=n_targets,
+                        coef=True,
+                        noise=5)
+
+
+
+
+
+
+
+
+To evaluate and compare the performance of the two algorithms, we
+split the data into test and train sets:
+
+
+.. code-block:: default
+
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+
+
+
+
+
+
+
+We will start with SRR. We use a dense grid of alphas with 20
+log-spaced values -- a common heuristic used to ensure a wide sampling
+of alpha values
+
+
+.. code-block:: default
+
+
+    n_alphas = 20
+    srr_alphas = np.logspace(-10, 10, n_alphas)
+    srr = RidgeCV(alphas=srr_alphas)
+    srr.fit(X_train, y_train)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    RidgeCV(alphas=array([1.00000000e-10, 1.12883789e-09, 1.27427499e-08, 1.43844989e-07,
+           1.62377674e-06, 1.83298071e-05, 2.06913808e-04, 2.33572147e-03,
+           2.63665090e-02, 2.97635144e-01, 3.35981829e+00, 3.79269019e+01,
+           4.28133240e+02, 4.83293024e+03, 5.45559478e+04, 6.15848211e+05,
+           6.95192796e+06, 7.84759970e+07, 8.85866790e+08, 1.00000000e+10]))
+
+
+
+We sample the same number of fractions for FRR, evenly distributed between
+1/n_alphas and 1.
+
+
+
+.. code-block:: default
+
+
+    fracs = np.linspace(1/n_alphas, 1 + 1/n_alphas, n_alphas)
+    frr = FracRidgeRegressorCV(frac_grid=fracs)
+    frr.fit(X_train, y_train)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    FracRidgeRegressorCV(frac_grid=array([0.05      , 0.10263158, 0.15526316, 0.20789474, 0.26052632,
+           0.31315789, 0.36578947, 0.41842105, 0.47105263, 0.52368421,
+           0.57631579, 0.62894737, 0.68157895, 0.73421053, 0.78684211,
+           0.83947368, 0.89210526, 0.94473684, 0.99736842, 1.05      ]))
+
+
+
+Both models are fit and used to predict a left out set. Performance
+of the models is compared using the :func:`sklearn.metrics.r2_score`
+function (coefficient of determination).
+
+
+.. code-block:: default
+
+
+    pred_frr = frr.predict(X_test)
+    pred_srr = srr.predict(X_test)
+
+    frr_r2 = r2_score(y_test, pred_frr)
+    srr_r2 = r2_score(y_test, pred_srr)
+
+    print(frr_r2)
+    print(srr_r2)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    0.4697201311909546
+    0.4529958754457008
+
+
+
+
+In addition to a direct comparison of performance, we might ask what are the
+differences in terms of how the models have reached this point.
+The FRR CV estimator has a property that tells us what has been discovered
+as the best fraction (or 'gamma') to use:
+
+
+.. code-block:: default
+
+
+    print(frr.best_frac_)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    0.5763157894736842
+
+
+
+
+We can also ask what `alpha` value was deemed best. For the
+multi-target case presented here, this will be a vector of values,
+one for each target:
+
+
+.. code-block:: default
+
+
+    print(frr.alpha_)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [[0.12555081 0.13940575 0.13794834 0.14893141 0.12563128 0.11981233
+      0.13679139 0.11238843 0.15308675 0.13794939 0.0903119  0.09080746
+      0.11676323 0.09915391 0.08304413]]
+
+
+
+
+In contrast, the SRR estimator has just one value of `alpha`:
+
+
+.. code-block:: default
+
+
+    print(srr.alpha_)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    0.026366508987303555
+
+
+
+
+But this one value causes many different changes in the coefficient
+
+
+
+.. code-block:: default
+
+
+    lr = LinearRegression()
+    frr.fit(X, y)
+    srr.fit(X, y)
+    lr.fit(X, y)
+
+    print(norm(frr.coef_, axis=0)  / norm(lr.coef_, axis=-1))
+    print(norm(srr.coef_, axis=-1)  / norm(lr.coef_, axis=-1))
+
+    print(srr.best_score_)
+    print(frr.best_score_)
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    [0.6785995  0.67364335 0.67829532 0.68279104 0.67668721 0.6788155
+     0.67816643 0.68123355 0.67621213 0.67972257 0.67026131 0.67905148
+     0.68229611 0.68045321 0.68428745]
+    [0.88964723 0.88712935 0.89721432 0.89815576 0.89318108 0.88262288
+     0.89403994 0.88681387 0.9010228  0.91220024 0.87434107 0.87530769
+     0.88111432 0.89198447 0.88295353]
+    -35.00654307428932
+    0.4438346039693565
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  1.126 seconds)
+
+
+.. _sphx_glr_download_auto_examples_plot_alpha_vs_gamma.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-python
+
+     :download:`Download Python source code: plot_alpha_vs_gamma.py <plot_alpha_vs_gamma.py>`
+
+
+
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+     :download:`Download Jupyter notebook: plot_alpha_vs_gamma.ipynb <plot_alpha_vs_gamma.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

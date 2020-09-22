@@ -37,13 +37,14 @@ Imports:
 
 
 
-This is the fracridge sklearn-style estimator:
+
+This is the Fracridge sklearn-style estimator:
 
 
 
 .. code-block:: default
 
-    from fracridge import FracRidge
+    from fracridge import FracRidgeRegressor
 
     from sklearn import datasets
     from sklearn.linear_model import Ridge
@@ -124,7 +125,7 @@ predictions are generated:
 
 
     fracs = np.linspace(0, 1, n_alphas)
-    FR = FracRidge(fracs=fracs, fit_intercept=True)
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=True)
     FR.fit(X, y)
     fr_pred = cross_val_predict(FR, X, y)
 
@@ -136,7 +137,8 @@ predictions are generated:
 
 
 We plot the results. First, the FRR coefficients as a function of requested
-fractions:
+fractions and then the RR coefficient as a function of the requested
+log-spaced alpha:
 
 
 .. code-block:: default
@@ -147,31 +149,6 @@ fractions:
     ylims = ax[0].get_ylim()
     ax[0].vlines(fracs, ylims[0], ylims[1], linewidth=0.5, color='gray')
     ax[0].set_ylim(*ylims)
-
-
-
-
-.. image:: /auto_examples/images/sphx_glr_plot_diabetes_001.png
-    :alt: plot diabetes
-    :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    (-869.3573357640904, 828.4524952231792)
-
-
-
-Next, the RR as a function of the requested log-spaced alpha:
-
-
-.. code-block:: default
-
     ax[1].plot(np.log(rr_alphas[::-1]), rr_coefs.T)
     ylims = ax[1].get_ylim()
     ax[1].vlines(np.log(rr_alphas[::-1]), ylims[0], ylims[1], linewidth=0.5,
@@ -180,6 +157,10 @@ Next, the RR as a function of the requested log-spaced alpha:
 
 
 
+
+.. image:: /auto_examples/images/sphx_glr_plot_diabetes_001.png
+    :alt: plot diabetes
+    :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -235,7 +216,7 @@ sample that did not include that observation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.809 seconds)
+   **Total running time of the script:** ( 0 minutes  0.448 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_diabetes.py:
