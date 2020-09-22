@@ -2,5 +2,10 @@ __pycache__
 .DS_Store
 .ipynb_checkpoints
 fracridge/version.py
-docs/build
-docs/source/auto_examples/
+docs/_build/
+docs/auto_examples/
+docs/generated/
+build/
+dist/
+fracridge.egg-info/
+pip-wheel-metadata/

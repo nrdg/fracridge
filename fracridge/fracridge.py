@@ -8,7 +8,6 @@ import warnings
 from sklearn.base import BaseEstimator, MultiOutputMixin
 from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
                                       _check_sample_weight)
-
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
 from sklearn.model_selection import GridSearchCV
 
@@ -18,7 +17,8 @@ SMALL_BIAS = 10e-3
 BIAS_STEP = 0.2
 
 
-__all__ = ["fracridge", "vec_len", "FracRidge", "FracRidgeCV"]
+__all__ = ["fracridge", "vec_len", "FracRidgeRegressor",
+           "FracRidgeRegressorCV"]
 
 
 def _do_svd(X, y, jit=True):
@@ -65,7 +65,7 @@ def _do_svd(X, y, jit=True):
     return selt, v_t, ols_coef
 
 
-def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
+def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -95,19 +95,24 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
         desired fraction.
     alphas : ndarray, shape (f, b)
         The alpha coefficients associated with each solution
+
     Examples
     --------
+
     Generate random data:
+
     >>> np.random.seed(0)
     >>> y = np.random.randn(100)
     >>> X = np.random.randn(100, 10)
 
     Calculate coefficients with naive OLS:
+
     >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
     >>> print(np.linalg.norm(coef))  # doctest: +NUMBER
     0.35
 
     Call fracridge function:
+
     >>> coef2, alpha = fracridge(X, y, 0.3)
     >>> print(np.linalg.norm(coef2))  # doctest: +NUMBER
     0.10
@@ -115,6 +120,7 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     0.3
 
     Calculate coefficients with naive RR:
+
     >>> alphaI = alpha * np.eye(X.shape[1])
     >>> coef3 = np.linalg.inv(X.T @ X + alphaI) @ X.T @ y
     >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
@@ -197,43 +203,74 @@ def fracridge(X, y, fracs=None, tol=1e-6, jit=True):
     return coef.squeeze(), alphas
 
 
-class FracRidge(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     """
-    Fractional Ridge Regression estimator
-
     Parameters
     ----------
     fracs : float or sequence
         The desired fractions of the parameter vector length, relative to
-        OLS solution. If 1d array, the shape is (f,).
+        OLS solution.
         Default: np.arange(.1, 1.1, .1)
 
+    fit_intercept : bool, optional
+        Whether to fit an intercept term. Default: False.
+
+    normalize : bool, optional
+        Whether to normalize the columns of X. Default: False.
+
+    copy_X : bool, optional
+        Whether to make a copy of the X matrix before fitting. Default: True.
+
+    tol : float, optional.
+        Tolerance under which singular values of the X matrix are considered
+        to be zero. Default: 1e-10.
+
+    jit : bool, optional.
+        Whether to use jit-accelerated implementation. Default: True.
+
+    Attributes
+    ----------
+    coef_ : ndarray, shape (p, f, b)
+        The full estimated parameters across units of measurement for every
+        desired fraction. Where p number of model parameters, f number of
+        fractions and b number of targets.
+
+
+    alpha_ : ndarray, shape (f, b)
+        The alpha coefficients associated with each solution. Where f number
+        of fractions and b number of targets.
 
     Examples
     --------
+
     Generate random data:
+
     >>> np.random.seed(1)
     >>> y = np.random.randn(100)
     >>> X = np.random.randn(100, 10)
 
     Calculate coefficients with naive OLS:
+
     >>> coef = np.linalg.inv(X.T @ X) @ X.T @ y
 
     Initialize the estimator with a single fraction:
-    >>> fr = FracRidge(fracs=0.3)
+
+    >>> fr = FracRidgeRegressor(fracs=0.3)
 
     Fit estimator:
+
     >>> fr.fit(X, y)
-    FracRidge(fracs=0.3)
+    FracRidgeRegressor(fracs=0.3)
 
     Check results:
+
     >>> coef_ = fr.coef_
     >>> alpha_ = fr.alpha_
     >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
     0.29
     """
     def __init__(self, fracs=None, fit_intercept=False, normalize=False,
-                 copy_X=True, tol=1e-6, jit=True):
+                 copy_X=True, tol=1e-10, jit=True):
         self.fracs = fracs
         self.fit_intercept = fit_intercept
         self.normalize = normalize
@@ -241,7 +278,10 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         self.tol = tol
         self.jit = jit
 
-    def fit(self, X, y, sample_weight=None):
+    def _validate_input(self, X, y, sample_weight=None):
+        """
+        Helper function to validate the inputs
+        """
         X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
 
         if sample_weight is not None:
@@ -256,7 +296,11 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         if sample_weight is not None:
             # Sample weight can be implemented via a simple rescaling.
             X, y = _rescale_data(X, y, sample_weight)
+        return X, y, X_offset, y_offset, X_scale
 
+    def fit(self, X, y, sample_weight=None):
+        X, y, X_offset, y_offset, X_scale = self._validate_input(
+            X, y, sample_weight=sample_weight)
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
                                 jit=self.jit)
         self.alpha_ = alpha
@@ -305,40 +349,85 @@ class FracRidge(BaseEstimator, MultiOutputMixin):
         return {'multioutput': True}
 
 
-class FracRidgeCV(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressorCV(FracRidgeRegressor):
+    """
+    Uses :class:`sklearn.model_selection.GridSearchCV` to find the best
+    value of `frac` given the data, using cross-validation.
+
+    Parameters
+    ----------
+    frac_grid : sequence or float, optional
+        The values of frac to consider. Default: np.arange(.1, 1.1, .1)
+
+    fit_intercept : bool, optional
+        Whether to fit an intercept term. Default: False.
+
+    normalize : bool, optional
+        Whether to normalize the columns of X. Default: False.
+
+    copy_X : bool, optional
+        Whether to make a copy of the X matrix before fitting. Default: True.
+
+    tol : float, optional.
+        Tolerance under which singular values of the X matrix are considered
+        to be zero. Default: 1e-10.
+
+    jit : bool, optional.
+        Whether to use jit-accelerated implementation. Default: True.
+
+    cv : int, cross-validation generator or an iterable
+        See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html  # noqa
+
+    scoring : str, callable, list/tuple or dict, default=None
+        See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html  # noqa
+
+    Attributes
+    ----------
+    best_frac_ : float
+        The best fraction as determined by cross-validation.s
+
+    alpha_ : ndarray, shape (b)
+        The alpha coefficients associated with this fraction for each
+        target.
+
+    coef_ : ndarray, shape (p, b)
+        The coefficients corresponding to the best solution. Where p number
+        of parameters and b number of targets.
+
+    Examples
+    --------
+    Generate random data:
+
+    >>> np.random.seed(1)
+    >>> y = np.random.randn(100)
+    >>> X = np.random.randn(100, 10)
+
+    Fit model with cross-validation:
+
+    >>> frcv = FracRidgeRegressorCV()
+    >>> frcv.fit(X, y)
+    FracRidgeRegressorCV(frac_grid=array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))
+    >>> print(frcv.best_frac_)
+    0.1
+    """
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
-                 copy_X=True, tol=1e-6, jit=True, cv=None, scoring=None):
+                 copy_X=True, tol=1e-10, jit=True, cv=None, scoring=None):
 
         self.frac_grid = frac_grid
         if self.frac_grid is None:
-            self.frac_grid = (0.1, 0.3, 0.6, 0.9)
-        self.fit_intercept = fit_intercept
-        self.normalize = normalize
-        self.copy_X = copy_X
-        self.tol = tol
-        self.jit = jit
-
+            self.frac_grid = np.arange(.1, 1.1, .1)
+        super().__init__(self, fit_intercept=False, normalize=False,
+                         copy_X=True, tol=tol, jit=True)
         self.cv = cv
         self.scoring = scoring
 
     def fit(self, X, y, sample_weight=None):
-
-        # XXX The checks below are identical to those in FracRidge.fit.
-        # Should make that a decorator
-        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
-
-        if sample_weight is not None:
-            sample_weight = _check_sample_weight(sample_weight, X,
-                                                 dtype=X.dtype)
-
-        X, y, X_offset, y_offset, X_scale = _preprocess_data(
-            X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
-            copy=self.copy_X, sample_weight=sample_weight,
-            return_mean=True)
+        X, y, _, _, _ = self._validate_input(
+            X, y, sample_weight=sample_weight)
 
         parameters = {'fracs': self.frac_grid}
         gs = GridSearchCV(
-                FracRidge(
+                FracRidgeRegressor(
                     fit_intercept=self.fit_intercept,
                     normalize=self.normalize,
                     copy_X=self.copy_X,
@@ -351,6 +440,8 @@ class FracRidgeCV(BaseEstimator, MultiOutputMixin):
         self.best_score_ = gs.best_score_
         self.coef_ = estimator.coef_
         self.intercept_ = estimator.intercept_
+        self.best_frac_ = estimator.fracs
+        self.alpha_ = estimator.alpha_
         self.is_fitted_ = True
 
         return self
