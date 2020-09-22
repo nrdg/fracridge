@@ -24,8 +24,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from sklearn.linear_model import RidgeCV, LinearRegression
 from fracridge import FracRidgeRegressorCV
-import matplotlib.pyplot as plt
-
 
 ##########################################################################
 # Here, we use a synthetic dataset. We generate a regression dataset
