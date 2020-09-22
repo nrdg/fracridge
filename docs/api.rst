@@ -20,26 +20,35 @@ fracs : a vector (1 x f) of one or more fractions between 0 and 1.
         0 and 1 should be no less than 0.001 and no greater than 0.999.
         For example, ``fracs`` could be ``0:.05:1`` or ``0:.1:1``.
 
-y : The data (d x t) with one or more target variables in the columns.
+y : The data (d x t)
+    One or more target variables in the columns.
 
 tol : (optional) is a tolerance value such that eigenvalues
       below the tolerance are treated as 0. Default: 1e-6.
+
 mode : (optional) can be:
-  0 means the default behavior
+
+  0 means the default behavior, ``fracs`` is interpreted as a series of
+  requested fractions.
+
   1 means to interpret ``fracs`` as exact alpha values that are desired.
   This case involves using the rotation trick to speed up the ridge
   regression but does not involve the fraction-based tailoring method.
   In the case that ``mode`` is 1, the output ``alphas`` is returned as [].
+
   Default: 0.
 
 standardizemode : (optional) can be:
+
   0 means the default behavior (do not modify any of the regressors). In this case,
   we do not add an offset term to the model. Note that the user may choose to include
   an constant regressor in ``X`` if so desired.
+
   1 means to add an offset term to the model. In this case, the offset term is fully
   estimated using ordinary least squares, and ridge regression is applied to
   de-meaned data and de-meaned regressors. (The user should not include a constant
   regressor in ``X`` if using this mode.)
+
   2 means to standardize the regressors before performing ridge regression. In this case,
   an offset term is added to the model, and is fully estimated using ordinary least
   squares. Ridge regression is applied to de-meaned data and standardized
@@ -111,7 +120,7 @@ Example 2 (Compare execution time between naive ridge regression and fracridge)
     cache2 = X'*y;
     coef = zeros(3000,length(alphas),300);
     for j=1:length(alphas)
-    coef(:,j,:) = permute(inv(cache1 + alphas(j)*eye(size(X,2)))*cache2,[1 3 2]);
+        coef(:,j,:) = permute(inv(cache1 + alphas(j)*eye(size(X,2)))*cache2,[1 3 2]);
     end
     toc;
     % fracridge approach
@@ -157,8 +166,8 @@ Example 4 (Demonstrate how fracridge handles standardization of regressors)
     h = [];
     legendstr = {};
     for p=1:length(fracs)
-    h(p) = plot(modelfit(:,p),'-','Color',cmap0(p,:));
-    legendstr{p} = sprintf('Frac %.1f',fracs(p));
+        h(p) = plot(modelfit(:,p),'-','Color',cmap0(p,:));
+        legendstr{p} = sprintf('Frac %.1f',fracs(p));
     end
     hdata = plot(y,'k-','LineWidth',2);
     legend([hdata h],['Data' legendstr],'Location','EastOutside');
