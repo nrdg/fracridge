@@ -184,8 +184,8 @@ This is the functional API for the software.
 
    fracridge.fracridge
 
-FracRidge
----------
+FracRidgeRegressor
+------------------
 
 This is the object-oriented interface for the software.
 
@@ -194,3 +194,17 @@ This is the object-oriented interface for the software.
    :template: class.rst
 
    fracridge.FracRidgeRegressor
+
+
+
+FracRidgeRegressorCV
+--------------------
+
+This object uses :class:`sklearn.model_selection.GridSearchCV` to find the
+best value of ``frac`` for provided data using cross-validation.
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   fracridge.FracRidgeRegressorCV
