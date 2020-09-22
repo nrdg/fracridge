@@ -68,10 +68,10 @@ How do I compare the best fractions across targets?
 ----------------------------------------------------
 
 The best fraction might differ across targets. The best fraction for a
- particular target depends on many factors, including the noise in the data
- and the degree of redundancy among regressors. However, it is independent
- of the scale of the target data. This means that it provides a relatively
- stable assessment of the quality of a model setting: when the selected
- fraction is high (close to 1), this means that signal-to-noise in the target
- data is relatively high, while the redundancy between regressors is relatively
- low.
+particular target depends on many factors, including the noise in the data
+and the degree of redundancy among regressors. However, it is independent
+of the scale of the target data. This means that it provides a relatively
+stable assessment of the quality of a model setting: when the selected
+fraction is high (close to 1), this means that signal-to-noise in the target
+data is relatively high, while the redundancy between regressors is relatively
+low.
