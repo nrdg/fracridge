@@ -1,3 +1,12 @@
+1.2 (September 22, 2020)
+========================
+This version substantially overhauls the documentation and adds a
+cross-validation estimator.
+
+  * Documentation overhaul. (#12)
+  * FracRidgeCV estimator (#13)
+
+
 Version 1.1 (June 29, 2020)
 ===================
 
