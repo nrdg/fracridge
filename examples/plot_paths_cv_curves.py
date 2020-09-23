@@ -1,8 +1,8 @@
 """
 
-========================================
-Example using scikit learn diabetes data
-========================================
+=============================================
+Coefficient paths and cross-validation curves
+=============================================
 
 This example demonstrates some of the properties of the FRR approach and
 compares it to the use of standard ridge regression (RR) on the diabetes
@@ -10,7 +10,9 @@ dataset that is included in sckit-learn.
 
 In standard ridge regression, it is common to select alpha by testing a
 range of log-spaced values between very minimal regularization and
-very strong regularization.
+very strong regularization. In fractional ridge regression, we instead
+select a set of ``frac`` values that represent the desired reduction in
+the L2-norm of the coefficients.
 
 """
 
