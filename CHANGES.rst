@@ -1,3 +1,10 @@
+1.2.1 (September 22, 2020)
+==========================
+This micro version fixes a few small things in the documentation.
+
+  * Doc fixes (#15)
+
+
 1.2 (September 22, 2020)
 ========================
 This version substantially overhauls the documentation and adds a
