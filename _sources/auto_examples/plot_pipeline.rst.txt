@@ -9,7 +9,7 @@
     .. _sphx_glr_auto_examples_plot_pipeline.py:
 
 
-====================================================
+=====================================================
 Integrating FracRidge objects into sklearn pipelines
 =====================================================
 
@@ -107,7 +107,7 @@ best fraction for FracRidge decreases.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.077 seconds)
+   **Total running time of the script:** ( 0 minutes  6.335 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:

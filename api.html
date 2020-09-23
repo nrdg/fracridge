@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fracridge API &mdash; fracridge 1.2 documentation</title>
+  <title>fracridge API &mdash; fracridge 1.2.1 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                1.2
+                1.2.1
               </div>
             
           
@@ -209,26 +209,31 @@
 0 and 1 should be no less than 0.001 and no greater than 0.999.
 For example, <code class="docutils literal notranslate"><span class="pre">fracs</span></code> could be <code class="docutils literal notranslate"><span class="pre">0:.05:1</span></code> or <code class="docutils literal notranslate"><span class="pre">0:.1:1</span></code>.</p>
 </dd>
-</dl>
-<p>y : The data (d x t) with one or more target variables in the columns.</p>
-<dl>
+<dt>y<span class="classifier">The data (d x t)</span></dt><dd><p>One or more target variables in the columns.</p>
+</dd>
 <dt>tol<span class="classifier">(optional) is a tolerance value such that eigenvalues</span></dt><dd><p>below the tolerance are treated as 0. Default: 1e-6.</p>
 </dd>
-<dt>mode<span class="classifier">(optional) can be:</span></dt><dd><p>0 means the default behavior
-1 means to interpret <code class="docutils literal notranslate"><span class="pre">fracs</span></code> as exact alpha values that are desired.
+</dl>
+<p>mode : (optional) can be:</p>
+<blockquote>
+<div><p>0 means the default behavior, <code class="docutils literal notranslate"><span class="pre">fracs</span></code> is interpreted as a series of
+requested fractions.</p>
+<p>1 means to interpret <code class="docutils literal notranslate"><span class="pre">fracs</span></code> as exact alpha values that are desired.
 This case involves using the rotation trick to speed up the ridge
 regression but does not involve the fraction-based tailoring method.
-In the case that <code class="docutils literal notranslate"><span class="pre">mode</span></code> is 1, the output <code class="docutils literal notranslate"><span class="pre">alphas</span></code> is returned as [].
-Default: 0.</p>
-</dd>
-<dt>standardizemode<span class="classifier">(optional) can be:</span></dt><dd><p>0 means the default behavior (do not modify any of the regressors). In this case,
+In the case that <code class="docutils literal notranslate"><span class="pre">mode</span></code> is 1, the output <code class="docutils literal notranslate"><span class="pre">alphas</span></code> is returned as [].</p>
+<p>Default: 0.</p>
+</div></blockquote>
+<p>standardizemode : (optional) can be:</p>
+<blockquote>
+<div><p>0 means the default behavior (do not modify any of the regressors). In this case,
 we do not add an offset term to the model. Note that the user may choose to include
-an constant regressor in <code class="docutils literal notranslate"><span class="pre">X</span></code> if so desired.
-1 means to add an offset term to the model. In this case, the offset term is fully
+an constant regressor in <code class="docutils literal notranslate"><span class="pre">X</span></code> if so desired.</p>
+<p>1 means to add an offset term to the model. In this case, the offset term is fully
 estimated using ordinary least squares, and ridge regression is applied to
 de-meaned data and de-meaned regressors. (The user should not include a constant
-regressor in <code class="docutils literal notranslate"><span class="pre">X</span></code> if using this mode.)
-2 means to standardize the regressors before performing ridge regression. In this case,
+regressor in <code class="docutils literal notranslate"><span class="pre">X</span></code> if using this mode.)</p>
+<p>2 means to standardize the regressors before performing ridge regression. In this case,
 an offset term is added to the model, and is fully estimated using ordinary least
 squares. Ridge regression is applied to de-meaned data and standardized
 regressors. The returned regression weights will refer to the original regressors
@@ -237,8 +242,7 @@ preferred for most applications given that the effects of regularization are
 influenced by the scale of the regressors. (The user should not include a constant
 regressor in <code class="docutils literal notranslate"><span class="pre">X</span></code> if using this mode.)</p>
 <p>Default: 0.</p>
-</dd>
-</dl>
+</div></blockquote>
 </div>
 <div class="section" id="returns">
 <h3>Returns:<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
@@ -293,7 +297,7 @@ are all zeros and alpha values that are all zeros.</p></li>
 <span class="n">cache2</span> <span class="p">=</span> <span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span>
 <span class="n">coef</span> <span class="p">=</span> <span class="nb">zeros</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">alphas</span><span class="p">),</span><span class="mi">300</span><span class="p">);</span>
 <span class="n">for</span> <span class="s">j=1:length(alphas)</span>
-<span class="n">coef</span><span class="p">(:,</span><span class="nb">j</span><span class="p">,:)</span> <span class="p">=</span> <span class="nb">permute</span><span class="p">(</span><span class="n">inv</span><span class="p">(</span><span class="n">cache1</span> <span class="o">+</span> <span class="n">alphas</span><span class="p">(</span><span class="nb">j</span><span class="p">)</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">cache2</span><span class="p">,[</span><span class="mi">1</span> <span class="mi">3</span> <span class="mi">2</span><span class="p">]);</span>
+    <span class="n">coef</span><span class="p">(:,</span><span class="nb">j</span><span class="p">,:)</span> <span class="p">=</span> <span class="nb">permute</span><span class="p">(</span><span class="n">inv</span><span class="p">(</span><span class="n">cache1</span> <span class="o">+</span> <span class="n">alphas</span><span class="p">(</span><span class="nb">j</span><span class="p">)</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">cache2</span><span class="p">,[</span><span class="mi">1</span> <span class="mi">3</span> <span class="mi">2</span><span class="p">]);</span>
 <span class="n">end</span>
 <span class="s">toc</span><span class="p">;</span>
 <span class="c">% fracridge approach</span>
@@ -335,8 +339,8 @@ are all zeros and alpha values that are all zeros.</p></li>
 <span class="n">h</span> <span class="p">=</span> <span class="p">[];</span>
 <span class="n">legendstr</span> <span class="p">=</span> <span class="p">{};</span>
 <span class="n">for</span> <span class="s">p=1:length(fracs)</span>
-<span class="n">h</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">modelfit</span><span class="p">(:,</span><span class="n">p</span><span class="p">),</span><span class="s">&#39;-&#39;</span><span class="p">,</span><span class="s">&#39;Color&#39;</span><span class="p">,</span><span class="n">cmap0</span><span class="p">(</span><span class="n">p</span><span class="p">,:));</span>
-<span class="n">legendstr</span><span class="p">{</span><span class="n">p</span><span class="p">}</span> <span class="p">=</span> <span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;Frac %.1f&#39;</span><span class="p">,</span><span class="n">fracs</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+    <span class="n">h</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">modelfit</span><span class="p">(:,</span><span class="n">p</span><span class="p">),</span><span class="s">&#39;-&#39;</span><span class="p">,</span><span class="s">&#39;Color&#39;</span><span class="p">,</span><span class="n">cmap0</span><span class="p">(</span><span class="n">p</span><span class="p">,:));</span>
+    <span class="n">legendstr</span><span class="p">{</span><span class="n">p</span><span class="p">}</span> <span class="p">=</span> <span class="n">sprintf</span><span class="p">(</span><span class="s">&#39;Frac %.1f&#39;</span><span class="p">,</span><span class="n">fracs</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
 <span class="n">end</span>
 <span class="s">hdata</span> <span class="p">=</span> <span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="s">&#39;k-&#39;</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
 <span class="n">legend</span><span class="p">([</span><span class="n">hdata</span> <span class="n">h</span><span class="p">],[</span><span class="s">&#39;Data&#39;</span> <span class="n">legendstr</span><span class="p">],</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;EastOutside&#39;</span><span class="p">);</span>

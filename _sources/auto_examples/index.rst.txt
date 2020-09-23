@@ -59,10 +59,10 @@ Example `fracridge` usage
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_diabetes_thumb.png
-     :alt: Example using scikit learn diabetes data
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_paths_cv_curves_thumb.png
+     :alt: Coefficient paths and cross-validation curves
 
-     :ref:`sphx_glr_auto_examples_plot_diabetes.py`
+     :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py`
 
 .. raw:: html
 
@@ -72,7 +72,7 @@ Example `fracridge` usage
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_diabetes
+   /auto_examples/plot_paths_cv_curves
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
