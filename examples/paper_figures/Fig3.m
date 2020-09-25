@@ -30,25 +30,25 @@ for rep=1:numreps
   % play with number of targets
   E = 1
   for ii=1:length(numb), ii
-    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig2_simhelper(basen,basep,numb(ii),1,standardalphas);
-    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig2_simhelper(basen,basep,numb(ii),2,fracs,X,y);
-    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig2_simhelper(basen,basep,numb(ii),3,standardalphas,X,y);
+    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig3_simhelper(basen,basep,numb(ii),1,standardalphas);
+    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig3_simhelper(basen,basep,numb(ii),2,fracs,X,y);
+    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig3_simhelper(basen,basep,numb(ii),3,standardalphas,X,y);
   end
 
   % play with number of predictors
   E = 2
   for ii=1:length(nump), ii
-    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig2_simhelper(basen,nump(ii),baseb,1,standardalphas);
-    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig2_simhelper(basen,nump(ii),baseb,2,fracs,X,y);
-    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig2_simhelper(basen,nump(ii),baseb,3,standardalphas,X,y);
+    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig3_simhelper(basen,nump(ii),baseb,1,standardalphas);
+    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig3_simhelper(basen,nump(ii),baseb,2,fracs,X,y);
+    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig3_simhelper(basen,nump(ii),baseb,3,standardalphas,X,y);
   end
 
   % play with number of data points
   E = 3
   for ii=1:length(numn), ii
-    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig2_simhelper(numn(ii),basep,baseb,1,standardalphas);
-    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig2_simhelper(numn(ii),basep,baseb,2,fracs,X,y);
-    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig2_simhelper(numn(ii),basep,baseb,3,standardalphas,X,y);
+    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig3_simhelper(numn(ii),basep,baseb,1,standardalphas);
+    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig3_simhelper(numn(ii),basep,baseb,2,fracs,X,y);
+    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig3_simhelper(numn(ii),basep,baseb,3,standardalphas,X,y);
   end
 
   % play with number of hyperparameters
@@ -56,9 +56,9 @@ for rep=1:numreps
   for ii=1:length(numh), ii
     standardalphas0 = 10.^linspace(-4,5.5,numh(ii));
     fracs0 = 1/numh(ii):1/numh(ii):1;
-    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig2_simhelper(basen,basep,baseb,1,standardalphas0);
-    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig2_simhelper(basen,basep,baseb,2,fracs0,X,y);
-    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig2_simhelper(basen,basep,baseb,3,standardalphas0,X,y);
+    [etime{E}(ii,1,rep),stime{E}(:,ii,1,rep),X,y] = Fig3_simhelper(basen,basep,baseb,1,standardalphas0);
+    [etime{E}(ii,2,rep),stime{E}(:,ii,2,rep)] = Fig3_simhelper(basen,basep,baseb,2,fracs0,X,y);
+    [etime{E}(ii,3,rep),stime{E}(:,ii,3,rep)] = Fig3_simhelper(basen,basep,baseb,3,standardalphas0,X,y);
   end
 
   % save
