@@ -19,10 +19,7 @@ the solutions obtained for different γ are guaranteed to vary, guarding against
 wasted calculations, and automatically span the relevant range of
 regularization, avoiding the need for arduous manual exploration.
 
-In a `companion preprint article <https://arxiv.org/abs/2005.03220>`_, we show
-that the proposed method is fast and scalable for large-scale data problems, and
-delivers results that are straightforward to interpret and compare across models
-and datasets.
+In a `companion article <https://academic.oup.com/gigascience/article/9/12/giaa133/6011381>`_, we show that the proposed method is fast and scalable for large-scale data problems, and delivers results that are straightforward to interpret and compare across models and datasets.
 
 .. toctree::
    :maxdepth: 2
