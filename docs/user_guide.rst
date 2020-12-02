@@ -77,3 +77,23 @@ stable assessment of the quality of a model setting: when the selected
 fraction is high (close to 1), this means that signal-to-noise in the target
 data is relatively high, while the redundancy between regressors is relatively
 low.
+
+How do I cite ``fracridge`` if I used it in a publication?
+----------------------------------------------------------
+
+If you use ``fracridge``, please cite our paper: "Fractional ridge regression: a fast, interpretable reparameterization of ridge regression" (2020)  *GigaScience*, Volume 9, Issue 12, December 2020, https://doi.org/10.1093/gigascience/giaa133
+
+
+For your convenience, here is the bibtex entry::
+
+    @ARTICLE{fracridge2020,
+    title    = "Fractional ridge regression: a fast, interpretable
+                reparameterization of ridge regression",
+    author   = "Rokem, Ariel and Kay, Kendrick",
+    journal  = "Gigascience",
+    volume   =  9,
+    number   =  12,
+    month    =  nov,
+    year     =  2020,
+    doi      = https://doi.org/10.1093/gigascience/giaa133
+    }
