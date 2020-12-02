@@ -172,7 +172,7 @@ log-spaced alpha:
  .. code-block:: none
 
 
-    (-869.3573262312635, 828.4524912270947)
+    (-869.3573262312634, 828.4524912270947)
 
 
 
@@ -218,7 +218,7 @@ sample that did not include that observation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.506 seconds)
+   **Total running time of the script:** ( 0 minutes  0.366 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_paths_cv_curves.py:
