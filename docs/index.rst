@@ -21,6 +21,11 @@ regularization, avoiding the need for arduous manual exploration.
 
 In a `companion article <https://academic.oup.com/gigascience/article/9/12/giaa133/6011381>`_, we show that the proposed method is fast and scalable for large-scale data problems, and delivers results that are straightforward to interpret and compare across models and datasets.
 
+.. raw:: html
+
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/lc_LLF-iA_c" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 .. toctree::
    :maxdepth: 2
    :hidden:
