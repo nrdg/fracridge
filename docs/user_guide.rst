@@ -81,7 +81,7 @@ low.
 How do I cite ``fracridge`` if I used it in a publication?
 ----------------------------------------------------------
 
-If you use ``fracridge``, please cite our paper: "Fractional ridge regression: a fast, interpretable reparameterization of ridge regression" (2020)  *GigaScience*, Volume 9, Issue 12, December 2020, https://doi.org/10.1093/gigascience/giaa133 `link <https://academic.oup.com/gigascience/article/9/12/giaa133/6011381>`_.
+If you use ``fracridge``, please cite our paper: "Fractional ridge regression: a fast, interpretable reparameterization of ridge regression" (2020)  *GigaScience*, Volume 9, Issue 12, December 2020, https://doi.org/10.1093/gigascience/giaa133
 
 
 For your convenience, here is the bibtex entry::
