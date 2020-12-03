@@ -176,7 +176,7 @@ Example 4 (Demonstrate how fracridge handles standardization of regressors)
 Python
 ======
 
-The ``fracrdige`` API includes a functional interface and an object-oriented
+The ``fracridge`` API includes a functional interface and an object-oriented
 interface. The object-oriented interface is consistent with the
 `Scikit Learn <https://scikit-learn.org/stable/>`_ API, providing an
 estimator that can be integrated into pipelines that use scikit learn.
