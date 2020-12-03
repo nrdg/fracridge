@@ -20,7 +20,7 @@ Python
 To install the released version of the software, you can use the Python ``pip``
 package manager. In a shell command line issue::
 
-    pip install fracrdige
+    pip install fracridge
 
 This should download and install the software for your use.
 
