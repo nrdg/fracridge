@@ -10,8 +10,8 @@ def run_fracridge(X, y, fracs, jit):
     fracridge(X, y, fracs=fracs, jit=jit)
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("jit", [True, False])
 def test_benchmark_fracridge(nn, pp, bb, jit, benchmark):
     X, y, _, _ = make_data(nn, pp, bb)
@@ -33,8 +33,8 @@ def make_data(nn, pp, bb, fit_intercept=False):
     return X, y, coef_ols, pred_ols
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_ols(nn, pp, bb):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
@@ -45,8 +45,8 @@ def test_fracridge_ols(nn, pp, bb):
 
 
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_fracs(frac, nn, pp, bb):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     # Make sure that you get the fraction you asked for
@@ -62,8 +62,8 @@ def test_FracRidge_estimator():
     check_estimator(FracRidgeRegressorCV())
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [False])
 def test_v_ols(nn, pp, bb, fit_intercept):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
@@ -73,8 +73,8 @@ def test_v_ols(nn, pp, bb, fit_intercept):
     assert np.allclose(FR.coef_[:, -1, ...], coef_ols, atol=10e-3)
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
 def test_v_fracs(nn, pp, bb, frac):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
@@ -86,8 +86,8 @@ def test_v_fracs(nn, pp, bb, frac):
             - vec_len(FR.coef_, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
 def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, jit):
@@ -109,8 +109,8 @@ def test_FracRidge_singleton_frac():
     pred_fr = FR.predict(X)
     assert pred_fr.shape == y.shape
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
 def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
@@ -130,8 +130,8 @@ def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
     assert np.allclose(RR.coef_.T, FRCV.coef_, atol=10e-3)
 
 
-@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100)])
-@pytest.mark.parametrize("bb", [(1), (2)])
+@pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_unsorted(nn, pp, bb):
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.array([0.1, 0.8, 1.0, 0.2])
