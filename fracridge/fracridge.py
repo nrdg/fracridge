@@ -22,7 +22,7 @@ __all__ = ["fracridge", "vec_len", "FracRidgeRegressor",
            "FracRidgeRegressorCV"]
 
 
-def _do_svd(X, y, jit=True):
+def _do_svd(X, y, mode=1):
     """
     Helper function to produce SVD outputs
     """
@@ -32,7 +32,22 @@ def _do_svd(X, y, jit=True):
     # Per default, we'll try to use the jit-compiled SVD, which should be
     # more performant:
     use_scipy = False
-    if jit:
+    if mode == 2:
+        from functools import partial
+        try:
+            from jax.numpy.linalg import svd
+            svd = partial(svd, full_matrices=False)
+
+        except ImportError:
+            warnings.warn("The `mode` key-word argument is set to `2` ",
+                          "but jax could not be imported, or some ",
+                          "dependencies were missing. ",
+                          "compilation failed. Falling back to ",
+                          "`scipy.linalg.svd`")
+            use_scipy = True
+            mode = 0
+
+    elif mode == 1:
         try:
             from ._linalg import svd
         except ImportError:
@@ -43,7 +58,7 @@ def _do_svd(X, y, jit=True):
             use_scipy = True
 
     # If that doesn't work, or you asked not to, we'll use scipy SVD:
-    if not jit or use_scipy:
+    if not mode or use_scipy:
         from functools import partial
         from scipy.linalg import svd  # noqa
         svd = partial(svd, full_matrices=False)
@@ -63,7 +78,7 @@ def _do_svd(X, y, jit=True):
     return selt, v_t, ols_coef
 
 
-def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
+def fracridge(X, y, fracs=None, tol=1e-10, mode=1):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -82,10 +97,10 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
         to be sorted. Otherwise, raises ValueError.
         Default: np.arange(.1, 1.1, .1).
 
-    jit : bool, optional
+    mode : int, optional
         Whether to speed up computations by using a just-in-time compiled
-        version of core computations. This may not work well with very large
-        datasets. Default: True
+        version of core computations (mode=1), or using jax (mode=2).
+        This may not work well with very large datasets. Default: 1
 
     Returns
     -------
@@ -145,7 +160,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     ff = fracs.shape[0]
 
     # Calculate the rotation of the data
-    selt, v_t, ols_coef = _do_svd(X, y, jit=jit)
+    selt, v_t, ols_coef = _do_svd(X, y, mode=mode)
 
     # Set solutions for small eigenvalues to 0 for all targets:
     isbad = selt < tol
@@ -229,8 +244,9 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         Tolerance under which singular values of the X matrix are considered
         to be zero. Default: 1e-10.
 
-    jit : bool, optional.
-        Whether to use jit-accelerated implementation. Default: True.
+    mode : int, optional.
+        Whether to use jit-accelerated implementation (mode=1), jax (mode=2), 
+        or revert to scipy (mode=0). Default: 1.
 
     Attributes
     ----------
@@ -274,13 +290,13 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     0.29
     """
     def __init__(self, fracs=None, fit_intercept=False, normalize=False,
-                 copy_X=True, tol=1e-10, jit=True):
+                 copy_X=True, tol=1e-10, mode=1):
         self.fracs = fracs
         self.fit_intercept = fit_intercept
         self.normalize = normalize
         self.copy_X = copy_X
         self.tol = tol
-        self.jit = jit
+        self.mode = mode
 
     def _validate_input(self, X, y, sample_weight=None):
         """
@@ -306,7 +322,7 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         X, y, X_offset, y_offset, X_scale = self._validate_input(
             X, y, sample_weight=sample_weight)
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
-                                jit=self.jit)
+                                mode=self.mode)
         self.alpha_ = alpha
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
@@ -376,8 +392,9 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         Tolerance under which singular values of the X matrix are considered
         to be zero. Default: 1e-10.
 
-    jit : bool, optional.
-        Whether to use jit-accelerated implementation. Default: True.
+    mode : bool, optional.
+        Whether to use jit-accelerated implementation (mode=1), or
+        jax (mode=2), otherwise revert to scipy. Default: 1.
 
     cv : int, cross-validation generator or an iterable
         See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html  # noqa
@@ -415,13 +432,13 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     0.1
     """
     def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
-                 copy_X=True, tol=1e-10, jit=True, cv=None, scoring=None):
+                 copy_X=True, tol=1e-10, mode=1, cv=None, scoring=None):
 
         self.frac_grid = frac_grid
         if self.frac_grid is None:
             self.frac_grid = np.arange(.1, 1.1, .1)
         super().__init__(self, fit_intercept=False, normalize=False,
-                         copy_X=True, tol=tol, jit=True)
+                         copy_X=True, tol=tol, mode=1)
         self.cv = cv
         self.scoring = scoring
 
@@ -436,7 +453,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
                     normalize=self.normalize,
                     copy_X=self.copy_X,
                     tol=self.tol,
-                    jit=self.jit),
+                    mode=self.mode),
                 parameters, cv=self.cv, scoring=self.scoring)
 
         gs.fit(X, y, sample_weight=sample_weight)
