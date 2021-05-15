@@ -150,3 +150,5 @@ def test_fracridge_single_regressor(nn, bb):
     fracs = np.arange(.1, 1.1, .1)
     FR = FracRidgeRegressor(fracs=fracs)
     FR.fit(X, y)
+    pred_fr = FR.predict(X)
+    assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
