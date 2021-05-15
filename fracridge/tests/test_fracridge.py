@@ -138,3 +138,15 @@ def test_fracridge_unsorted(nn, pp, bb):
     # Frac input needs to be sorted:
     with pytest.raises(ValueError):
         coef, alpha = fracridge(X, y, fracs=fracs)
+
+
+@pytest.mark.parametrize("nn", [(1000), (10), (284)])
+@pytest.mark.parametrize("bb", [(1), (2), (1000)])
+def test_fracridge_single_regressor(nn, bb):
+    # Sometimes we want to have just one regressor
+    # See: https://github.com/nrdg/fracridge/issues/24
+    pp = 1
+    X, y, coef_ols, pred_ols = make_data(nn, pp, bb)
+    fracs = np.arange(.1, 1.1, .1)
+    FR = FracRidgeRegressor(fracs=fracs)
+    FR.fit(X, y)
