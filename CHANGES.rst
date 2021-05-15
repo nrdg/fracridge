@@ -1,4 +1,4 @@
-1.3.1 (February 3rd, 2021)
+1.3.2 (February 3rd, 2021)
 ==========================
 Fixes a bug in cases where the number of targets is larger than
 the number of samples in each target.
