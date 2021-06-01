@@ -420,8 +420,8 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         self.frac_grid = frac_grid
         if self.frac_grid is None:
             self.frac_grid = np.arange(.1, 1.1, .1)
-        super().__init__(self, fit_intercept=False, normalize=False,
-                         copy_X=True, tol=tol, jit=True)
+        super().__init__(self, fit_intercept=fit_intercept, normalize=normalize,
+                         copy_X=copy_X, tol=tol, jit=True)
         self.cv = cv
         self.scoring = scoring
 

@@ -119,7 +119,8 @@ def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
     FRCV = FracRidgeRegressorCV(frac_grid=fracs, fit_intercept=fit_intercept,
                                 jit=jit)
     FRCV.fit(X, y)
-    FR = FracRidgeRegressor(fracs=FRCV.best_frac_)
+    FR = FracRidgeRegressor(fracs=FRCV.best_frac_,
+                            fit_intercept=fit_intercept)
     FR.fit(X, y)
     assert np.allclose(FR.coef_, FRCV.coef_, atol=10e-3)
     RR = Ridge(alpha=FRCV.alpha_, fit_intercept=fit_intercept,
