@@ -6,17 +6,17 @@ from sklearn.utils.estimator_checks import check_estimator
 import pytest
 
 
-def run_fracridge(X, y, fracs, jit):
-    fracridge(X, y, fracs=fracs, jit=jit)
+def run_fracridge(X, y, fracs, mode):
+    fracridge(X, y, fracs=fracs, mode=mode)
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
-@pytest.mark.parametrize("jit", [True, False])
-def test_benchmark_fracridge(nn, pp, bb, jit, benchmark):
+@pytest.mark.parametrize("mode", [0, 1, 2])
+def test_benchmark_fracridge(nn, pp, bb, mode, benchmark):
     X, y, _, _ = make_data(nn, pp, bb)
     fracs = np.arange(.1, 1.1, .1)
-    benchmark(run_fracridge, X, y, fracs, jit)
+    benchmark(run_fracridge, X, y, fracs, mode)
 
 
 def make_data(nn, pp, bb, fit_intercept=False):
@@ -89,11 +89,12 @@ def test_v_fracs(nn, pp, bb, frac):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
-@pytest.mark.parametrize("jit", [True, False])
-def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, jit):
+@pytest.mark.parametrize("mode", [0, 1, 2])
+def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, mode):
     X, y, coef_ols, pred_ols = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
-    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept, jit=jit)
+    FR = FracRidgeRegressor(
+        fracs=fracs, fit_intercept=fit_intercept, mode=mode)
     FR.fit(X, y)
     pred_fr = FR.predict(X)
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
@@ -112,12 +113,12 @@ def test_FracRidge_singleton_frac():
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [True, False])
-@pytest.mark.parametrize("jit", [True, False])
-def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
+@pytest.mark.parametrize("mode", [0, 1, 2])
+def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, mode):
     X, y, _, _ = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
     FRCV = FracRidgeRegressorCV(frac_grid=fracs, fit_intercept=fit_intercept,
-                                jit=jit)
+                                mode=mode)
     FRCV.fit(X, y)
     FR = FracRidgeRegressor(fracs=FRCV.best_frac_)
     FR.fit(X, y)
