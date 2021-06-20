@@ -20,7 +20,6 @@ To install the release version:
 
 Or to install the development version (and stay up-to-date by pulling from GitHub):
 
-    pip install -r requirements.txt
     pip install -e .
 
 To upgrade to newer release version:
