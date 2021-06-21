@@ -18,10 +18,13 @@ To install the release version:
 
     pip install fracridge
 
-Or to install the development version:
+Or to install the development version (and stay up-to-date by pulling from GitHub):
 
-    pip install -r requirements.txt
-    pip install .
+    pip install -e .
+
+To upgrade to newer release version:
+
+    pip install -U fracridge
 
 ## Usage
 
