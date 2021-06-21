@@ -51,7 +51,10 @@ def _do_svd(X, y, jit=True):
     if X.shape[0] > X.shape[1]:
         uu, ss, v_t = svd(X.T @ X)
         selt = np.sqrt(ss)
-        ynew = np.diag(1./selt) @ v_t @ (X.T @ y)
+        if y.shape[-1] >= X.shape[0]:
+            ynew = (np.diag(1./selt) @ v_t @ X.T) @ y
+        else:
+            ynew = np.diag(1./selt) @ v_t @ (X.T @ y)
 
     else:
         # This rotates the targets by the unitary matrix uu.T:
