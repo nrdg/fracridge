@@ -397,7 +397,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     Attributes
     ----------
     best_frac_ : float
-        The best fraction as determined by cross-validation.s
+        The best fraction as determined by cross-validation.
 
     alpha_ : ndarray, shape (b)
         The alpha coefficients associated with this fraction for each
@@ -430,7 +430,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         if self.frac_grid is None:
             self.frac_grid = np.arange(.1, 1.1, .1)
         super().__init__(self, fit_intercept=fit_intercept, normalize=normalize,
-                         copy_X=copy_X, tol=tol, jit=True)
+                         copy_X=copy_X, tol=tol, jit=jit)
         self.cv = cv
         self.scoring = scoring
 
@@ -445,7 +445,8 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
                     normalize=self.normalize,
                     copy_X=self.copy_X,
                     tol=self.tol,
-                    jit=self.jit),
+                    jit=self.jit
+                    sample_weight=sample_weight),
                 parameters, cv=self.cv, scoring=self.scoring)
 
         gs.fit(X, y, sample_weight=sample_weight)
