@@ -445,8 +445,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
                     normalize=self.normalize,
                     copy_X=self.copy_X,
                     tol=self.tol,
-                    jit=self.jit
-                    sample_weight=sample_weight),
+                    jit=self.jit),
                 parameters, cv=self.cv, scoring=self.scoring)
 
         gs.fit(X, y, sample_weight=sample_weight)
