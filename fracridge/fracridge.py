@@ -36,9 +36,9 @@ def _do_svd(X, y, jit=True):
         try:
             from ._linalg import svd
         except ImportError:
-            warnings.warn("The `jit` key-word argument is set to `True` ",
-                          "but numba could not be imported, or just-in time ",
-                          "compilation failed. Falling back to ",
+            warnings.warn("The `jit` key-word argument is set to `True` "\
+                          "but numba could not be imported, or just-in time "\
+                          "compilation failed. Falling back to "\
                           "`scipy.linalg.svd`")
             use_scipy = True
 
