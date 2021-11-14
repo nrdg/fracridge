@@ -8,8 +8,7 @@ Is an implementation of fractional ridge regression (FRR).
 
 ### MATLAB
 
-Download and copy the files from the
-[https://github.com/nrdg/fracridge/tree/master/matlab](MATLAB directory) into
+Download and copy the files from https://github.com/nrdg/fracridge/tree/master/matlab into
 your MATLAB path.
 
 ### Python
