@@ -1,6 +1,6 @@
-function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
+function [coef,alphas,offset,looe] = fracridge(X,fracs,y,tol,mode,standardizemode,wantlooe)
 
-% function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
+% function [coef,alphas,offset,looe] = fracridge(X,fracs,y,tol,mode,standardizemode,wantlooe)
 %
 % <X> is the design matrix (d x p) with different data points
 %   in the rows and different regressors in the columns.
@@ -35,6 +35,18 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %     influenced by the scale of the regressors. (The user should not include a constant
 %     regressor in <X> if using this mode.)
 %   Default: 0.
+% <wantlooe> (optional) is whether to use the analytic method of Rifkin 2007 to compute
+%   leave-one-out cross-validation mean squared error. The original design of fracridge
+%   is to leave it to the user to perform cross-validation based on the outputs of
+%   fracridge. However, the analytic method of Rifkin has the appealing feature that
+%   it can be very fast compared to actually performing leave-one-out cross-validation,
+%   and it saves the user trouble of actually implementing cross-validation. Thus, it 
+%   may be useful for some scenarios. However, please note that if you use this feature, 
+%   fractions cannot be exactly 0 or 1 (or, equivalently, alphas cannot be exactly 
+%   Inf or 0). Also, note that in the case of <mode>==0, this method may be quite 
+%   slow if there are many target variables (since there is a for-loop over targets).
+%   If you have many target variables, you may be better off implementing your own
+%   cross-validation scheme. Default: 0.
 %
 % return:
 %  <coef> as the estimated regression weights (p x f x t)
@@ -46,6 +58,8 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %  <offset> as the offset term for each target variable (f x t).
 %    Note that when <standardizemode> is 0, no offset term is added,
 %    and <offset> is returned as all zeros.
+%  <looe> has leave-one-out cross-validation mean squared errors (f x t).
+%    This is calculated only if <wantlooe>==1. Otherwise, we return [].
 %
 % The basic idea is that we want ridge-regression solutions
 % whose vector lengths are controlled by the user. The vector
@@ -79,6 +93,7 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 %   are all zeros and alpha values that are all zeros.
 %
 % History:
+% - 2022/02/13 - add <wantlooe> feature.
 % - 2020/07/26 - fix in interpolation to ensure monotonically increasing x-coordinates.
 %                (code would have failed assert, prior to this.)
 %
@@ -154,6 +169,17 @@ function [coef,alphas,offset] = fracridge(X,fracs,y,tol,mode,standardizemode)
 % end
 % hdata = plot(y,'k-','LineWidth',2);
 % legend([hdata h],['Data' legendstr],'Location','EastOutside');
+%
+% % Example 5 (Demonstrate the LOOE feature)
+%
+% X = randn(500,200);
+% y = X*((5*rand(1,5)) .* randn(200,5)) + (randn(500,5) .* (30+10*rand(1,5))) + 5;
+% fracs = [.05:.05:.95 .999];
+% [coef,alphas,offset,looe] = fracridge(X,fracs,y,[],[],2,1);
+% figure; hold on;
+% plot(fracs,looe,'o-');
+% xlabel('Fraction');
+% ylabel('Cross-validated MSE');
 
 %% %%%%%% SETUP
 
@@ -166,6 +192,9 @@ if ~exist('mode','var') || isempty(mode)
 end
 if ~exist('standardizemode','var') || isempty(standardizemode)
   standardizemode = 0;
+end
+if ~exist('wantlooe','var') || isempty(wantlooe)
+  wantlooe = 0;
 end
 
 % internal constants
@@ -227,7 +256,7 @@ f = length(fracs);  % number of fractions (or alphas) being requested
 % decompose X [this is a costly step]
   % [u,s,v] = svd(X,'econ');  % when d>=p, u is d x p, s is p x p, v is p x p
   %                           % when d< p, u is d x d, s is d x d, v is p x d
-if d >= p
+if d >= p && ~wantlooe  % when wantlooe, we need to compute u
 
   % avoid making a large u
   [~,s,v] = svd(X'*X,'econ');
@@ -256,7 +285,9 @@ else
 
   % rotate the data
   ynew = u'*y;     % d x t
-  clear u;         % clean up to save memory
+  if ~wantlooe
+    clear u;         % clean up to save memory
+  end
 
 end
 
@@ -287,6 +318,11 @@ else
   coef = zeros(d,f*t,class(X));  % in this case, the final rotation will change from d dimensions to p dimensions.
 end
 offset = zeros(f,t,class(X));
+if wantlooe
+  looe = zeros(f,t,class(X));
+else
+  looe = cast([],class(X));
+end
 
 % we have two modes of operation...
 switch mode
@@ -371,6 +407,16 @@ case 0
 
     % apply scaling to the OLS solution
     coef(:,(ii-1)*f+(1:f)) = repmat(seltSQ .* ynew(:,ii),[1 f]) ./ (seltSQ2 + repmat(temp',[sz 1]));
+    
+    % compute LOOE?
+    if wantlooe
+      for aa=1:f
+        alpha0 = temp(aa);
+        S_bar = (1 ./ (selt.^2 + alpha0) - 1/alpha0)';               % 1 x sz (rank of the problem)
+        A = (u .* S_bar)*u' + diag(repmat(1/alpha0,[1 size(u,1)]));  % d x d
+        looe(aa,ii) = mean((A*y(:,ii) ./ diag(A)).^2,1);
+      end
+    end
 
   end
 
@@ -414,6 +460,16 @@ case 1
 
   % deal with output (alphas is irrelevant, so set to [])
   alphas = cast([],class(X));
+  
+  % compute LOOE?
+  if wantlooe
+    for aa=1:f
+      alpha0 = temp(aa);
+      S_bar = (1 ./ (selt.^2 + alpha0) - 1/alpha0)';               % 1 x sz (rank of the problem)
+      A = (u .* S_bar)*u' + diag(repmat(1/alpha0,[1 size(u,1)]));  % d x d
+      looe(aa,:) = mean((A*y ./ diag(A)).^2,1);
+    end
+  end
 
 end
 
