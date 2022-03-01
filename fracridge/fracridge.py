@@ -323,7 +323,7 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     def predict(self, X):
         X = check_array(X, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
-        if len(self.coef_.shape) == 0 or X.shape[-1] == 1:
+        if len(self.coef_.shape) == 0:
             pred_coef = self.coef_[np.newaxis]
         else:
             pred_coef = self.coef_
