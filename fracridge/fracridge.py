@@ -336,16 +336,14 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         """Set the intercept_
         """
         if self.fit_intercept:
-            if len(self.coef_.shape) <= 2:
+            if len(self.coef_.shape) <= 1:
+                self.coef_ = self.coef_ / X_scale
+            elif len(self.coef_.shape) == 2:
                 self.coef_ = self.coef_ / X_scale[:, np.newaxis]
-            else:
+            elif len(self.coef_.shape) == 3:
                 self.coef_ = self.coef_ / X_scale[:, np.newaxis, np.newaxis]
-            if X_offset.shape[0] == 1:
-                axes = (0)
-            else:
-                axes = (1)
             self.intercept_ = y_offset - np.tensordot(X_offset,
-                                                      self.coef_, axes=axes)
+                                                      self.coef_, axes=(0,0))
         else:
             self.intercept_ = 0.
 
