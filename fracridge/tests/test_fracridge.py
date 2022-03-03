@@ -155,3 +155,62 @@ def test_fracridge_single_regressor(nn, bb, fit_intercept):
     FR.fit(X, y)
     pred_fr = FR.predict(X).squeeze()
     assert np.allclose(pred_fr[:, -1, ...], pred_ols, atol=10e-3)
+
+
+@pytest.mark.parametrize("nn", [(1000), (10), (284)])
+@pytest.mark.parametrize("pp", [(1), (2), (1000)])
+@pytest.mark.parametrize("fit_intercept", [(False), (True)])
+def test_fracridge_singleton_target(nn, pp, fit_intercept):
+    # Sometimes we want to have just one target, and this should work for either a vector y or single-column matrix y,
+    # See: https://github.com/nrdg/fracridge/issues/39
+    bb = 1
+
+    # first, we consider the case that fracs is a vectors.
+    fracs = np.arange(.1, 1.1, .1)
+    X, y, _, pred_ols = make_data(nn, pp, bb,
+                                  fit_intercept=fit_intercept)
+    # y is a vector
+    assert len(y.shape)==1
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
+    FR.fit(X, y)
+    pred_fr = FR.predict(X)
+
+    if hasattr(fracs, "__len__"): # extract the 1.0 fraction column (should be equivalent to OLS)
+        pred_fr=pred_fr[:,-1,...]
+    assert np.allclose(pred_fr, pred_ols, atol=10e-3)
+    assert np.array_equal(y.shape,pred_fr.shape)
+
+    # y is a single-column matrix
+    y = np.expand_dims(y, axis=1)
+    assert len(y.shape)==2
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
+    FR.fit(X, y)
+    pred_fr = FR.predict(X)
+    if hasattr(fracs, "__len__"): # extract the 1.0 fraction column (should be equivalent to OLS)
+        pred_fr=pred_fr[:,-1,...]
+    assert np.allclose(pred_fr, np.expand_dims(pred_ols,-1), atol=10e-3)
+    assert np.array_equal(y.shape,pred_fr.shape)
+
+    # and now consider the case of a float fracs:
+    fracs = 1.0
+
+    X, y, _, pred_ols = make_data(nn, pp, bb,
+                                fit_intercept=fit_intercept)
+
+    # y is a vector
+    assert len(y.shape)==1
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
+    FR.fit(X, y)
+    pred_fr = FR.predict(X)
+
+    assert np.allclose(pred_fr, pred_ols, atol=10e-3)
+    assert np.array_equal(y.shape,pred_fr.shape)
+
+    # y is a single-column matrix
+    y = np.expand_dims(y, axis=1)
+    assert len(y.shape)==2
+    FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
+    FR.fit(X, y)
+    pred_fr = FR.predict(X)
+    assert np.allclose(pred_fr, np.expand_dims(pred_ols,-1), atol=10e-3)
+    assert np.array_equal(y.shape,pred_fr.shape)
