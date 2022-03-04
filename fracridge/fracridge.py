@@ -94,7 +94,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     -------
     coef : ndarray, shape (p, f, b)
         The full estimated parameters across units of measurement for every
-        desired fraction.
+        desired fraction. If fracs is a float or y is a vector, the second or third dimensions are squeezed, correspondingly.
     alphas : ndarray, shape (f, b)
         The alpha coefficients associated with each solution
 
@@ -131,17 +131,18 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     if fracs is None:
         fracs = np.arange(.1, 1.1, .1)
 
-    if hasattr(fracs, "__len__"):
+    fracs_is_vector = hasattr(fracs, "__len__")
+    if fracs_is_vector:
         if np.any(np.diff(fracs) < 0):
             raise ValueError("The `frac` inputs to the `fracridge` function ",
                              f"must be sorted. You provided: {fracs}")
-
     else:
         fracs = [fracs]
     fracs = np.array(fracs)
 
     nn, pp = X.shape
-    if len(y.shape) == 1:
+    single_target = len(y.shape) == 1
+    if single_target:
         y = y[:, np.newaxis]
 
     bb = y.shape[-1]
@@ -206,8 +207,11 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     # matrix and reshape to conform to desired output:
     coef = np.reshape(v_t.T @ coef.reshape((first_dim, ff * bb)),
                       (pp, ff, bb))
-
-    return coef.squeeze(), alphas
+    if single_target:
+        coef = coef.squeeze(2)
+    if not fracs_is_vector:
+        coef = coef.squeeze(1)
+    return coef, alphas
 
 
 class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
@@ -319,7 +323,7 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     def predict(self, X):
         X = check_array(X, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
-        if len(self.coef_.shape) == 0 or X.shape[-1] == 1:
+        if len(self.coef_.shape) == 0:
             pred_coef = self.coef_[np.newaxis]
         else:
             pred_coef = self.coef_
@@ -332,16 +336,14 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         """Set the intercept_
         """
         if self.fit_intercept:
-            if len(self.coef_.shape) <= 2:
+            if len(self.coef_.shape) <= 1:
+                self.coef_ = self.coef_ / X_scale
+            elif len(self.coef_.shape) == 2:
                 self.coef_ = self.coef_ / X_scale[:, np.newaxis]
-            else:
+            elif len(self.coef_.shape) == 3:
                 self.coef_ = self.coef_ / X_scale[:, np.newaxis, np.newaxis]
-            if X_offset.shape[0] == 1:
-                axes = (0)
-            else:
-                axes = (1)
             self.intercept_ = y_offset - np.tensordot(X_offset,
-                                                      self.coef_, axes=axes)
+                                                      self.coef_, axes=(0,0))
         else:
             self.intercept_ = 0.
 
