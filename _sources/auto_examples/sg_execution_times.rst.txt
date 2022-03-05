@@ -5,12 +5,12 @@
 
 Computation times
 =================
-**00:06.023** total execution time for **auto_examples** files:
+**00:05.860** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)               | 00:04.568 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)               | 00:04.843 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py` (``plot_alpha_vs_gamma.py``)   | 00:01.107 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py` (``plot_alpha_vs_gamma.py``)   | 00:00.640 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py` (``plot_paths_cv_curves.py``) | 00:00.348 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py` (``plot_paths_cv_curves.py``) | 00:00.377 | 0.0 MB |
 +-------------------------------------------------------------------------------------+-----------+--------+

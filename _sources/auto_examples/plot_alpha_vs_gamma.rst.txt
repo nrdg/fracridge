@@ -205,8 +205,8 @@ function (coefficient of determination).
 
  .. code-block:: none
 
-    0.4697201311909546
-    0.4529958754457008
+    0.46972013119095474
+    0.45299587544570136
 
 
 
@@ -332,7 +332,7 @@ But this one value causes many different changes in the coefficient
      0.89403994 0.88681387 0.9010228  0.91220024 0.87434107 0.87530769
      0.88111432 0.89198447 0.88295353]
     -35.00654307428932
-    0.4438346039693565
+    0.4438346039693564
 
 
 
@@ -340,7 +340,7 @@ But this one value causes many different changes in the coefficient
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.107 seconds)
+   **Total running time of the script:** ( 0 minutes  0.640 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_alpha_vs_gamma.py:
