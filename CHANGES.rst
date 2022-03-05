@@ -1,3 +1,14 @@
+1.4 (March 04, 2022)
+====================
+  * made coef.squeeze in fracridge less eager (#40)
+  * added lapack import & updated too long string; fixes #33 (#34)
+  * Optimizes the computation to use best option for order of operations. (#30)
+  * MAINT: Support version of Python up to 3.9 (#29)
+  * BF: Propagate keyword arguments in the CV estimator. (#26)
+  * DOC: Explains how to upgrade the software to newer releases. (#27)
+  * Single regressor (#25)
+
+
 1.3.2 (February 3rd, 2021)
 ==========================
 Fixes a bug in cases where the number of targets is larger than
