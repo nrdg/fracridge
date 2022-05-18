@@ -420,7 +420,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     >>> frcv = FracRidgeRegressorCV()
     >>> frcv.fit(X, y)
     FracRidgeRegressorCV()
-    >>> print(frcv.best_frac_, frac_grid=array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))
+    >>> print(frcv.best_frac_, frac_grid=np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))
     0.1
     """
     def __init__(self, fit_intercept=False, normalize=False,
