@@ -307,7 +307,9 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
 
         if sample_weight is not None:
             # Sample weight can be implemented via a simple rescaling.
-            X, y, _ = _rescale_data(X, y, sample_weight)
+            outs = _rescale_data(X, y, sample_weight)
+            X, y = outs[0], outs[1]
+
         return X, y, X_offset, y_offset, X_scale
 
     def fit(self, X, y, sample_weight=None):
