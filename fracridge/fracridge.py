@@ -303,11 +303,11 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         X, y, X_offset, y_offset, X_scale = _preprocess_data(
             X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
             copy=self.copy_X, sample_weight=sample_weight,
-            return_mean=True)
+            check_input=True)
 
         if sample_weight is not None:
             # Sample weight can be implemented via a simple rescaling.
-            X, y = _rescale_data(X, y, sample_weight)
+            X, y, _ = _rescale_data(X, y, sample_weight)
         return X, y, X_offset, y_offset, X_scale
 
     def fit(self, X, y, sample_weight=None):
@@ -319,6 +319,8 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
         self.is_fitted_ = True
+        self.n_features_in_ = X.shape[1]
+
         return self
 
     def predict(self, X):
@@ -459,6 +461,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         self.best_frac_ = estimator.fracs
         self.alpha_ = estimator.alpha_
         self.is_fitted_ = True
+        self.n_features_in_ = X.shape[1]
 
         return self
 
