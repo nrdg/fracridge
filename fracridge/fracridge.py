@@ -1,6 +1,7 @@
 """
 
 """
+from random import sample
 import numpy as np
 from numpy import interp
 import warnings
@@ -369,9 +370,6 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
 
     Parameters
     ----------
-    frac_grid : sequence or float, optional
-        The values of frac to consider. Default: np.arange(.1, 1.1, .1)
-
     fit_intercept : bool, optional
         Whether to fit an intercept term. Default: False.
 
@@ -419,26 +417,31 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
 
     >>> frcv = FracRidgeRegressorCV()
     >>> frcv.fit(X, y)
-    FracRidgeRegressorCV(frac_grid=array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))
-    >>> print(frcv.best_frac_)
+    FracRidgeRegressorCV()
+    >>> print(frcv.best_frac_, frac_grid=array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))
     0.1
     """
-    def __init__(self, frac_grid=None, fit_intercept=False, normalize=False,
+    def __init__(self, fit_intercept=False, normalize=False,
                  copy_X=True, tol=1e-10, jit=True, cv=None, scoring=None):
 
-        self.frac_grid = frac_grid
-        if self.frac_grid is None:
-            self.frac_grid = np.arange(.1, 1.1, .1)
         super().__init__(self, fit_intercept=fit_intercept, normalize=normalize,
                          copy_X=copy_X, tol=tol, jit=jit)
         self.cv = cv
         self.scoring = scoring
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, frac_grid=None):
+        """
+        Parameters
+        ----------
+        frac_grid : sequence or float, optional
+            The values of frac to consider. Default: np.arange(.1, 1.1, .1)
+        """
         X, y, _, _, _ = self._validate_input(
-            X, y, sample_weight=sample_weight)
+            X, y, sample_weight=None)
 
-        parameters = {'fracs': self.frac_grid}
+        if frac_grid is None:
+            frac_grid=np.arange(.1, 1.1, .1)
+        parameters = {'fracs': frac_grid}
         gs = GridSearchCV(
                 FracRidgeRegressor(
                     fit_intercept=self.fit_intercept,

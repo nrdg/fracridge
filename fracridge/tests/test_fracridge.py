@@ -2,8 +2,13 @@ import numpy as np
 from fracridge import (fracridge, vec_len, FracRidgeRegressor,
                        FracRidgeRegressorCV)
 from sklearn.linear_model import Ridge
-from sklearn.utils.estimator_checks import check_estimator
 import pytest
+from sklearn.utils.estimator_checks import parametrize_with_checks
+
+
+@parametrize_with_checks([FracRidgeRegressor(), FracRidgeRegressorCV()])
+def test_sklearn_compatible_estimator(estimator, check):
+    check(estimator)
 
 
 def run_fracridge(X, y, fracs, jit):
@@ -55,11 +60,6 @@ def test_fracridge_fracs(frac, nn, pp, bb):
         np.abs(
             frac
             - vec_len(coef, axis=0) / vec_len(coef_ols, axis=0)) < 0.01)
-
-
-def test_FracRidge_estimator():
-    check_estimator(FracRidgeRegressor())
-    check_estimator(FracRidgeRegressorCV())
 
 
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
@@ -116,9 +116,10 @@ def test_FracRidge_singleton_frac():
 def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
     X, y, _, _ = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(.1, 1.1, .1)
-    FRCV = FracRidgeRegressorCV(frac_grid=fracs, fit_intercept=fit_intercept,
+    FRCV = FracRidgeRegressorCV(fit_intercept=fit_intercept,
                                 jit=jit)
-    FRCV.fit(X, y)
+    FRCV.fit(X, y, frac_grid=fracs)
+
     FR = FracRidgeRegressor(fracs=FRCV.best_frac_,
                             fit_intercept=fit_intercept)
     FR.fit(X, y)
