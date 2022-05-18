@@ -67,8 +67,8 @@ srr.fit(X_train, y_train)
 #
 
 fracs = np.linspace(1/n_alphas, 1 + 1/n_alphas, n_alphas)
-frr = FracRidgeRegressorCV(frac_grid=fracs)
-frr.fit(X_train, y_train)
+frr = FracRidgeRegressorCV()
+frr.fit(X_train, y_train, frac_grid=fracs)
 
 ##########################################################################
 # Both models are fit and used to predict a left out set. Performance
