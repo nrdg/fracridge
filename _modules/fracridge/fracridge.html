@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fracridge.fracridge &mdash; fracridge 1.4.3 documentation</title>
+  <title>fracridge.fracridge &mdash; fracridge 2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/project-template.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -32,7 +32,7 @@
             <a href="../../index.html" class="icon icon-home"> fracridge
           </a>
               <div class="version">
-                1.4.3
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -85,6 +85,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">sample</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">interp</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -386,11 +387,13 @@
         <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">X_scale</span> <span class="o">=</span> <span class="n">_preprocess_data</span><span class="p">(</span>
             <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">,</span>
             <span class="n">copy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy_X</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">,</span>
-            <span class="n">return_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">check_input</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">sample_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Sample weight can be implemented via a simple rescaling.</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">_rescale_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+            <span class="n">outs</span> <span class="o">=</span> <span class="n">_rescale_data</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="p">)</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">outs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">X_scale</span>
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -402,6 +405,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="n">coef</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_intercept</span><span class="p">(</span><span class="n">X_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">,</span> <span class="n">X_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_fitted_</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
@@ -453,9 +458,6 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    frac_grid : sequence or float, optional</span>
-<span class="sd">        The values of frac to consider. Default: np.arange(.1, 1.1, .1)</span>
-
 <span class="sd">    fit_intercept : bool, optional</span>
 <span class="sd">        Whether to fit an intercept term. Default: False.</span>
 
@@ -481,7 +483,7 @@
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    best_frac_ : float</span>
-<span class="sd">        The best fraction as determined by cross-validation.s</span>
+<span class="sd">        The best fraction as determined by cross-validation.</span>
 
 <span class="sd">    alpha_ : ndarray, shape (b)</span>
 <span class="sd">        The alpha coefficients associated with this fraction for each</span>
@@ -502,27 +504,32 @@
 <span class="sd">    Fit model with cross-validation:</span>
 
 <span class="sd">    &gt;&gt;&gt; frcv = FracRidgeRegressorCV()</span>
-<span class="sd">    &gt;&gt;&gt; frcv.fit(X, y)</span>
-<span class="sd">    FracRidgeRegressorCV(frac_grid=array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))</span>
+<span class="sd">    &gt;&gt;&gt; frcv.fit(X, y, frac_grid=np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1. ]))</span>
+<span class="sd">    FracRidgeRegressorCV()</span>
 <span class="sd">    &gt;&gt;&gt; print(frcv.best_frac_)</span>
 <span class="sd">    0.1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="FracRidgeRegressorCV.__init__"><a class="viewcode-back" href="../../generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frac_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="FracRidgeRegressorCV.__init__"><a class="viewcode-back" href="../../generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">copy_X</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">frac_grid</span> <span class="o">=</span> <span class="n">frac_grid</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">frac_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="n">fit_intercept</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span>
-                         <span class="n">copy_X</span><span class="o">=</span><span class="n">copy_X</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                         <span class="n">copy_X</span><span class="o">=</span><span class="n">copy_X</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="n">jit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cv</span> <span class="o">=</span> <span class="n">cv</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span> <span class="o">=</span> <span class="n">scoring</span></div>
 
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FracRidgeRegressorCV.fit"><a class="viewcode-back" href="../../generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frac_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        frac_grid : sequence or float, optional</span>
+<span class="sd">            The values of frac to consider. Default: np.arange(.1, 1.1, .1)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_input</span><span class="p">(</span>
-            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="n">sample_weight</span><span class="p">)</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sample_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
-        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fracs&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">frac_grid</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">frac_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">frac_grid</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fracs&#39;</span><span class="p">:</span> <span class="n">frac_grid</span><span class="p">}</span>
         <span class="n">gs</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span>
                 <span class="n">FracRidgeRegressor</span><span class="p">(</span>
                     <span class="n">fit_intercept</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_intercept</span><span class="p">,</span>
@@ -540,8 +547,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">best_frac_</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">fracs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">alpha_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_fitted_</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_features_in_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
     <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;multioutput&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>

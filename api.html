@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fracridge API &mdash; fracridge 1.4.3 documentation</title>
+  <title>fracridge API &mdash; fracridge 2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/project-template.css" type="text/css" />
       <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
@@ -35,7 +35,7 @@
             <a href="index.html" class="icon icon-home"> fracridge
           </a>
               <div class="version">
-                1.4.3
+                2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -273,7 +273,7 @@ estimator that can be integrated into pipelines that use scikit learn.</p>
 <section id="fracridge">
 <h3>fracridge<a class="headerlink" href="#fracridge" title="Permalink to this headline">¶</a></h3>
 <p>This is the functional API for the software.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -288,7 +288,7 @@ estimator that can be integrated into pipelines that use scikit learn.</p>
 <section id="fracridgeregressor">
 <h3>FracRidgeRegressor<a class="headerlink" href="#fracridgeregressor" title="Permalink to this headline">¶</a></h3>
 <p>This is the object-oriented interface for the software.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -306,16 +306,16 @@ estimator that can be integrated into pipelines that use scikit learn.</p>
 </section>
 <section id="fracridgeregressorcv">
 <h3>FracRidgeRegressorCV<a class="headerlink" href="#fracridgeregressorcv" title="Permalink to this headline">¶</a></h3>
-<p>This object uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the
+<p>This object uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the
 best value of <code class="docutils literal notranslate"><span class="pre">frac</span></code> for provided data using cross-validation.</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV" title="fracridge.FracRidgeRegressorCV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressorCV</span></code></a>([frac_grid, ...])</p></td>
-<td><p>Uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the best value of <cite>frac</cite> given the data, using cross-validation.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV" title="fracridge.FracRidgeRegressorCV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressorCV</span></code></a>([...])</p></td>
+<td><p>Uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the best value of <cite>frac</cite> given the data, using cross-validation.</p></td>
 </tr>
 </tbody>
 </table>
