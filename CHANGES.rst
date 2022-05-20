@@ -1,3 +1,12 @@
+2.0 (May 19, 2022)
+==================
+This major release upgrades support to the newest version of Scikit Learn, but
+also introduces breaking changes to the API of the ``FracRidgeRegressorCV``
+class.
+
+  * Allow flexible upgrading of sklearn. (#31)
+
+
 1.4 (March 04, 2022)
 ====================
   * made coef.squeeze in fracridge less eager (#40)
