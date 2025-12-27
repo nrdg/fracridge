@@ -8,9 +8,11 @@ import warnings
 import collections
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
-from sklearn.utils.validation import (check_X_y, check_array, check_is_fitted,
+from sklearn.utils.validation import (validate_data, check_X_y,
+                                      check_array, check_is_fitted,
                                       _check_sample_weight)
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
+
 from sklearn.model_selection import GridSearchCV
 
 # Module-wide constants
@@ -162,6 +164,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     # Limits on the grid of candidate alphas used for interpolation:
     val1 = BIG_BIAS * selt[0] ** 2
     val2 = SMALL_BIAS * selt[-1] ** 2
+    val2 = SMALL_BIAS if val2 == 0 else val2
 
     # Generates the grid of candidate alphas used in interpolation:
     alphagrid = np.concatenate(
@@ -215,7 +218,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     return coef, alphas
 
 
-class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
+class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
     """
     Parameters
     ----------
@@ -226,9 +229,6 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
 
     fit_intercept : bool, optional
         Whether to fit an intercept term. Default: False.
-
-    normalize : bool, optional
-        Whether to normalize the columns of X. Default: False.
 
     copy_X : bool, optional
         Whether to make a copy of the X matrix before fitting. Default: True.
@@ -281,11 +281,14 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
     >>> print(np.linalg.norm(coef_) / np.linalg.norm(coef)) # doctest: +NUMBER
     0.29
     """
-    def __init__(self, fracs=None, fit_intercept=False, normalize=False,
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        return tags
+
+    def __init__(self, fracs=None, fit_intercept=False,
                  copy_X=True, tol=1e-10, jit=True):
         self.fracs = fracs
         self.fit_intercept = fit_intercept
-        self.normalize = normalize
         self.copy_X = copy_X
         self.tol = tol
         self.jit = jit
@@ -294,14 +297,14 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         """
         Helper function to validate the inputs
         """
-        X, y = check_X_y(X, y, y_numeric=True, multi_output=True)
+        X, y = validate_data(self, X, y, multi_output=True)
 
         if sample_weight is not None:
             sample_weight = _check_sample_weight(sample_weight, X,
                                                  dtype=X.dtype)
 
-        X, y, X_offset, y_offset, X_scale = _preprocess_data(
-            X, y, fit_intercept=self.fit_intercept, normalize=self.normalize,
+        X, y, X_offset, y_offset, X_scale, _ = _preprocess_data(
+            X, y, fit_intercept=self.fit_intercept,
             copy=self.copy_X, sample_weight=sample_weight,
             check_input=True)
 
@@ -313,6 +316,7 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         return X, y, X_offset, y_offset, X_scale
 
     def fit(self, X, y, sample_weight=None):
+
         X, y, X_offset, y_offset, X_scale = self._validate_input(
             X, y, sample_weight=sample_weight)
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
@@ -326,7 +330,7 @@ class FracRidgeRegressor(BaseEstimator, MultiOutputMixin):
         return self
 
     def predict(self, X):
-        X = check_array(X, accept_sparse=True)
+        X = validate_data(self, X, reset=False, accept_sparse=True)
         check_is_fitted(self, 'is_fitted_')
         if len(self.coef_.shape) == 0:
             pred_coef = self.coef_[np.newaxis]
@@ -377,9 +381,6 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     fit_intercept : bool, optional
         Whether to fit an intercept term. Default: False.
 
-    normalize : bool, optional
-        Whether to normalize the columns of X. Default: False.
-
     copy_X : bool, optional
         Whether to make a copy of the X matrix before fitting. Default: True.
 
@@ -425,10 +426,10 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     >>> print(frcv.best_frac_)
     0.1
     """
-    def __init__(self, fit_intercept=False, normalize=False,
+    def __init__(self, fit_intercept=False,
                  copy_X=True, tol=1e-10, jit=True, cv=None, scoring=None):
 
-        super().__init__(self, fit_intercept=fit_intercept, normalize=normalize,
+        super().__init__(self, fit_intercept=fit_intercept,
                          copy_X=copy_X, tol=tol, jit=jit)
         self.cv = cv
         self.scoring = scoring
@@ -449,7 +450,6 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         gs = GridSearchCV(
                 FracRidgeRegressor(
                     fit_intercept=self.fit_intercept,
-                    normalize=self.normalize,
                     copy_X=self.copy_X,
                     tol=self.tol,
                     jit=self.jit),
