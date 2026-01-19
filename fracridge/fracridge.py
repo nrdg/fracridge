@@ -8,9 +8,11 @@ import warnings
 import collections
 
 from sklearn.base import BaseEstimator, MultiOutputMixin
-from sklearn.utils.validation import (validate_data, check_X_y,
-                                      check_array, check_is_fitted,
-                                      _check_sample_weight)
+from sklearn.utils.validation import (
+    validate_data,
+    check_is_fitted,
+    _check_sample_weight,
+    )
 from sklearn.linear_model._base import _preprocess_data, _rescale_data
 
 from sklearn.model_selection import GridSearchCV
@@ -293,32 +295,27 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
         self.tol = tol
         self.jit = jit
 
-    def _validate_input(self, X, y, sample_weight=None):
+    def _validate_input(self, X, y):
         """
         Helper function to validate the inputs
         """
         X, y = validate_data(self, X, y, multi_output=True)
 
-        if sample_weight is not None:
-            sample_weight = _check_sample_weight(sample_weight, X,
-                                                 dtype=X.dtype)
-
         X, y, X_offset, y_offset, X_scale, _ = _preprocess_data(
-            X, y, fit_intercept=self.fit_intercept,
-            copy=self.copy_X, sample_weight=sample_weight,
-            check_input=True)
-
-        if sample_weight is not None:
-            # Sample weight can be implemented via a simple rescaling.
-            outs = _rescale_data(X, y, sample_weight)
-            X, y = outs[0], outs[1]
+            X,
+            y,
+            fit_intercept=self.fit_intercept,
+            copy=self.copy_X,
+            rescale_with_sw=True,
+        )
 
         return X, y, X_offset, y_offset, X_scale
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y):
 
         X, y, X_offset, y_offset, X_scale = self._validate_input(
-            X, y, sample_weight=sample_weight)
+            X, y)
+
         coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol,
                                 jit=self.jit)
         self.alpha_ = alpha
@@ -356,7 +353,7 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
         else:
             self.intercept_ = 0.
 
-    def score(self, X, y, sample_weight=None):
+    def score(self, X, y):
         """
         Score the fracridge fit
         """
@@ -365,10 +362,7 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
         if len(y_pred.shape) > len(y.shape):
             y = y[..., np.newaxis]
         y = np.broadcast_to(y, y_pred.shape)
-        return r2_score(y, y_pred, sample_weight=sample_weight)
-
-    def _more_tags(self):
-        return {'multioutput': True}
+        return r2_score(y, y_pred)
 
 
 class FracRidgeRegressorCV(FracRidgeRegressor):
@@ -434,18 +428,17 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         self.cv = cv
         self.scoring = scoring
 
-    def fit(self, X, y, sample_weight=None, frac_grid=None):
+    def fit(self, X, y, frac_grid=None):
         """
         Parameters
         ----------
         frac_grid : sequence or float, optional
             The values of frac to consider. Default: np.arange(.1, 1.1, .1)
         """
-        X, y, _, _, _ = self._validate_input(
-            X, y, sample_weight=None)
+        X, y, _, _, _ = self._validate_input(X, y)
 
         if frac_grid is None:
-            frac_grid=np.arange(.1, 1.1, .1)
+            frac_grid = np.arange(.1, 1.1, .1)
         parameters = {'fracs': frac_grid}
         gs = GridSearchCV(
                 FracRidgeRegressor(
@@ -455,7 +448,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
                     jit=self.jit),
                 parameters, cv=self.cv, scoring=self.scoring)
 
-        gs.fit(X, y, sample_weight=sample_weight)
+        gs.fit(X, y)
         estimator = gs.best_estimator_
         self.best_score_ = gs.best_score_
         self.coef_ = estimator.coef_
@@ -466,9 +459,6 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         self.n_features_in_ = X.shape[1]
 
         return self
-
-    def _more_tags(self):
-        return {'multioutput': True}
 
 
 def vec_len(vec, axis=0):
