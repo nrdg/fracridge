@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.12"]
 
     steps:
     - name: Checkout repo
@@ -27,7 +27,7 @@ jobs:
         cd docs
         make html
     - name: Upload docs
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v6
       with:
         name: docs
         path: docs/_build/html
