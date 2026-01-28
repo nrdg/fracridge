@@ -43,7 +43,7 @@ jobs:
         run: pip install dist/*.tar.gz
       - run: python -c 'import fracridge; print(fracridge.__version__)'
       - name: Install pytest
-        run: pip install pytest
+        run: pip install pytest pytest-cov pytest-benchmark
       - name: Run tests
         run: pytest -v --pyargs fracridge
   pre-publish:
