@@ -3,14 +3,41 @@
 
 .. _sphx_glr_auto_examples_sg_execution_times:
 
+
 Computation times
 =================
-**00:05.957** total execution time for **auto_examples** files:
+**00:15.124** total execution time for 3 files **from auto_examples**:
 
-+-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)               | 00:04.858 | 0.0 MB |
-+-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py` (``plot_alpha_vs_gamma.py``)   | 00:00.786 | 0.0 MB |
-+-------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py` (``plot_paths_cv_curves.py``) | 00:00.313 | 0.0 MB |
-+-------------------------------------------------------------------------------------+-----------+--------+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
+     - 00:11.320
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py` (``plot_alpha_vs_gamma.py``)
+     - 00:03.508
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py` (``plot_paths_cv_curves.py``)
+     - 00:00.296
+     - 0.0

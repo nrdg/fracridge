@@ -1,25 +1,24 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fracridge.FracRidgeRegressor &mdash; fracridge 2.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/project-template.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>fracridge.FracRidgeRegressor &mdash; fracridge 3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/project-template.css?v=d1d1afb3" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/js/copybutton.js"></script>
+      <script src="../_static/documentation_options.js?v=110ea713"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/js/copybutton.js?v=26522df0"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -32,14 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> fracridge
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            fracridge
           </a>
-              <div class="version">
-                2.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -85,9 +85,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API</a> &raquo;</li>
-      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">fracridge</span></code>.FracRidgeRegressor</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API</a></li>
+      <li class="breadcrumb-item active"><code class="xref py py-mod docutils literal notranslate"><span class="pre">fracridge</span></code>.FracRidgeRegressor</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/generated/fracridge.FracRidgeRegressor.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,12 +98,12 @@
            <div itemprop="articleBody">
              
   <section id="fracridge-fracridgeregressor">
-<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fracridge</span></code>.FracRidgeRegressor<a class="headerlink" href="#fracridge-fracridgeregressor" title="Permalink to this headline">¶</a></h1>
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">fracridge</span></code>.FracRidgeRegressor<a class="headerlink" href="#fracridge-fracridgeregressor" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="fracridge.FracRidgeRegressor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FracRidgeRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fracs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor" title="Permalink to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FracRidgeRegressor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fracs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>fracs</strong><span class="classifier">float or sequence</span></dt><dd><p>The desired fractions of the parameter vector length, relative to
 OLS solution.
@@ -111,14 +111,23 @@ Default: np.arange(.1, 1.1, .1)</p>
 </dd>
 <dt><strong>fit_intercept</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to fit an intercept term. Default: False.</p>
 </dd>
-<dt><strong>normalize</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to normalize the columns of X. Default: False.</p>
-</dd>
 <dt><strong>copy_X</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to make a copy of the X matrix before fitting. Default: True.</p>
 </dd>
 <dt><strong>tol</strong><span class="classifier">float, optional.</span></dt><dd><p>Tolerance under which singular values of the X matrix are considered
 to be zero. Default: 1e-10.</p>
 </dd>
 <dt><strong>jit</strong><span class="classifier">bool, optional.</span></dt><dd><p>Whether to use jit-accelerated implementation. Default: True.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>coef_</strong><span class="classifier">ndarray, shape (p, f, b)</span></dt><dd><p>The full estimated parameters across units of measurement for every
+desired fraction. Where p number of model parameters, f number of
+fractions and b number of targets.</p>
+</dd>
+<dt><strong>alpha_</strong><span class="classifier">ndarray, shape (f, b)</span></dt><dd><p>The alpha coefficients associated with each solution. Where f number
+of fractions and b number of targets.</p>
 </dd>
 </dl>
 </dd>
@@ -146,41 +155,45 @@ to be zero. Default: 1e-10.</p>
 <p>Check results:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coef_</span> <span class="o">=</span> <span class="n">fr</span><span class="o">.</span><span class="n">coef_</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">alpha_</span> <span class="o">=</span> <span class="n">fr</span><span class="o">.</span><span class="n">alpha_</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coef_</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">))</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coef_</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">))</span>
 <span class="go">0.29</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>coef_</strong><span class="classifier">ndarray, shape (p, f, b)</span></dt><dd><p>The full estimated parameters across units of measurement for every
-desired fraction. Where p number of model parameters, f number of
-fractions and b number of targets.</p>
-</dd>
-<dt><strong>alpha_</strong><span class="classifier">ndarray, shape (f, b)</span></dt><dd><p>The alpha coefficients associated with each solution. Where f number
-of fractions and b number of targets.</p>
-</dd>
-</dl>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="fracridge.FracRidgeRegressor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fracs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fracs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fracridge.FracRidgeRegressor.get_metadata_routing">
+<span class="sig-name descname"><span class="pre">get_metadata_routing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fracridge.FracRidgeRegressor.get_metadata_routing" title="Link to this definition">¶</a></dt>
+<dd><p>Get metadata routing of this object.</p>
+<p>Please check <a class="reference external" href="http://scikit-learn.org/stable/metadata_routing.html#metadata-routing" title="(in scikit-learn v1.8)"><span class="xref std std-ref">User Guide</span></a> on how the routing
+mechanism works.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>routing</strong><span class="classifier">MetadataRequest</span></dt><dd><p>A <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.utils.metadata_routing.MetadataRequest.html#sklearn.utils.metadata_routing.MetadataRequest" title="(in scikit-learn v1.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MetadataRequest</span></code></a> encapsulating
+routing information.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fracridge.FracRidgeRegressor.get_params">
-<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracridge.FracRidgeRegressor.get_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">get_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">deep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracridge.FracRidgeRegressor.get_params" title="Link to this definition">¶</a></dt>
 <dd><p>Get parameters for this estimator.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>deep</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, will return the parameters for this estimator and
 contained subobjects that are estimators.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>params</strong><span class="classifier">dict</span></dt><dd><p>Parameter names mapped to their values.</p>
 </dd>
@@ -191,26 +204,26 @@ contained subobjects that are estimators.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fracridge.FracRidgeRegressor.score">
-<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor.score" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fracridge/fracridge.html#FracRidgeRegressor.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fracridge.FracRidgeRegressor.score" title="Link to this definition">¶</a></dt>
 <dd><p>Score the fracridge fit</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fracridge.FracRidgeRegressor.set_params">
-<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracridge.FracRidgeRegressor.set_params" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fracridge.FracRidgeRegressor.set_params" title="Link to this definition">¶</a></dt>
 <dd><p>Set the parameters of this estimator.</p>
 <p>The method works on simple estimators as well as on nested objects
-(such as <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
+(such as <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v1.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code></a>). The latter have
 parameters of the form <code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s
 possible to update each component of a nested object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>**params</strong><span class="classifier">dict</span></dt><dd><p>Estimator parameters.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt><strong>self</strong><span class="classifier">estimator instance</span></dt><dd><p>Estimator instance.</p>
 </dd>
@@ -222,26 +235,17 @@ possible to update each component of a nested object.</p>
 </dd></dl>
 
 <section id="examples-using-fracridge-fracridgeregressor">
-<h2>Examples using <code class="docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressor</span></code><a class="headerlink" href="#examples-using-fracridge-fracridgeregressor" title="Permalink to this headline">¶</a></h2>
-<div class="sphx-glr-thumbcontainer" tooltip="Because Fracridge is implemented using a Scikit-Learn-compatible API, the objects in the librar..."><figure class="align-default" id="id1">
-<img alt="Integrating FracRidge objects into sklearn pipelines" src="../_images/sphx_glr_plot_pipeline_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Integrating FracRidge objects into sklearn pipelines</span></a></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Here we compare parameterization using fractional ridge regression (FRR) and standard ridge reg..."><figure class="align-default" id="id2">
-<img alt="Comparing alpha and fracs" src="../_images/sphx_glr_plot_alpha_vs_gamma_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_alpha_vs_gamma.html#sphx-glr-auto-examples-plot-alpha-vs-gamma-py"><span class="std std-ref">Comparing alpha and fracs</span></a></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use..."><figure class="align-default" id="id3">
-<img alt="Coefficient paths and cross-validation curves" src="../_images/sphx_glr_plot_paths_cv_curves_thumb.png" />
-<figcaption>
-<p><span class="caption-text"><a class="reference internal" href="../auto_examples/plot_paths_cv_curves.html#sphx-glr-auto-examples-plot-paths-cv-curves-py"><span class="std std-ref">Coefficient paths and cross-validation curves</span></a></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
-</figcaption>
-</figure>
-</div><div style='clear:both'></div></section>
+<h2>Examples using <code class="docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressor</span></code><a class="headerlink" href="#examples-using-fracridge-fracridgeregressor" title="Link to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Because Fracridge is implemented using a Scikit-Learn-compatible API, the objects in the library can be integrated into pipelines that use objects from the Scikit Learn library."><img alt="" src="../_images/sphx_glr_plot_pipeline_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_pipeline.html"><span class="doc">Integrating FracRidge objects into sklearn pipelines</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Integrating FracRidge objects into sklearn pipelines</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Here we compare parameterization using fractional ridge regression (FRR) and standard ridge regression (SRR)."><img alt="" src="../_images/sphx_glr_plot_alpha_vs_gamma_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_alpha_vs_gamma.html"><span class="doc">Comparing alpha and fracs</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Comparing alpha and fracs</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use of standard ridge regression (RR) on the diabetes dataset that is included in sckit-learn."><img alt="" src="../_images/sphx_glr_plot_paths_cv_curves_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/plot_paths_cv_curves.html"><span class="doc">Coefficient paths and cross-validation curves</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Coefficient paths and cross-validation curves</div>
+</div></div><div style='clear:both'></div></section>
 </section>
 
 

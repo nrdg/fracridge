@@ -1,25 +1,24 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User guide : contents &mdash; fracridge 2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/project-template.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>User guide : contents &mdash; fracridge 3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/project-template.css?v=d1d1afb3" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/js/copybutton.js"></script>
+      <script src="_static/documentation_options.js?v=110ea713"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/js/copybutton.js?v=26522df0"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -32,14 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> fracridge
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            fracridge
           </a>
-              <div class="version">
-                2.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -84,8 +84,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>User guide : contents</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User guide : contents</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/user_guide.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -96,9 +96,9 @@
            <div itemprop="articleBody">
              
   <section id="user-guide">
-<span id="id1"></span><h1>User guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>User guide<a class="headerlink" href="#user-guide" title="Link to this heading">¶</a></h1>
 <section id="matlab">
-<h2>MATLAB<a class="headerlink" href="#matlab" title="Permalink to this headline">¶</a></h2>
+<h2>MATLAB<a class="headerlink" href="#matlab" title="Link to this heading">¶</a></h2>
 <p>The MATLAB implementation provides a single entry-point function called <code class="docutils literal notranslate"><span class="pre">fracridge</span></code>.</p>
 <p>To use it, arrange your data <code class="docutils literal notranslate"><span class="pre">y</span></code>, to have d rows by t columns, where <code class="docutils literal notranslate"><span class="pre">d</span></code>
 represents the number of observations in each target, and <code class="docutils literal notranslate"><span class="pre">t</span></code> is the number of
@@ -109,7 +109,7 @@ relative to the unregularized solution.</p>
 <p>For detailed documentation, see also <a class="reference external" href="api.html">API documentation</a></p>
 </section>
 <section id="python">
-<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<h2>Python<a class="headerlink" href="#python" title="Link to this heading">¶</a></h2>
 <p>The Python implementation can be used in several different ways. The first
 is a function, <a class="reference internal" href="generated/fracridge.fracridge.html#fracridge.fracridge" title="fracridge.fracridge"><code class="xref py py-func docutils literal notranslate"><span class="pre">fracridge.fracridge()</span></code></a>, which is called in a similar
 manner to the MATLAB function, with <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> and <code class="docutils literal notranslate"><span class="pre">frac</span></code> inputs.
@@ -122,11 +122,11 @@ object implements a grid search over provided values of <code class="docutils li
 the  best value of <code class="docutils literal notranslate"><span class="pre">frac</span></code> given the data.</p>
 <p>For detailed documentation, see also <a class="reference external" href="api.html">API documentation</a></p>
 <section id="frequently-asked-questions">
-<h3>Frequently asked questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h3>
+<h3>Frequently asked questions<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading">¶</a></h3>
 </section>
 </section>
 <section id="how-should-i-set-the-frac-input">
-<h2>How should I set the <code class="docutils literal notranslate"><span class="pre">frac</span></code> input?<a class="headerlink" href="#how-should-i-set-the-frac-input" title="Permalink to this headline">¶</a></h2>
+<h2>How should I set the <code class="docutils literal notranslate"><span class="pre">frac</span></code> input?<a class="headerlink" href="#how-should-i-set-the-frac-input" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">frac</span></code> input determines the L2-norm of the regularized coefficients for
 the linear regression problem, <em>relative</em> to the L2-norm of the unregularized
 coefficients for the same problem. If you are not sure how to set this, choose
@@ -138,7 +138,7 @@ to use a strategy such as cross-validation (see the
 for an explanation of this concept.</p>
 </section>
 <section id="how-do-i-interpret-the-alphas-output">
-<h2>How do I interpret the alphas output?<a class="headerlink" href="#how-do-i-interpret-the-alphas-output" title="Permalink to this headline">¶</a></h2>
+<h2>How do I interpret the alphas output?<a class="headerlink" href="#how-do-i-interpret-the-alphas-output" title="Link to this heading">¶</a></h2>
 <p>The values of <code class="docutils literal notranslate"><span class="pre">alpha</span></code> generated by the Python <a class="reference internal" href="generated/fracridge.fracridge.html#fracridge.fracridge" title="fracridge.fracridge"><code class="xref py py-func docutils literal notranslate"><span class="pre">fracridge.fracridge()</span></code></a>
 function or MATLAB <cite>fradcridge</cite> function represent the degree of regularization
 corresponding to the fraction values chosen by the user.</p>
@@ -148,7 +148,7 @@ automatically uses cross-validation to determine a best fraction for the data
 provided.</p>
 </section>
 <section id="how-do-i-compare-the-best-fractions-across-targets">
-<h2>How do I compare the best fractions across targets?<a class="headerlink" href="#how-do-i-compare-the-best-fractions-across-targets" title="Permalink to this headline">¶</a></h2>
+<h2>How do I compare the best fractions across targets?<a class="headerlink" href="#how-do-i-compare-the-best-fractions-across-targets" title="Link to this heading">¶</a></h2>
 <p>The best fraction might differ across targets. The best fraction for a
 particular target depends on many factors, including the noise in the data
 and the degree of redundancy among regressors. However, it is independent
@@ -159,7 +159,7 @@ data is relatively high, while the redundancy between regressors is relatively
 low.</p>
 </section>
 <section id="how-do-i-cite-fracridge-if-i-used-it-in-a-publication">
-<h2>How do I cite <code class="docutils literal notranslate"><span class="pre">fracridge</span></code> if I used it in a publication?<a class="headerlink" href="#how-do-i-cite-fracridge-if-i-used-it-in-a-publication" title="Permalink to this headline">¶</a></h2>
+<h2>How do I cite <code class="docutils literal notranslate"><span class="pre">fracridge</span></code> if I used it in a publication?<a class="headerlink" href="#how-do-i-cite-fracridge-if-i-used-it-in-a-publication" title="Link to this heading">¶</a></h2>
 <p>If you use <code class="docutils literal notranslate"><span class="pre">fracridge</span></code>, please cite our paper: “Fractional ridge regression: a fast, interpretable reparameterization of ridge regression” (2020)  <em>GigaScience</em>, Volume 9, Issue 12, December 2020, <a class="reference external" href="https://doi.org/10.1093/gigascience/giaa133">https://doi.org/10.1093/gigascience/giaa133</a></p>
 <p>For your convenience, here is the bibtex entry:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@ARTICLE</span><span class="p">{</span><span class="n">fracridge2020</span><span class="p">,</span>

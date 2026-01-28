@@ -1,25 +1,24 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fracridge API &mdash; fracridge 2.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/project-template.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+  <title>fracridge API &mdash; fracridge 3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/project-template.css?v=d1d1afb3" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/js/copybutton.js"></script>
+      <script src="_static/documentation_options.js?v=110ea713"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/js/copybutton.js?v=26522df0"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -32,14 +31,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> fracridge
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            fracridge
           </a>
-              <div class="version">
-                2.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -97,8 +97,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -109,15 +109,15 @@
            <div itemprop="articleBody">
              
   <section id="fracridge-api">
-<h1><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API<a class="headerlink" href="#fracridge-api" title="Permalink to this headline">¶</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API<a class="headerlink" href="#fracridge-api" title="Link to this heading">¶</a></h1>
 <section id="matlab">
-<h2>MATLAB<a class="headerlink" href="#matlab" title="Permalink to this headline">¶</a></h2>
+<h2>MATLAB<a class="headerlink" href="#matlab" title="Link to this heading">¶</a></h2>
 <p>The MATLAB version of the software provides the function <code class="docutils literal notranslate"><span class="pre">fracridge</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">function</span> <span class="p">[</span><span class="n">coef</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">tol</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">standardizemode</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="parameters">
-<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">¶</a></h3>
 <dl class="simple">
 <dt>X<span class="classifier">The design matrix (d x p) with different data points in the rows and</span></dt><dd><p>different regressors in the columns.</p>
 </dd>
@@ -161,7 +161,7 @@ regressor in <code class="docutils literal notranslate"><span class="pre">X</spa
 </div></blockquote>
 </section>
 <section id="returns">
-<h3>Returns:<a class="headerlink" href="#returns" title="Permalink to this headline">¶</a></h3>
+<h3>Returns:<a class="headerlink" href="#returns" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><dl class="simple">
 <dt>coef<span class="classifier">as the estimated regression weights (p x f x t)</span></dt><dd><p>for all fractional levels for all target variables.</p>
@@ -177,7 +177,7 @@ and &lt;offset&gt; is returned as all zeros.</p>
 </div></blockquote>
 </section>
 <section id="notes">
-<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h3>
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>We silently ignore regressors that are all zeros.</p></li>
 <li><p>The class of <code class="docutils literal notranslate"><span class="pre">coef</span></code> and <code class="docutils literal notranslate"><span class="pre">alphas</span></code> is matched to the class of <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
@@ -188,96 +188,92 @@ are all zeros and alpha values that are all zeros.</p></li>
 </ul>
 </section>
 <section id="examples">
-<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
 <p>Example 1 (Demonstrate that fracridge achieves the correct fractional length)</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
-<span class="n">coef</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">inv</span><span class="p">(</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span><span class="w"></span>
-<span class="p">[</span><span class="n">coef2</span><span class="p">,</span><span class="nb">alpha</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="n">y</span><span class="p">);</span><span class="w"></span>
-<span class="n">coef3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">inv</span><span class="p">(</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">alpha</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span><span class="w"></span>
-<span class="n">coef4</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="nb">alpha</span><span class="p">,</span><span class="n">y</span><span class="p">,[],</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="nb">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span><span class="w"></span>
-<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="p">)</span><span class="w"></span>
-<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="p">)</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="nb">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span><span class="w"></span>
-<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="o">-</span><span class="n">coef3</span><span class="p">)</span><span class="w"></span>
-<span class="nb">norm</span><span class="p">(</span><span class="n">coef4</span><span class="o">-</span><span class="n">coef3</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">coef</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">inv</span><span class="p">(</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span>
+<span class="p">[</span><span class="n">coef2</span><span class="p">,</span><span class="nb">alpha</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+<span class="n">coef3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">inv</span><span class="p">(</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">alpha</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span>
+<span class="n">coef4</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="nb">alpha</span><span class="p">,</span><span class="n">y</span><span class="p">,[],</span><span class="mi">1</span><span class="p">);</span>
+<span class="nb">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
+<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="p">)</span>
+<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="p">)</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="nb">norm</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
+<span class="nb">norm</span><span class="p">(</span><span class="n">coef2</span><span class="o">-</span><span class="n">coef3</span><span class="p">)</span>
+<span class="nb">norm</span><span class="p">(</span><span class="n">coef4</span><span class="o">-</span><span class="n">coef3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Example 2 (Compare execution time between naive ridge regression and fracridge)</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">300</span><span class="p">);</span><span class="w">        </span><span class="c">% 1000 data points x 300 target variables</span><span class="w"></span>
-<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">3000</span><span class="p">);</span><span class="w">       </span><span class="c">% 1000 data points x 3000 predictors</span><span class="w"></span>
-<span class="c">% naive approach</span><span class="w"></span>
-<span class="nb">tic</span><span class="p">;</span><span class="w"></span>
-<span class="n">alphas</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">10.</span>^<span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span><span class="mf">.5</span><span class="p">:</span><span class="mf">5.5</span><span class="p">);</span><span class="w">  </span><span class="c">% guess 20 alphas</span><span class="w"></span>
-<span class="n">cache1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="p">;</span><span class="w"></span>
-<span class="n">cache2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span><span class="w"></span>
-<span class="n">coef</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">zeros</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">alphas</span><span class="p">),</span><span class="mi">300</span><span class="p">);</span><span class="w"></span>
-<span class="k">for</span><span class="w"> </span><span class="nb">j</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">coef</span><span class="p">(:,</span><span class="nb">j</span><span class="p">,:)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">permute</span><span class="p">(</span><span class="nb">inv</span><span class="p">(</span><span class="n">cache1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">alphas</span><span class="p">(</span><span class="nb">j</span><span class="p">)</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">cache2</span><span class="p">,[</span><span class="mi">1</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="mi">2</span><span class="p">]);</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
-<span class="nb">toc</span><span class="p">;</span><span class="w"></span>
-<span class="c">% fracridge approach</span><span class="w"></span>
-<span class="nb">tic</span><span class="p">;</span><span class="w"></span>
-<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">.05</span><span class="p">:</span><span class="mf">.05</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span><span class="w">         </span><span class="c">% get 20 equally-spaced lengths</span><span class="w"></span>
-<span class="n">coef2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">);</span><span class="w"></span>
-<span class="nb">toc</span><span class="p">;</span><span class="w"></span>
-<span class="c">% fracridge implementation of simple rotation</span><span class="w"></span>
-<span class="nb">tic</span><span class="p">;</span><span class="w"></span>
-<span class="n">coef3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">y</span><span class="p">,[],</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="nb">toc</span><span class="p">;</span><span class="w"></span>
-<span class="nb">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">coef</span><span class="p">(:)</span><span class="o">-</span><span class="n">coef3</span><span class="p">(:))</span><span class="o">&lt;</span><span class="mf">1e-4</span><span class="p">));</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">300</span><span class="p">);</span><span class="w">        </span><span class="c">% 1000 data points x 300 target variables</span>
+<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">3000</span><span class="p">);</span><span class="w">       </span><span class="c">% 1000 data points x 3000 predictors</span>
+<span class="c">% naive approach</span>
+<span class="nb">tic</span><span class="p">;</span>
+<span class="n">alphas</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">10</span><span class="o">.^</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span><span class="mf">.5</span><span class="p">:</span><span class="mf">5.5</span><span class="p">);</span><span class="w">  </span><span class="c">% guess 20 alphas</span>
+<span class="n">cache1</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">&#39;*</span><span class="n">X</span><span class="p">;</span>
+<span class="n">cache2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">&#39;*</span><span class="n">y</span><span class="p">;</span>
+<span class="n">coef</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">zeros</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">alphas</span><span class="p">),</span><span class="mi">300</span><span class="p">);</span>
+<span class="k">for</span><span class="w"> </span><span class="nb">j</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span>
+<span class="w">    </span><span class="n">coef</span><span class="p">(:,</span><span class="nb">j</span><span class="p">,:)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">permute</span><span class="p">(</span><span class="nb">inv</span><span class="p">(</span><span class="n">cache1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">alphas</span><span class="p">(</span><span class="nb">j</span><span class="p">)</span><span class="o">*</span><span class="nb">eye</span><span class="p">(</span><span class="nb">size</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="n">cache2</span><span class="p">,[</span><span class="mi">1</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="mi">2</span><span class="p">]);</span>
+<span class="k">end</span>
+<span class="nb">toc</span><span class="p">;</span>
+<span class="c">% fracridge approach</span>
+<span class="nb">tic</span><span class="p">;</span>
+<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">.05</span><span class="p">:</span><span class="mf">.05</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span><span class="w">         </span><span class="c">% get 20 equally-spaced lengths</span>
+<span class="n">coef2</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+<span class="nb">toc</span><span class="p">;</span>
+<span class="c">% fracridge implementation of simple rotation</span>
+<span class="nb">tic</span><span class="p">;</span>
+<span class="n">coef3</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">y</span><span class="p">,[],</span><span class="mi">1</span><span class="p">);</span>
+<span class="nb">toc</span><span class="p">;</span>
+<span class="nb">assert</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">coef</span><span class="p">(:)</span><span class="o">-</span><span class="n">coef3</span><span class="p">(:))</span><span class="o">&lt;</span><span class="mf">1e-4</span><span class="p">));</span>
 </pre></div>
 </div>
 <p>Example 3 (Plot coefficient paths and vector length for a simple example)</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="nb">rand</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">));</span><span class="w"></span>
-<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">.05</span><span class="p">:</span><span class="mf">.05</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="p">[</span><span class="n">coef</span><span class="p">,</span><span class="n">alphas</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">);</span><span class="w"></span>
-<span class="nb">figure</span><span class="p">;</span><span class="w"></span>
-<span class="nb">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span><span class="w"></span>
-<span class="nb">plot</span><span class="p">(</span><span class="n">fracs</span><span class="p">,</span><span class="n">coef</span><span class="o">&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Fraction&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Trace plot of coefficients&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="nb">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span><span class="w"></span>
-<span class="nb">plot</span><span class="p">(</span><span class="n">fracs</span><span class="p">,</span><span class="nb">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">coef</span><span class="o">.^</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="s">&#39;ro-&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Fraction&#39;</span><span class="p">);</span><span class="w"></span>
-<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;Vector length&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="nb">rand</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">));</span>
+<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">.05</span><span class="p">:</span><span class="mf">.05</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">[</span><span class="n">coef</span><span class="p">,</span><span class="n">alphas</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+<span class="nb">figure</span><span class="p">;</span>
+<span class="nb">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span>
+<span class="nb">plot</span><span class="p">(</span><span class="n">fracs</span><span class="p">,</span><span class="n">coef</span><span class="o">&#39;</span><span class="p">);</span>
+<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Fraction&#39;</span><span class="p">);</span>
+<span class="nb">title</span><span class="p">(</span><span class="s">&#39;Trace plot of coefficients&#39;</span><span class="p">);</span>
+<span class="nb">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span>
+<span class="nb">plot</span><span class="p">(</span><span class="n">fracs</span><span class="p">,</span><span class="nb">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">coef</span><span class="o">.^</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="s">&#39;ro-&#39;</span><span class="p">);</span>
+<span class="nb">xlabel</span><span class="p">(</span><span class="s">&#39;Fraction&#39;</span><span class="p">);</span>
+<span class="nb">ylabel</span><span class="p">(</span><span class="s">&#39;Vector length&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Example 4 (Demonstrate how fracridge handles standardization of regressors)</p>
-<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-<span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">*</span><span class="nb">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
-<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">:</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="p">[</span><span class="n">coef</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">offset</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">,[],[],</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-<span class="n">modelfit</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">*</span><span class="n">coef</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">repmat</span><span class="p">(</span><span class="n">offset</span><span class="o">&#39;</span><span class="p">,[</span><span class="mi">50</span><span class="w"> </span><span class="mi">1</span><span class="p">]);</span><span class="w"></span>
-<span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span><span class="w"></span>
-<span class="n">cmap0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">copper</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">fracs</span><span class="p">));</span><span class="w"></span>
-<span class="n">h</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[];</span><span class="w"></span>
-<span class="n">legendstr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
-<span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">fracs</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">h</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">plot</span><span class="p">(</span><span class="n">modelfit</span><span class="p">(:,</span><span class="n">p</span><span class="p">),</span><span class="s">&#39;-&#39;</span><span class="p">,</span><span class="s">&#39;Color&#39;</span><span class="p">,</span><span class="n">cmap0</span><span class="p">(</span><span class="n">p</span><span class="p">,:));</span><span class="w"></span>
-<span class="w">    </span><span class="n">legendstr</span><span class="p">{</span><span class="n">p</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;Frac %.1f&#39;</span><span class="p">,</span><span class="n">fracs</span><span class="p">(</span><span class="n">p</span><span class="p">));</span><span class="w"></span>
-<span class="k">end</span><span class="w"></span>
-<span class="n">hdata</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">plot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="s">&#39;k-&#39;</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-<span class="nb">legend</span><span class="p">([</span><span class="n">hdata</span><span class="w"> </span><span class="n">h</span><span class="p">],[</span><span class="s">&#39;Data&#39;</span><span class="w"> </span><span class="n">legendstr</span><span class="p">],</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;EastOutside&#39;</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">y</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">*</span><span class="nb">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">randn</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">fracs</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mf">0.1</span><span class="p">:</span><span class="mf">0.1</span><span class="p">:</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">[</span><span class="n">coef</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">offset</span><span class="p">]</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">fracridge</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">fracs</span><span class="p">,</span><span class="n">y</span><span class="p">,[],[],</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">modelfit</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">X</span><span class="o">*</span><span class="n">coef</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">repmat</span><span class="p">(</span><span class="n">offset</span><span class="o">&#39;</span><span class="p">,[</span><span class="mi">50</span><span class="w"> </span><span class="mi">1</span><span class="p">]);</span>
+<span class="nb">figure</span><span class="p">;</span><span class="w"> </span><span class="n">hold</span><span class="w"> </span><span class="s">on</span><span class="p">;</span>
+<span class="n">cmap0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">copper</span><span class="p">(</span><span class="nb">length</span><span class="p">(</span><span class="n">fracs</span><span class="p">));</span>
+<span class="n">h</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[];</span>
+<span class="n">legendstr</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{};</span>
+<span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="p">=</span><span class="mi">1</span><span class="p">:</span><span class="nb">length</span><span class="p">(</span><span class="n">fracs</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">plot</span><span class="p">(</span><span class="n">modelfit</span><span class="p">(:,</span><span class="n">p</span><span class="p">),</span><span class="s">&#39;-&#39;</span><span class="p">,</span><span class="s">&#39;Color&#39;</span><span class="p">,</span><span class="n">cmap0</span><span class="p">(</span><span class="n">p</span><span class="p">,:));</span>
+<span class="w">    </span><span class="n">legendstr</span><span class="p">{</span><span class="n">p</span><span class="p">}</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">sprintf</span><span class="p">(</span><span class="s">&#39;Frac %.1f&#39;</span><span class="p">,</span><span class="n">fracs</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+<span class="k">end</span>
+<span class="n">hdata</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nb">plot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="s">&#39;k-&#39;</span><span class="p">,</span><span class="s">&#39;LineWidth&#39;</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+<span class="nb">legend</span><span class="p">([</span><span class="n">hdata</span><span class="w"> </span><span class="n">h</span><span class="p">],[</span><span class="s">&#39;Data&#39;</span><span class="w"> </span><span class="n">legendstr</span><span class="p">],</span><span class="s">&#39;Location&#39;</span><span class="p">,</span><span class="s">&#39;EastOutside&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="python">
-<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<h2>Python<a class="headerlink" href="#python" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">fracridge</span></code> API includes a functional interface and an object-oriented
 interface. The object-oriented interface is consistent with the
 <a class="reference external" href="https://scikit-learn.org/stable/">Scikit Learn</a> API, providing an
 estimator that can be integrated into pipelines that use scikit learn.</p>
 <section id="fracridge">
-<h3>fracridge<a class="headerlink" href="#fracridge" title="Permalink to this headline">¶</a></h3>
+<h3>fracridge<a class="headerlink" href="#fracridge" title="Link to this heading">¶</a></h3>
 <p>This is the functional API for the software.</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/fracridge.fracridge.html#fracridge.fracridge" title="fracridge.fracridge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fracridge.fracridge</span></code></a>(X, y[, fracs, tol, jit])</p></td>
 <td><p>Approximates alpha parameters to match desired fractions of OLS length.</p></td>
@@ -286,36 +282,24 @@ estimator that can be integrated into pipelines that use scikit learn.</p>
 </table>
 </section>
 <section id="fracridgeregressor">
-<h3>FracRidgeRegressor<a class="headerlink" href="#fracridgeregressor" title="Permalink to this headline">¶</a></h3>
+<h3>FracRidgeRegressor<a class="headerlink" href="#fracridgeregressor" title="Link to this heading">¶</a></h3>
 <p>This is the object-oriented interface for the software.</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/fracridge.FracRidgeRegressor.html#fracridge.FracRidgeRegressor" title="fracridge.FracRidgeRegressor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressor</span></code></a>([fracs, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
 </section>
 <section id="fracridgeregressorcv">
-<h3>FracRidgeRegressorCV<a class="headerlink" href="#fracridgeregressorcv" title="Permalink to this headline">¶</a></h3>
-<p>This object uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the
+<h3>FracRidgeRegressorCV<a class="headerlink" href="#fracridgeregressorcv" title="Link to this heading">¶</a></h3>
+<p>This object uses <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the
 best value of <code class="docutils literal notranslate"><span class="pre">frac</span></code> for provided data using cross-validation.</p>
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/fracridge.FracRidgeRegressorCV.html#fracridge.FracRidgeRegressorCV" title="fracridge.FracRidgeRegressorCV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fracridge.FracRidgeRegressorCV</span></code></a>([...])</p></td>
-<td><p>Uses <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the best value of <cite>frac</cite> given the data, using cross-validation.</p></td>
+<td><p>Uses <a class="reference external" href="http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html#sklearn.model_selection.GridSearchCV" title="(in scikit-learn v1.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.GridSearchCV</span></code></a> to find the best value of <cite>frac</cite> given the data, using cross-validation.</p></td>
 </tr>
 </tbody>
 </table>

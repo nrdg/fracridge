@@ -10,8 +10,8 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_pipeline.py>`
-        to download the full example code
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_pipeline.py>`
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -36,7 +36,7 @@ Imports
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-27
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import numpy as np
@@ -62,7 +62,7 @@ We generate synthetic data
 
 .. GENERATED FROM PYTHON SOURCE LINES 30-44
 
-.. code-block:: default
+.. code-block:: Python
 
 
     np.random.seed(1984)
@@ -93,7 +93,7 @@ best fraction for FracRidge decreases.
 
 .. GENERATED FROM PYTHON SOURCE LINES 48-64
 
-.. code-block:: default
+.. code-block:: Python
 
 
     best_fracs = []
@@ -126,28 +126,26 @@ best fraction for FracRidge decreases.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.858 seconds)
+   **Total running time of the script:** (0 minutes 11.320 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
 
+.. only:: html
 
-.. only :: html
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_pipeline.ipynb <plot_pipeline.ipynb>`
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_pipeline.py <plot_pipeline.py>`
 
-     :download:`Download Python source code: plot_pipeline.py <plot_pipeline.py>`
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_pipeline.ipynb <plot_pipeline.ipynb>`
+      :download:`Download zipped: plot_pipeline.zip <plot_pipeline.zip>`
 
 
 .. only:: html

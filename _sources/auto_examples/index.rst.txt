@@ -1,9 +1,5 @@
 :orphan:
 
-
-
-.. _sphx_glr_auto_examples:
-
 ==========================
 Example `fracridge` usage
 ==========================
@@ -13,14 +9,62 @@ Example `fracridge` usage
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Because Fracridge is implemented using a Scikit-Learn-compatible API, the objects in the librar...">
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Because Fracridge is implemented using a Scikit-Learn-compatible API, the objects in the library can be integrated into pipelines that use objects from the Scikit Learn library.">
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_thumb.png
-     :alt: Integrating FracRidge objects into sklearn pipelines
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_thumb.png
+    :alt:
 
-     :ref:`sphx_glr_auto_examples_plot_pipeline.py`
+  :doc:`/auto_examples/plot_pipeline`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Integrating FracRidge objects into sklearn pipelines</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Here we compare parameterization using fractional ridge regression (FRR) and standard ridge regression (SRR).">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_alpha_vs_gamma_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/plot_alpha_vs_gamma`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Comparing alpha and fracs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use of standard ridge regression (RR) on the diabetes dataset that is included in sckit-learn.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_paths_cv_curves_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/plot_paths_cv_curves`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Coefficient paths and cross-validation curves</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -31,81 +75,46 @@ Example `fracridge` usage
    :hidden:
 
    /auto_examples/plot_pipeline
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="Here we compare parameterization using fractional ridge regression (FRR) and standard ridge reg...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_alpha_vs_gamma_thumb.png
-     :alt: Comparing alpha and fracs
-
-     :ref:`sphx_glr_auto_examples_plot_alpha_vs_gamma.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_alpha_vs_gamma
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates some of the properties of the FRR approach and compares it to the use...">
-
-.. only:: html
-
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_paths_cv_curves_thumb.png
-     :alt: Coefficient paths and cross-validation curves
-
-     :ref:`sphx_glr_auto_examples_plot_paths_cv_curves.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
    /auto_examples/plot_paths_cv_curves
-.. raw:: html
-
-    <div class="sphx-glr-clear"></div>
-
-
-
-.. _sphx_glr_auto_examples_paper_figures:
 
 The code in this directory relies on functions contained in:
   http://github.com/kendrickkay/knkutils/
 
 
+
 .. raw:: html
 
-    <div class="sphx-glr-clear"></div>
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
 
 
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
+.. toctree::
+   :hidden:
+   :includehidden:
 
 
-  .. container:: sphx-glr-download sphx-glr-download-python
-
-    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+   /auto_examples/paper_figures/index.rst
 
 
+.. only:: html
 
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

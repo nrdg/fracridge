@@ -10,8 +10,8 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_paths_cv_curves.py>`
-        to download the full example code
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_paths_cv_curves.py>`
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -39,7 +39,7 @@ Imports:
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-26
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import numpy as np
@@ -59,7 +59,7 @@ This is the Fracridge sklearn-style estimator:
 
 .. GENERATED FROM PYTHON SOURCE LINES 29-36
 
-.. code-block:: default
+.. code-block:: Python
 
     from fracridge import FracRidgeRegressor
 
@@ -82,7 +82,7 @@ Get example data from scikit learn:
 
 .. GENERATED FROM PYTHON SOURCE LINES 39-42
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X, y = datasets.load_diabetes(return_X_y=True)
@@ -102,7 +102,7 @@ That are log-spaced from a very small value to a very large value:
 
 .. GENERATED FROM PYTHON SOURCE LINES 46-52
 
-.. code-block:: default
+.. code-block:: Python
 
     n_alphas = 20
     rr_alphas = np.logspace(-10, 10, n_alphas)
@@ -124,7 +124,7 @@ alpha:
 
 .. GENERATED FROM PYTHON SOURCE LINES 55-62
 
-.. code-block:: default
+.. code-block:: Python
 
 
     for aa in range(len(rr_alphas)):
@@ -150,7 +150,7 @@ predictions are generated:
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-74
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fracs = np.linspace(0, 1, n_alphas)
@@ -173,7 +173,7 @@ log-spaced alpha:
 
 .. GENERATED FROM PYTHON SOURCE LINES 78-90
 
-.. code-block:: default
+.. code-block:: Python
 
 
     fig, ax = plt.subplots(1, 2)
@@ -198,12 +198,10 @@ log-spaced alpha:
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
 
-    (-869.3480959251679, 828.4461624666238)
+    (-869.3480959251823, 828.44616246663)
 
 
 
@@ -215,7 +213,7 @@ sample that did not include that observation.
 
 .. GENERATED FROM PYTHON SOURCE LINES 94-115
 
-.. code-block:: default
+.. code-block:: Python
 
 
     test_y = np.tile(y, (fr_pred.shape[-1], 1)).T
@@ -253,28 +251,26 @@ sample that did not include that observation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.313 seconds)
+   **Total running time of the script:** (0 minutes 0.296 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_paths_cv_curves.py:
 
+.. only:: html
 
-.. only :: html
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_paths_cv_curves.ipynb <plot_paths_cv_curves.ipynb>`
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: plot_paths_cv_curves.py <plot_paths_cv_curves.py>`
 
-     :download:`Download Python source code: plot_paths_cv_curves.py <plot_paths_cv_curves.py>`
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: plot_paths_cv_curves.ipynb <plot_paths_cv_curves.ipynb>`
+      :download:`Download zipped: plot_paths_cv_curves.zip <plot_paths_cv_curves.zip>`
 
 
 .. only:: html
