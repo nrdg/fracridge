@@ -30,6 +30,6 @@ jobs:
         ruff check .
 
     - name: Run tests
-      run: uv run pytest tests --pyargs fracridge --cov-report term-missing --cov=fracridge --doctest-modules
+      run: uv run pytest --pyargs fracridge --cov-report term-missing --cov=fracridge --doctest-modules
 
 
