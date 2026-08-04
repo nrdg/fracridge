@@ -30,7 +30,7 @@ def make_data(nn, pp, bb, fit_intercept=False):
     y = np.random.randn(nn, bb).squeeze()
     if fit_intercept:
         X = np.hstack([X, np.ones(X.shape[0])[:, np.newaxis]])
-    coef_ols = np.linalg.pinv(X.T @ X) @ X.T @ y
+    coef_ols = np.linalg.pinv(X) @ y
     pred_ols = X @ coef_ols
     if fit_intercept:
         coef_ols = coef_ols[:-1]
