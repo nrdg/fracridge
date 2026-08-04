@@ -433,7 +433,11 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         scoring=None,
     ):
         super().__init__(
-            self, fit_intercept=fit_intercept, copy_X=copy_X, tol=tol, jit=jit
+            fracs=None,
+            fit_intercept=fit_intercept,
+            copy_X=copy_X,
+            tol=tol,
+            jit=jit,
         )
         self.cv = cv
         self.scoring = scoring
@@ -445,7 +449,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         frac_grid : sequence or float, optional
             The values of frac to consider. Default: np.arange(.1, 1.1, .1)
         """
-        X, y, _, _, _ = self._validate_input(X, y)
+        X, y = validate_data(self, X, y, multi_output=True)
 
         if frac_grid is None:
             frac_grid = np.arange(0.1, 1.1, 0.1)
