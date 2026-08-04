@@ -5,22 +5,23 @@ from pathlib import Path
 import pytest
 
 EXPECTED_CODE_SHA256 = (
-    "443bc52a59fd8544bba30e5387de778045e3d5d07e02359b0522480b911f1e6e"
+    "9d1c13371baab219dc08e01da9bdd9c288e1041b39a78352a7f248eb89feaac4"
 )
 REQUIRED_MAINTAINER_SECTIONS = (
     "## Executive summary",
+    "### Legacy reproductions are local, not monkeypatches",
     "### Expected invariant: affine OLS behavior",
-    "### Current code path: preprocessing in the wrong coordinate system",
-    "### Interpreting the current estimator",
-    "### Why the raw-data reference isolates the fix",
-    "### Problem 1 acceptance criteria",
+    "### Legacy code path: preprocessing in the wrong coordinate system",
+    "### Why the raw-data control isolates the fix",
+    "### Interpreting the legacy and corrected estimators",
+    "### Problem 1 resolution",
     "### Expected invariant: stable OLS at fraction 1.0",
-    "### Current code path: normal equations square conditioning",
+    "### Legacy code path: normal equations square conditioning",
+    "### Why the direct-SVD path solves the root cause",
     "### Controlled experiment and reported metrics",
     "### Interpreting coefficient error and residual error",
-    "### Why the direct-SVD reference solves the root cause",
-    "### Problem 2 acceptance criteria",
-    "## Pull request acceptance checklist",
+    "### Problem 2 resolution",
+    "## Pull request verification checklist",
 )
 EXPECTED_NOTEBOOK_METADATA = {
     "kernelspec": {
