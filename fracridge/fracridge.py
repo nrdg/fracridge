@@ -72,6 +72,22 @@ def _do_svd(X, y, tol=1e-10, jit=True):
     return eig, v_t, ols_coef
 
 
+def _shrinkage(eigsq, alphas, active):
+    """
+    Helper function to compute lambda**2 / (lambda**2 + alpha) safely
+    """
+    # Inactive directions already carry zero coefficients, so their scaling
+    # factor stays zero instead of being computed as 0 / 0:
+    scaling = np.zeros((alphas.shape[0], eigsq.shape[0]))
+    np.divide(
+        eigsq,
+        eigsq + alphas[:, np.newaxis],
+        out=scaling,
+        where=active[np.newaxis, :],
+    )
+    return scaling
+
+
 def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
@@ -162,6 +178,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
 
     # Set solutions for small eigenvalues to 0 for all targets:
     isbad = eig <= tol
+    active = ~isbad
     if np.any(isbad):
         warnings.warn("Some eigenvalues are being treated as 0", stacklevel=1)
 
@@ -184,7 +201,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     # The scaling factor applied to coefficients in the rotated space is
     # lambda**2 / (lambda**2 + alpha), where lambda are the singular values
     eigsq = eig**2
-    sclg = eigsq / (eigsq + alphagrid[:, None])
+    sclg = _shrinkage(eigsq, alphagrid, active)
     sclg_sq = sclg**2
 
     # Prellocate the solution:
@@ -211,7 +228,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
         # Allocate the alphas for this target:
         alphas[:, ii] = targetalphas
         # Calculate the new scaling factor, based on the interpolated alphas:
-        sc = eigsq / (eigsq + targetalphas[np.newaxis].T)
+        sc = _shrinkage(eigsq, targetalphas, active)
         # Use the scaling factor to calculate coefficients in the rotated
         # space:
         coef[..., ii] = (sc * ols_coef[..., ii]).T
