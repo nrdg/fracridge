@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
 import numpy as np
-from scipy.linalg import lapack as get_lapack_funcs
+from scipy.linalg import get_lapack_funcs
 
 from . import _numba as numba
 from ._numba import USE_NUMBA, arange, sign
@@ -99,9 +99,9 @@ def svd(X, fast=True, U_decision=False, transpose=True):
             U, S, VT = numba.svd(X)
         else:
             #### TO DO: If memory usage exceeds LWORK, use GESVD
-            U, S, VT, __ = get_lapack_funcs("gesdd")(X, full_matrices=False)
+            U, S, VT, __ = get_lapack_funcs("gesdd", (X,))(X, full_matrices=False)
     else:
-        U, S, VT, __ = get_lapack_funcs("gesvd")(X, full_matrices=False)
+        U, S, VT, __ = get_lapack_funcs("gesvd", (X,))(X, full_matrices=False)
 
     U, VT = svd_flip(U, VT, U_decision=U_decision)
 
