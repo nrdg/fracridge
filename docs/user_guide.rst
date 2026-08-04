@@ -66,6 +66,26 @@ automatically uses cross-validation to determine a best fraction for the data
 provided.
 
 
+Why is the solver slower than the published benchmarks?
+--------------------------------------------------------
+
+``fracridge`` computes a singular value decomposition of the design matrix
+``X`` directly. Earlier versions decomposed the normal matrix ``X.T @ X`` for
+designs with more observations than parameters, which is cheaper but squares
+the condition number of the problem and loses roughly half of the available
+decimal digits of precision. On nearly collinear designs that was enough to
+make the returned coefficients materially wrong even at a fraction of 1.
+
+Decomposing ``X`` directly costs more. For designs with many more observations
+than parameters, expect the decomposition to take roughly 10 to 30 times
+longer than it did previously, and to allocate an additional array of shape
+``(n_observations, n_parameters)``. The relative cost is largest for very tall,
+thin designs.
+
+This is a deliberate trade of speed for numerical accuracy, and it is not
+configurable. If throughput matters more than coefficient accuracy for your
+problem, reduce the number of observations you pass, or solve in batches.
+
 How do I compare the best fractions across targets?
 ----------------------------------------------------
 
