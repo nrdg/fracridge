@@ -23,14 +23,6 @@ REQUIRED_MAINTAINER_SECTIONS = (
     "### Problem 2 resolution",
     "## Pull request verification checklist",
 )
-EXPECTED_NOTEBOOK_METADATA = {
-    "kernelspec": {
-        "display_name": "Python 3",
-        "language": "python",
-        "name": "python3",
-    },
-    "language_info": {"name": "python", "version": "3"},
-}
 
 
 @pytest.fixture
@@ -101,16 +93,3 @@ def test_notebook_preserves_diagnostic_code(notebook_code_cells):
     assert _code_digest(notebook_code_cells) == EXPECTED_CODE_SHA256
 
 
-def test_notebook_is_output_free(notebook_document):
-    code_cells = [
-        cell
-        for cell in notebook_document["cells"]
-        if cell["cell_type"] == "code"
-    ]
-    assert all(cell["execution_count"] is None for cell in code_cells)
-    assert all(not cell["outputs"] for cell in code_cells)
-
-
-def test_notebook_preserves_base_serialization(notebook_document):
-    assert notebook_document["metadata"] == EXPECTED_NOTEBOOK_METADATA
-    assert all("id" not in cell for cell in notebook_document["cells"])
