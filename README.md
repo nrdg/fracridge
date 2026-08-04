@@ -1,5 +1,6 @@
 # fracridge
 
+[![Tests](https://github.com/nrdg/fracridge/actions/workflows/pythonpackage.yml/badge.svg?branch=master)](https://github.com/nrdg/fracridge/actions/workflows/pythonpackage.yml)
 [![DOI](https://zenodo.org/badge/261540866.svg)](https://zenodo.org/badge/latestdoi/261540866)
 
 Is an implementation of fractional ridge regression (FRR).
