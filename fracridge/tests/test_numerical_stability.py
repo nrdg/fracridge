@@ -106,3 +106,52 @@ def test_rank_deficient_tall_is_finite_and_minimum_norm(
     assert np.all(np.isfinite(coef))
     assert np.all(np.isfinite(alpha))
     assert relative_error(coef, expected) < MINIMUM_NORM_TOLERANCE
+
+
+@pytest.fixture
+def zero_column_design(collinear_columns):
+    """A tall design with one exactly-zero column."""
+    return np.column_stack(
+        (
+            collinear_columns["base"],
+            collinear_columns["extras"][:, 0],
+            np.zeros_like(collinear_columns["base"]),
+        )
+    )
+
+
+@pytest.mark.parametrize("jit", [False, True])
+def test_zero_singular_value_is_finite(zero_column_design, jit):
+    y = zero_column_design @ np.array([1.0, -0.5, 0.0])
+    expected = np.linalg.lstsq(zero_column_design, y, rcond=None)[0]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        coef, alpha = fracridge(
+            zero_column_design, y, fracs=np.array([0.3, 1.0]), jit=jit
+        )
+
+    assert np.all(np.isfinite(coef))
+    assert np.all(np.isfinite(alpha))
+    assert relative_error(coef[:, -1], expected) < MINIMUM_NORM_TOLERANCE
+
+
+def test_zero_singular_value_multi_target_is_finite(zero_column_design):
+    targets = np.column_stack(
+        [
+            zero_column_design @ np.array([1.0, -0.5, 0.0]),
+            zero_column_design @ np.array([0.25, 2.0, 0.0]),
+        ]
+    )
+    expected = np.linalg.lstsq(zero_column_design, targets, rcond=None)[0]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        coef, alpha = fracridge(zero_column_design, targets, fracs=1.0, jit=False)
+
+    assert coef.shape == (zero_column_design.shape[1], 2)
+    assert np.all(np.isfinite(coef))
+    assert np.all(np.isfinite(alpha))
+    for target in range(targets.shape[1]):
+        assert (
+            relative_error(coef[:, target], expected[:, target])
+            < MINIMUM_NORM_TOLERANCE
+        )
