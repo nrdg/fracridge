@@ -21,19 +21,15 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidgeRegressor", "FracRidgeRegressorCV"]
 
 
-def _do_svd(X, y, jit=True):
+def _select_svd(jit):
     """
-    Helper function to produce SVD outputs
+    Helper function to select the economy-SVD backend
     """
-    if len(y.shape) == 1:
-        y = y[:, np.newaxis]
-
-    # Per default, we'll try to use the jit-compiled SVD, which should be
-    # more performant:
-    use_scipy = False
     if jit:
         try:
             from ._linalg import svd
+
+            return svd
         except ImportError:
             warnings.warn(
                 "The `jit` key-word argument is set to `True` "
@@ -42,32 +38,54 @@ def _do_svd(X, y, jit=True):
                 "`scipy.linalg.svd`",
                 stacklevel=1,
             )
-            use_scipy = True
 
-    # If that doesn't work, or you asked not to, we'll use scipy SVD:
-    if not jit or use_scipy:
-        from functools import partial
+    from functools import partial
 
-        from scipy.linalg import svd  # noqa
+    from scipy.linalg import svd  # noqa
 
-        svd = partial(svd, full_matrices=False)
+    return partial(svd, full_matrices=False)
 
-    if X.shape[0] > X.shape[1]:
-        uu, ss, v_t = svd(X.T @ X)
-        eig = np.sqrt(ss)
-        if y.shape[-1] >= X.shape[0]:
-            ynew = (np.diag(1.0 / eig) @ v_t @ X.T) @ y
-        else:
-            ynew = np.diag(1.0 / eig) @ v_t @ (X.T @ y)
 
-    else:
-        # This rotates the targets by the unitary matrix uu.T:
-        uu, eig, v_t = svd(X)
-        ynew = uu.T @ y
+def _do_svd(X, y, tol=1e-10, jit=True):
+    """
+    Helper function to produce SVD outputs
+    """
+    if len(y.shape) == 1:
+        y = y[:, np.newaxis]
 
-    ols_coef = (ynew.T / eig).T
+    svd = _select_svd(jit)
+
+    # Decompose `X` itself, so the condition number is never squared:
+    left, eig, v_t = svd(X)
+    projected_y = left.T @ y
+
+    # Never divide by singular values at or below the tolerance:
+    active = eig > tol
+    ols_coef = np.zeros_like(projected_y, dtype=float)
+    np.divide(
+        projected_y,
+        eig[:, np.newaxis],
+        out=ols_coef,
+        where=active[:, np.newaxis],
+    )
 
     return eig, v_t, ols_coef
+
+
+def _shrinkage(eigsq, alphas, active):
+    """
+    Helper function to compute lambda**2 / (lambda**2 + alpha) safely
+    """
+    # Inactive directions already carry zero coefficients, so their scaling
+    # factor stays zero instead of being computed as 0 / 0:
+    scaling = np.zeros((alphas.shape[0], eigsq.shape[0]))
+    np.divide(
+        eigsq,
+        eigsq + alphas[:, np.newaxis],
+        out=scaling,
+        where=active[np.newaxis, :],
+    )
+    return scaling
 
 
 def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
@@ -156,10 +174,11 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     ff = fracs.shape[0]
 
     # Calculate the rotation of the data
-    eig, v_t, ols_coef = _do_svd(X, y, jit=jit)
+    eig, v_t, ols_coef = _do_svd(X, y, tol=tol, jit=jit)
 
     # Set solutions for small eigenvalues to 0 for all targets:
-    isbad = eig < tol
+    isbad = eig <= tol
+    active = ~isbad
     if np.any(isbad):
         warnings.warn("Some eigenvalues are being treated as 0", stacklevel=1)
 
@@ -182,7 +201,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     # The scaling factor applied to coefficients in the rotated space is
     # lambda**2 / (lambda**2 + alpha), where lambda are the singular values
     eigsq = eig**2
-    sclg = eigsq / (eigsq + alphagrid[:, None])
+    sclg = _shrinkage(eigsq, alphagrid, active)
     sclg_sq = sclg**2
 
     # Prellocate the solution:
@@ -209,7 +228,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
         # Allocate the alphas for this target:
         alphas[:, ii] = targetalphas
         # Calculate the new scaling factor, based on the interpolated alphas:
-        sc = eigsq / (eigsq + targetalphas[np.newaxis].T)
+        sc = _shrinkage(eigsq, targetalphas, active)
         # Use the scaling factor to calculate coefficients in the rotated
         # space:
         coef[..., ii] = (sc * ols_coef[..., ii]).T
@@ -433,7 +452,11 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         scoring=None,
     ):
         super().__init__(
-            self, fit_intercept=fit_intercept, copy_X=copy_X, tol=tol, jit=jit
+            fracs=None,
+            fit_intercept=fit_intercept,
+            copy_X=copy_X,
+            tol=tol,
+            jit=jit,
         )
         self.cv = cv
         self.scoring = scoring
@@ -445,7 +468,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         frac_grid : sequence or float, optional
             The values of frac to consider. Default: np.arange(.1, 1.1, .1)
         """
-        X, y, _, _, _ = self._validate_input(X, y)
+        X, y = validate_data(self, X, y, multi_output=True)
 
         if frac_grid is None:
             frac_grid = np.arange(0.1, 1.1, 0.1)

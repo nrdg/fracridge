@@ -1,6 +1,7 @@
 __pycache__
 .DS_Store
 .ipynb_checkpoints
+.worktrees/
 fracridge/version.py
 docs/_build/
 docs/auto_examples/
