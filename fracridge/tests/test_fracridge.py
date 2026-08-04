@@ -5,13 +5,25 @@ from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fracridge import FracRidgeRegressor, FracRidgeRegressorCV, fracridge, vec_len
 
+# Most tests below sweep the same (nn, pp) trio deliberately: (1000, 10) is a
+# tall design, (10, 100) is wide, and (284, 50) is a moderately tall one. The
+# tall and wide cases take different code paths through the SVD, so a change
+# that only works for one shape fails here. The bb sweep covers a single
+# target, a few targets, and 1000 targets, which in the wide case is more
+# targets than observations.
+
 
 @parametrize_with_checks([FracRidgeRegressor(), FracRidgeRegressorCV()])
 def test_sklearn_compatible_estimator(estimator, check):
+    """Runs scikit-learn's own estimator contract suite, which catches
+    constructor, clone, get_params, and fitted-attribute violations that our
+    own tests would not think to look for.
+    """
     check(estimator)
 
 
 def run_fracridge(X, y, fracs, jit):
+    """Thin wrapper so the benchmark fixture has a single callable to time."""
     fracridge(X, y, fracs=fracs, jit=jit)
 
 
@@ -19,12 +31,22 @@ def run_fracridge(X, y, fracs, jit):
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("jit", [True, False])
 def test_benchmark_fracridge(nn, pp, bb, jit, benchmark):
+    """Records timings only; it asserts nothing and so cannot fail on speed.
+    Useful for watching the cost of the direct-SVD solve, which is markedly
+    slower on tall designs than the old normal-equations path.
+    """
     X, y, _, _ = make_data(nn, pp, bb)
     fracs = np.arange(0.1, 1.1, 0.1)
     benchmark(run_fracridge, X, y, fracs, jit)
 
 
 def make_data(nn, pp, bb, fit_intercept=False):
+    """Builds a fixed random design plus its reference OLS solution.
+
+    The oracle is `pinv(X) @ y`, not the normal-equations form
+    `pinv(X.T @ X) @ X.T @ y`: for wide designs the latter is itself
+    numerically inaccurate and produced spurious failures here.
+    """
     np.random.seed(1)
     X = np.random.randn(nn, pp)
     y = np.random.randn(nn, bb).squeeze()
@@ -41,6 +63,10 @@ def make_data(nn, pp, bb, fit_intercept=False):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_ols(nn, pp, bb):
+    """Two separate claims: at fraction 1.0 the solution must reduce to OLS, and
+    alphas must be non-increasing across ascending fractions, since a larger
+    fraction means less regularization.
+    """
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(0.1, 1.1, 0.1)
     coef, alpha = fracridge(X, y, fracs=fracs)
@@ -53,6 +79,10 @@ def test_fracridge_ols(nn, pp, bb):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_fracs(frac, nn, pp, bb):
+    """The package's defining contract: the returned coefficient norm, relative
+    to the OLS norm, equals the requested fraction. 0.23 is deliberately not on
+    the default grid, so the alpha must be found by interpolation.
+    """
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     # Make sure that you get the fraction you asked for
     coef, _ = fracridge(X, y, fracs=np.array([frac]))
@@ -65,6 +95,10 @@ def test_fracridge_fracs(frac, nn, pp, bb):
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [False])
 def test_v_ols(nn, pp, bb, fit_intercept):
+    """The same reduce-to-OLS claim as test_fracridge_ols, but reached through
+    the estimator API, so a regression in fit or in coef_ shaping is caught even
+    if the underlying function is fine.
+    """
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.arange(0.1, 1.1, 0.1)
     FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept)
@@ -76,6 +110,9 @@ def test_v_ols(nn, pp, bb, fit_intercept):
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("frac", [0.1, 0.23, 1])
 def test_v_fracs(nn, pp, bb, frac):
+    """The requested-fraction contract through the estimator API, and with a
+    scalar fracs, which squeezes the fraction axis out of coef_.
+    """
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     FR = FracRidgeRegressor(fracs=frac)
     FR.fit(X, y)
@@ -89,6 +126,10 @@ def test_v_fracs(nn, pp, bb, frac):
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
 def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, jit):
+    """Checks predictions rather than coefficients, which is what catches an
+    intercept applied in the wrong coordinate system: coefficients can be right
+    while every prediction is offset. Both SVD backends are swept.
+    """
     X, y, coef_ols, pred_ols = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(0.1, 1.1, 0.1)
     FR = FracRidgeRegressor(fracs=fracs, fit_intercept=fit_intercept, jit=jit)
@@ -98,6 +139,10 @@ def test_FracRidgeRegressor_predict(nn, pp, bb, fit_intercept, jit):
 
 
 def test_FracRidge_singleton_frac():
+    """The smallest possible problem, two observations of one regressor with a
+    scalar fracs. Both the fraction and target axes get squeezed, so this pins
+    that predict returns something shaped like y rather than a 3-D array.
+    """
     X = np.array([[1.64644051], [2.1455681]])
     y = np.array([1.0, 2.0])
     fracs = 0.1
@@ -112,6 +157,10 @@ def test_FracRidge_singleton_frac():
 @pytest.mark.parametrize("fit_intercept", [True, False])
 @pytest.mark.parametrize("jit", [True, False])
 def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
+    """Ties the cross-validated result to two independent references: a direct
+    fit at the fraction CV chose, and scikit-learn's Ridge at the alpha CV
+    reported. The latter validates our fraction-to-alpha mapping externally.
+    """
     X, y, _, _ = make_data(nn, pp, bb, fit_intercept)
     fracs = np.arange(0.1, 1.1, 0.1)
     FRCV = FracRidgeRegressorCV(fit_intercept=fit_intercept, jit=jit)
@@ -130,6 +179,9 @@ def test_FracRidgeRegressorCV(nn, pp, bb, fit_intercept, jit):
 @pytest.mark.parametrize("nn, pp", [(1000, 10), (10, 100), (284, 50)])
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 def test_fracridge_unsorted(nn, pp, bb):
+    """Unsorted fractions must raise rather than silently return nonsense: the
+    alpha search interpolates over the fraction grid and requires it ascending.
+    """
     X, y, coef_ols, _ = make_data(nn, pp, bb)
     fracs = np.array([0.1, 0.8, 1.0, 0.2])
     # Frac input needs to be sorted:
@@ -141,6 +193,9 @@ def test_fracridge_unsorted(nn, pp, bb):
 @pytest.mark.parametrize("bb", [(1), (2), (1000)])
 @pytest.mark.parametrize("fit_intercept", [(False), (True)])
 def test_fracridge_single_regressor(nn, bb, fit_intercept):
+    """Regression test for a single-column design, where the SVD returns
+    length-one arrays and the squeeze logic previously misbehaved.
+    """
     # Sometimes we want to have just one regressor
     # See: https://github.com/nrdg/fracridge/issues/24
     pp = 1
@@ -160,6 +215,10 @@ def test_fracridge_single_regressor(nn, bb, fit_intercept):
 def test_fracridge_singleton_target(
     nn, pp, fit_intercept, fracs, y_is_a_single_column_matrix
 ):
+    """A single target must behave identically whether y arrives as a vector or
+    as a one-column matrix, and predict must mirror the shape it was given.
+    Both a fraction vector and a scalar fraction are swept.
+    """
     # Sometimes we want to have just one target, and this should work for
     # either a vector y or single-column matrix y,
     # See: https://github.com/nrdg/fracridge/issues/39
