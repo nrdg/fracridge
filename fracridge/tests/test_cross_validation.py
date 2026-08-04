@@ -25,10 +25,18 @@ def fixed_five_fold():
 
 
 def test_cv_constructor_leaves_fracs_unset():
+    """The constructor used to pass `self` as the base class's `fracs`
+    argument, leaving a freshly built estimator holding itself as a parameter
+    value.
+    """
     assert FracRidgeRegressorCV().fracs is None
 
 
 def test_cv_recovers_nonzero_intercept(affine_data, fixed_five_fold):
+    """The outer estimator used to center the whole dataset before the folds
+    were built, so the intercept it copied was defined in centered coordinates
+    while `predict` received raw X. The slope survived; the offset did not.
+    """
     X, y = affine_data
     model = FracRidgeRegressorCV(
         fit_intercept=True, cv=fixed_five_fold, jit=False
@@ -44,6 +52,9 @@ def test_cv_recovers_nonzero_intercept(affine_data, fixed_five_fold):
 
 
 def test_cv_recovers_two_target_intercepts(affine_data, fixed_five_fold):
+    """The same lost-offset bug with two targets, which also pins the
+    per-target intercept and coefficient shapes alongside their values.
+    """
     X, y = affine_data
     targets = np.column_stack([y, SECOND_INTERCEPT + SECOND_SLOPE * X[:, 0]])
     model = FracRidgeRegressorCV(
@@ -61,6 +72,10 @@ def test_cv_recovers_two_target_intercepts(affine_data, fixed_five_fold):
 
 
 def test_cv_without_intercept_is_unchanged(fixed_five_fold):
+    """Control for the intercept fix: with `fit_intercept=False` no centering
+    happens on either code path, so this behavior must be identical before and
+    after, down to the copied fitted state.
+    """
     rng = np.random.default_rng(20260804)
     X = rng.normal(size=(80, 5))
     y = X @ np.array([1.0, -2.0, 0.5, 0.0, 3.0])

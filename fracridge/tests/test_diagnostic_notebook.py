@@ -58,6 +58,10 @@ def notebook_markdown(notebook_document):
 def test_diagnostic_notebook_executes(
     notebook_path, notebook_code_cells, monkeypatch
 ):
+    """Runs every code cell in order in one shared namespace, so the notebook's
+    own assertions become the regression test for its legacy-versus-corrected
+    evidence.
+    """
     monkeypatch.setenv("MPLBACKEND", "Agg")
     namespace = {"__name__": "__main__"}
 
@@ -68,6 +72,10 @@ def test_diagnostic_notebook_executes(
 
 
 def test_notebook_contains_maintainer_narrative(notebook_markdown):
+    """The notebook is the maintainer-facing record of both defects, so the
+    sections carrying that explanation must survive later edits to the code
+    cells around them.
+    """
     missing = [
         heading
         for heading in REQUIRED_MAINTAINER_SECTIONS

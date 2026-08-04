@@ -49,12 +49,28 @@ def rank_deficient_design(collinear_columns):
     )
 
 
+@pytest.fixture
+def zero_column_design(collinear_columns):
+    """A tall design with one exactly-zero column."""
+    return np.column_stack(
+        (
+            collinear_columns["base"],
+            collinear_columns["extras"][:, 0],
+            np.zeros_like(collinear_columns["base"]),
+        )
+    )
+
+
 def relative_error(actual, expected):
     return np.linalg.norm(actual - expected) / np.linalg.norm(expected)
 
 
 @pytest.mark.parametrize("jit", [False, True])
 def test_ill_conditioned_tall_matches_lstsq(ill_conditioned_design, jit):
+    """Decomposing `X.T @ X` squared the condition number, so fraction 1.0
+    drifted about 30% away from stable least squares on this design. Both SVD
+    backends must now agree with `lstsq`.
+    """
     y = ill_conditioned_design @ TRUE_COEFFICIENTS
     expected = np.linalg.lstsq(ill_conditioned_design, y, rcond=None)[0]
     coef, _ = fracridge(ill_conditioned_design, y, fracs=1.0, jit=jit)
@@ -64,6 +80,9 @@ def test_ill_conditioned_tall_matches_lstsq(ill_conditioned_design, jit):
 
 
 def test_ill_conditioned_tall_multi_target(ill_conditioned_design):
+    """The same accuracy requirement target by target, which also pins the
+    (n_features, n_targets) coefficient shape.
+    """
     targets = np.column_stack(
         [
             ill_conditioned_design @ TRUE_COEFFICIENTS,
@@ -85,6 +104,10 @@ def test_ill_conditioned_tall_multi_target(ill_conditioned_design):
 def test_ill_conditioned_tall_achieves_requested_fraction(
     ill_conditioned_design, frac
 ):
+    """Accuracy at fraction 1.0 alone would also be satisfied by a plain
+    least-squares solver. The requested norm ratio must still be delivered on an
+    ill-conditioned design, so shrinkage cannot quietly stop working.
+    """
     y = ill_conditioned_design @ TRUE_COEFFICIENTS
     expected = np.linalg.lstsq(ill_conditioned_design, y, rcond=None)[0]
     coef, _ = fracridge(ill_conditioned_design, y, fracs=frac, jit=False)
@@ -97,6 +120,10 @@ def test_ill_conditioned_tall_achieves_requested_fraction(
 def test_rank_deficient_tall_is_finite_and_minimum_norm(
     rank_deficient_design, jit
 ):
+    """A duplicated column leaves a singular value near 1e-15, which the old
+    code divided straight through. Coefficients must stay finite and land on the
+    minimum-norm solution.
+    """
     y = rank_deficient_design @ TRUE_COEFFICIENTS
     expected = np.linalg.lstsq(rank_deficient_design, y, rcond=None)[0]
     with warnings.catch_warnings():
@@ -108,20 +135,12 @@ def test_rank_deficient_tall_is_finite_and_minimum_norm(
     assert relative_error(coef, expected) < MINIMUM_NORM_TOLERANCE
 
 
-@pytest.fixture
-def zero_column_design(collinear_columns):
-    """A tall design with one exactly-zero column."""
-    return np.column_stack(
-        (
-            collinear_columns["base"],
-            collinear_columns["extras"][:, 0],
-            np.zeros_like(collinear_columns["base"]),
-        )
-    )
-
-
 @pytest.mark.parametrize("jit", [False, True])
 def test_zero_singular_value_is_finite(zero_column_design, jit):
+    """An exactly-zero singular value made the shrinkage factor compute 0/0, and
+    the NaN then poisoned every fraction and target. A literally zero column is
+    required here: a duplicated column yields ~1e-15, not 0.0.
+    """
     y = zero_column_design @ np.array([1.0, -0.5, 0.0])
     expected = np.linalg.lstsq(zero_column_design, y, rcond=None)[0]
     with warnings.catch_warnings():
@@ -136,6 +155,10 @@ def test_zero_singular_value_is_finite(zero_column_design, jit):
 
 
 def test_zero_singular_value_multi_target_is_finite(zero_column_design):
+    """The same zero-singular-value guard across two targets, because the NaN
+    used to spread through the shared alpha interpolation rather than staying in
+    one column.
+    """
     targets = np.column_stack(
         [
             zero_column_design @ np.array([1.0, -0.5, 0.0]),
@@ -159,7 +182,10 @@ def test_zero_singular_value_multi_target_is_finite(zero_column_design):
 
 @pytest.mark.parametrize("n_samples, n_features", [(1001, 1), (5000, 4)])
 def test_very_tall_thin_design_matches_lstsq(n_samples, n_features):
-    """The jit backend routes p / n < 0.001 designs down its LAPACK branch."""
+    """The jit backend only routes p / n < 0.001 designs down its LAPACK branch.
+    Decomposing X directly made that branch reachable for the first time, and it
+    raised TypeError there, on the default code path.
+    """
     rng = np.random.default_rng(20260804)
     X = rng.normal(size=(n_samples, n_features))
     y = X @ rng.normal(size=n_features)
