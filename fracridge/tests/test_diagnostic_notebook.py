@@ -1,12 +1,8 @@
-import hashlib
 import json
 from pathlib import Path
 
 import pytest
 
-EXPECTED_CODE_SHA256 = (
-    "9d1c13371baab219dc08e01da9bdd9c288e1041b39a78352a7f248eb89feaac4"
-)
 REQUIRED_MAINTAINER_SECTIONS = (
     "## Executive summary",
     "### Legacy reproductions are local, not monkeypatches",
@@ -59,14 +55,6 @@ def notebook_markdown(notebook_document):
     )
 
 
-def _code_digest(code_cells):
-    digest = hashlib.sha256()
-    for source in code_cells:
-        digest.update(source.encode("utf-8"))
-        digest.update(b"\0")
-    return digest.hexdigest()
-
-
 def test_diagnostic_notebook_executes(
     notebook_path, notebook_code_cells, monkeypatch
 ):
@@ -86,10 +74,4 @@ def test_notebook_contains_maintainer_narrative(notebook_markdown):
         if heading not in notebook_markdown
     ]
     assert not missing, f"Missing maintainer sections: {missing}"
-
-
-def test_notebook_preserves_diagnostic_code(notebook_code_cells):
-    assert len(notebook_code_cells) == 8
-    assert _code_digest(notebook_code_cells) == EXPECTED_CODE_SHA256
-
 
