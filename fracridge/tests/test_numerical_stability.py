@@ -155,3 +155,16 @@ def test_zero_singular_value_multi_target_is_finite(zero_column_design):
             relative_error(coef[:, target], expected[:, target])
             < MINIMUM_NORM_TOLERANCE
         )
+
+
+@pytest.mark.parametrize("n_samples, n_features", [(1001, 1), (5000, 4)])
+def test_very_tall_thin_design_matches_lstsq(n_samples, n_features):
+    """The jit backend routes p / n < 0.001 designs down its LAPACK branch."""
+    rng = np.random.default_rng(20260804)
+    X = rng.normal(size=(n_samples, n_features))
+    y = X @ rng.normal(size=n_features)
+    expected = np.linalg.lstsq(X, y, rcond=None)[0]
+    coef, _ = fracridge(X, y, fracs=1.0, jit=True)
+
+    assert np.all(np.isfinite(coef))
+    assert relative_error(coef, expected) < RELATIVE_TOLERANCE
