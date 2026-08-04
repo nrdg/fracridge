@@ -22,6 +22,14 @@ REQUIRED_MAINTAINER_SECTIONS = (
     "### Problem 2 acceptance criteria",
     "## Pull request acceptance checklist",
 )
+EXPECTED_NOTEBOOK_METADATA = {
+    "kernelspec": {
+        "display_name": "Python 3",
+        "language": "python",
+        "name": "python3",
+    },
+    "language_info": {"name": "python", "version": "3"},
+}
 
 
 @pytest.fixture
@@ -100,3 +108,8 @@ def test_notebook_is_output_free(notebook_document):
     ]
     assert all(cell["execution_count"] is None for cell in code_cells)
     assert all(not cell["outputs"] for cell in code_cells)
+
+
+def test_notebook_preserves_base_serialization(notebook_document):
+    assert notebook_document["metadata"] == EXPECTED_NOTEBOOK_METADATA
+    assert all("id" not in cell for cell in notebook_document["cells"])
