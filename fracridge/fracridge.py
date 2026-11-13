@@ -21,7 +21,38 @@ BIAS_STEP = 0.2
 __all__ = ["fracridge", "vec_len", "FracRidgeRegressor", "FracRidgeRegressorCV"]
 
 
-def _do_svd(X, y, jit=True):
+def _gram_svd(X, fallback=None):
+    """
+    Thin SVD of a wide X, from an eigendecomposition of the n x n matrix X X'
+
+    X = U S V' implies X X' = U S^2 U' and V' = S^-1 U' X. This is much faster
+    than an SVD of X when n << p, but only accurate to about eps * cond(X)**2.
+    If that is not below sqrt(eps) (cond(X) < 8192 for float64), this returns
+    fallback(X) instead. Without a fallback, it warns, or raises an error if
+    X X' is singular.
+    """
+    lam, uu = np.linalg.eigh(X @ X.T)
+    lam, uu = lam[::-1], uu[:, ::-1]  # descending, as from the SVD
+    well_conditioned = lam[-1] > np.sqrt(np.finfo(lam.dtype).eps) * lam[0]
+    if not well_conditioned:
+        if fallback is not None:
+            return fallback(X)
+        if lam[-1] <= 0:
+            raise np.linalg.LinAlgError(
+                "X @ X.T is singular (e.g., because the columns of X are "
+                "centered), so method='gram' cannot be used. Use method='auto' "
+                "or method='svd' instead."
+            )
+        warnings.warn(
+            "X is ill-conditioned, so method='gram' may be inaccurate. "
+            "Consider method='auto' or method='svd'.",
+            stacklevel=1,
+        )
+    eig = np.sqrt(lam)
+    return uu, eig, (uu / eig).T @ X
+
+
+def _do_svd(X, y, jit=True, method="auto"):
     """
     Helper function to produce SVD outputs
     """
@@ -60,9 +91,14 @@ def _do_svd(X, y, jit=True):
         else:
             ynew = np.diag(1.0 / eig) @ v_t @ (X.T @ y)
 
-    else:
+    elif method == "svd":
         # This rotates the targets by the unitary matrix uu.T:
         uu, eig, v_t = svd(X)
+        ynew = uu.T @ y
+
+    else:
+        # "auto" falls back to the SVD if X is ill-conditioned, "gram" doesn't:
+        uu, eig, v_t = _gram_svd(X, fallback=svd if method == "auto" else None)
         ynew = uu.T @ y
 
     ols_coef = (ynew.T / eig).T
@@ -70,7 +106,7 @@ def _do_svd(X, y, jit=True):
     return eig, v_t, ols_coef
 
 
-def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
+def fracridge(X, y, fracs=None, tol=1e-10, jit=True, method="auto"):
     """
     Approximates alpha parameters to match desired fractions of OLS length.
 
@@ -93,6 +129,16 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
         Whether to speed up computations by using a just-in-time compiled
         version of core computations. This may not work well with very large
         datasets. Default: True
+
+    method : {"auto", "gram", "svd"}, optional
+        How to decompose X when n <= p. "svd" takes the SVD of X. "gram"
+        takes the eigendecomposition of X @ X.T instead, which is much faster
+        when n << p, but squares the condition number of X. So "gram" warns
+        if X is ill-conditioned, and raises an error if X @ X.T is singular
+        (e.g., when the columns of X are centered). "auto" uses "gram" if X
+        is well-conditioned (for float64 data, cond(X) < 8192, so results
+        agree with "svd" to about 8 digits), and "svd" otherwise. When n > p,
+        X.T @ X is decomposed regardless of method. Default: "auto"
 
     Returns
     -------
@@ -133,6 +179,9 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     >>> print(np.linalg.norm(coef2 - coef3))  # doctest: +NUMBER
     0.0
     """
+    if method not in ("auto", "gram", "svd"):
+        raise ValueError(f"method must be 'auto', 'gram' or 'svd', not {method!r}")
+
     if fracs is None:
         fracs = np.arange(0.1, 1.1, 0.1)
 
@@ -156,7 +205,7 @@ def fracridge(X, y, fracs=None, tol=1e-10, jit=True):
     ff = fracs.shape[0]
 
     # Calculate the rotation of the data
-    eig, v_t, ols_coef = _do_svd(X, y, jit=jit)
+    eig, v_t, ols_coef = _do_svd(X, y, jit=jit, method=method)
 
     # Set solutions for small eigenvalues to 0 for all targets:
     isbad = eig < tol
@@ -246,6 +295,9 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
     jit : bool, optional.
         Whether to use jit-accelerated implementation. Default: True.
 
+    method : {"auto", "gram", "svd"}, optional.
+        How to decompose X when n <= p. See :func:`fracridge`. Default: "auto".
+
     Attributes
     ----------
     coef_ : ndarray, shape (p, f, b)
@@ -293,13 +345,20 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
         return tags
 
     def __init__(
-        self, fracs=None, fit_intercept=False, copy_X=True, tol=1e-10, jit=True
+        self,
+        fracs=None,
+        fit_intercept=False,
+        copy_X=True,
+        tol=1e-10,
+        jit=True,
+        method="auto",
     ):
         self.fracs = fracs
         self.fit_intercept = fit_intercept
         self.copy_X = copy_X
         self.tol = tol
         self.jit = jit
+        self.method = method
 
     def _validate_input(self, X, y):
         """
@@ -320,7 +379,9 @@ class FracRidgeRegressor(MultiOutputMixin, BaseEstimator):
     def fit(self, X, y):
         X, y, X_offset, y_offset, X_scale = self._validate_input(X, y)
 
-        coef, alpha = fracridge(X, y, fracs=self.fracs, tol=self.tol, jit=self.jit)
+        coef, alpha = fracridge(
+            X, y, fracs=self.fracs, tol=self.tol, jit=self.jit, method=self.method
+        )
         self.alpha_ = alpha
         self.coef_ = coef
         self._set_intercept(X_offset, y_offset, X_scale)
@@ -393,6 +454,9 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
     scoring : str, callable, list/tuple or dict, default=None
         See https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html  # noqa
 
+    method : {"auto", "gram", "svd"}, optional.
+        How to decompose X when n <= p. See :func:`fracridge`. Default: "auto".
+
     Attributes
     ----------
     best_frac_ : float
@@ -431,9 +495,15 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
         jit=True,
         cv=None,
         scoring=None,
+        method="auto",
     ):
         super().__init__(
-            self, fit_intercept=fit_intercept, copy_X=copy_X, tol=tol, jit=jit
+            self,
+            fit_intercept=fit_intercept,
+            copy_X=copy_X,
+            tol=tol,
+            jit=jit,
+            method=method,
         )
         self.cv = cv
         self.scoring = scoring
@@ -456,6 +526,7 @@ class FracRidgeRegressorCV(FracRidgeRegressor):
                 copy_X=self.copy_X,
                 tol=self.tol,
                 jit=self.jit,
+                method=self.method,
             ),
             parameters,
             cv=self.cv,
