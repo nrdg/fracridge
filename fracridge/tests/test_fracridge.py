@@ -4,6 +4,7 @@ from sklearn.linear_model import Ridge
 from sklearn.utils.estimator_checks import parametrize_with_checks
 
 from fracridge import FracRidgeRegressor, FracRidgeRegressorCV, fracridge, vec_len
+from fracridge.fracridge import _gram_svd
 
 
 @parametrize_with_checks([FracRidgeRegressor(), FracRidgeRegressorCV()])
@@ -186,3 +187,54 @@ def test_fracridge_singleton_target(
 
     assert np.allclose(pred_fr, pred_ols, atol=10e-3)
     assert np.array_equal(y.shape, pred_fr.shape)  # predictions should be shaped like y
+
+
+@pytest.mark.parametrize("cond", [1e2, 1e7])
+@pytest.mark.parametrize("jit", [True, False])
+def test_fracridge_method(cond, jit):
+    # For n < p, method="auto" decomposes X @ X.T unless X is ill-conditioned,
+    # so it should match method="svd" either way.
+    # See: https://github.com/nrdg/fracridge/issues/49
+    rng = np.random.default_rng(0)
+    nn, pp = 50, 500
+    Q1, _ = np.linalg.qr(rng.standard_normal((nn, nn)))
+    Q2, _ = np.linalg.qr(rng.standard_normal((pp, nn)))
+    X = (Q1 * np.geomspace(1, 1 / cond, nn)) @ Q2.T  # cond(X) == cond
+    y = X @ rng.standard_normal((pp, 2)) + 1e-3 * rng.standard_normal((nn, 2))
+    coef, alpha = fracridge(X, y, jit=jit)
+    coef_svd, alpha_svd = fracridge(X, y, jit=jit, method="svd")
+    assert np.allclose(coef, coef_svd)
+    assert np.allclose(alpha, alpha_svd)
+
+
+def test_gram_svd(mocker):
+    # _gram_svd only uses X @ X.T if X is well-conditioned, and otherwise
+    # calls the fallback (the SVD of X).
+    X = np.random.default_rng(0).standard_normal((50, 500))
+    fallback = mocker.Mock(side_effect=lambda X: np.linalg.svd(X, full_matrices=False))
+    uu, eig, v_t = _gram_svd(X, fallback)
+    fallback.assert_not_called()
+    assert np.allclose(eig, np.linalg.svd(X, compute_uv=False))
+    assert np.allclose((uu * eig) @ v_t, X)
+    # Centering the columns of a wide X makes it rank-deficient:
+    _gram_svd(X - X.mean(axis=0), fallback)
+    fallback.assert_called_once()
+
+
+def test_fracridge_gram():
+    # method="gram" always decomposes X @ X.T, so it should match method="svd"
+    # if X is well-conditioned, warn if it isn't, and raise an error if
+    # X @ X.T is singular.
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((50, 500))
+    y = rng.standard_normal(50)
+    coef, _ = fracridge(X, y, method="gram")
+    coef_svd, _ = fracridge(X, y, method="svd")
+    assert np.allclose(coef, coef_svd)
+    # Repeating observations makes X @ X.T singular:
+    with pytest.raises(np.linalg.LinAlgError, match="singular"):
+        fracridge(np.vstack([X[:25], X[:25]]), y, method="gram")
+    # Scaling down one observation makes X ill-conditioned:
+    X[0] *= 1e-6
+    with pytest.warns(UserWarning, match="ill-conditioned"):
+        fracridge(X, y, method="gram")
